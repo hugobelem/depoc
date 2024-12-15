@@ -39,7 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'modules.user',
     'rest_framework',
+]
+
+AUTH_USER_MODEL = 'user.User'
+
+AUTHENTICATION_BACKENDS = [
+    'modules.user.backends.EmailOrUsernameBackend',
 ]
 
 REST_FRAMEWORK = {
