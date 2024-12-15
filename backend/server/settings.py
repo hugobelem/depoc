@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'modules_user.User'
 
 AUTHENTICATION_BACKENDS = [
     'modules.user.backends.EmailOrUsernameBackend',
