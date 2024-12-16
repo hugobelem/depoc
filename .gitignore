@@ -47,3 +47,6 @@ setup.cfg
 
 #api
 api.rest
+
+Pipfile
+Pipfile.lock
