@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
-from .models import User
 from .forms import CustomUserCreationForm, CustomUserChangeForm
+
+User = get_user_model()
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('name', 'username', 'email')
@@ -33,7 +35,7 @@ class UserAdmin(admin.ModelAdmin):
             ]
         return super().get_fields(request, obj)
     
-    def get_form(self, request, obj=None, **kwargs):
+    def get_form(self, request, obj=None, **kwargs): # type: ignore
         if obj is None:
             self.form = CustomUserCreationForm
         else:
