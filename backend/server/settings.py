@@ -109,7 +109,7 @@ WSGI_APPLICATION = 'server.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost:5432/depoc',
+        default='postgresql://depoc_db_user:BMd4DxZWCf9SBeRywqoTnFn3tnmUJfDl@dpg-ctg768popnds73dm3log-a.oregon-postgres.render.com/depoc_db',
         conn_max_age=600
     )
 }
