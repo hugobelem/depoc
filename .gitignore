@@ -43,6 +43,7 @@ local_settings.py
 .mypy_cache/
 .dmypy.json
 dmypy.json
+setup.cfg
 
 #api
 api.rest
