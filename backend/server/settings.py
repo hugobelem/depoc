@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'modules.user',
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
 ]
 
 AUTH_USER_MODEL = 'modules_user.User'
