@@ -8,6 +8,9 @@ django = "*"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 djoser = "*"
+mypy = "*"
+django-stubs = "*"
+djangorestframework-stubs = "*"
 
 [dev-packages]
 
