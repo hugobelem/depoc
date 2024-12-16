@@ -48,5 +48,9 @@ setup.cfg
 #api
 api.rest
 
+#Pipenv
 Pipfile
 Pipfile.lock
+
+#env
+.env
