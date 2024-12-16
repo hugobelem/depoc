@@ -10,6 +10,7 @@ djangorestframework-simplejwt = "*"
 mypy = "*"
 django-stubs = "*"
 djangorestframework-stubs = "*"
+ulid-py = "*"
 
 [dev-packages]
 
