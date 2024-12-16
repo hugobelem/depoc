@@ -11,6 +11,10 @@ mypy = "*"
 django-stubs = "*"
 djangorestframework-stubs = "*"
 ulid-py = "*"
+psycopg2-binary = "*"
+dj-database-url = "*"
+gunicorn = "*"
+uvicorn = "*"
 
 [dev-packages]
 
