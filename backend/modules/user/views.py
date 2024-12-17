@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
+from rest_framework import status
 
 from django.contrib.auth import get_user_model
 
@@ -9,38 +10,32 @@ from .serializers import UserSerializer
 User = get_user_model()
 
 
-class GetMe(APIView):
+class Me(APIView):
     """
-    View to get logged in user info.
+    API view to manage authenticated user data.
 
-    * Requires token authentication.
+    - Retrieve the currently authenticated user's data.
+    - Allow the user to update their data.
+
     """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
         """
-        Return information of logged in user.
+        Return the currently logged-in user's data
         """
         user = request.user
         serializer = UserSerializer(user)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, format=None):
         """
-        Update information of logged in user.
+        Update the currently logged-in user's data
         """        
+        user = request.user
         data = request.data
-        default_attrs = ['name', 'email', 'username']
-        data_attrs = [field for field in data.keys()]
-        matching_attrs = all(item in default_attrs for item in data_attrs)
-
-        if not data_attrs:
-            return Response(f'attributes can not be empty')
-        elif matching_attrs:
-            user = User.objects.filter(id=request.user.id)
-            update = {key: value for key, value in data.items()}
-            user.update(**update)
-            return Response('Ok')
-        else:
-            wrong_attrs = [item for item in data_attrs if item not in default_attrs]
-            return Response(f'no matching attributes: {wrong_attrs}')         
+        serializer = UserSerializer(user, data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
