@@ -7,7 +7,7 @@ from .serializers import UserSerializer
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_me(request):
+def me(request):
     user = request.user
     serializer = UserSerializer(user)
     return Response(serializer.data)
