@@ -21,19 +21,3 @@ class Me(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-class CreateUser(APIView):
-    '''
-    API view to create a new user.
-    '''
-    permission_classes = [permissions.AllowAny]
-    
-    def post(self, request, format=None):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response(
-                {'detail': 'User created successfully.'},
-                status=status.HTTP_201_CREATED
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
