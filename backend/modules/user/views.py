@@ -11,14 +11,13 @@ User = get_user_model()
 
 
 class Me(APIView):
-    """
+    '''
     API view to manage authenticated user's data.
 
     - Retrieve.
     - Update.
     - Delete.
-
-    """
+    '''
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
@@ -42,3 +41,18 @@ class Me(APIView):
             {'detail': 'User deleted successfully.'}, 
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+class CreateUser(APIView):
+    '''
+    API view to create a new user.
+    '''
+    def post(self, request, format=None):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(
+                {'detail': 'User created successfully.'},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
