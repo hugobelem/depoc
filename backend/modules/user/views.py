@@ -7,6 +7,8 @@ from django.contrib.auth import get_user_model
 
 from .serializers import UserSerializer
 
+from datetime import timedelta, datetime
+
 User = get_user_model()
 
 
@@ -35,11 +37,18 @@ class Me(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, format=None):
-        user = request.user
-        user.delete()
+        '''
+        Schedules account deletion with a 90-day grace period.
+        '''
+        today = datetime.today()        
+        deletion_date = (today + timedelta(days=90)).strftime('%B %d, %Y')  
+        message = (
+            'Your account is scheduled for deletion. '
+            f'Log in before {deletion_date}, to restore it. '
+        )                    
         return Response(
-            {'detail': 'User deleted successfully.'}, 
-            status=status.HTTP_204_NO_CONTENT
+            {'detail': message}, 
+            status=status.HTTP_202_ACCEPTED
         )
 
 
