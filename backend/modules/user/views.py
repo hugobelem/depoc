@@ -39,7 +39,9 @@ class Me(APIView):
     def delete(self, request, format=None):
         '''
         Schedules account deletion with a 90-day grace period.
+        * Background task not implemented yet.
         '''
+        User.objects.get(id=request.user.id).delete()
         today = datetime.today()        
         deletion_date = (today + timedelta(days=90)).strftime('%B %d, %Y')  
         message = (
