@@ -7,51 +7,19 @@ from django.contrib.auth import get_user_model
 
 from .serializers import UserSerializer
 
-from datetime import timedelta, datetime
-
 User = get_user_model()
 
 
 class Me(APIView):
     '''
-    API view to manage authenticated user's data.
-
-    - Retrieve.
-    - Update.
-    - Delete.
+    API view to manage authenticated merchant's data.
     '''
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
 
     def get(self, request, format=None):
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, format=None):      
-        user = request.user
-        data = request.data
-        serializer = UserSerializer(user, data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request, format=None):
-        '''
-        Schedules account deletion with a 90-day grace period.
-        * Background task not implemented yet.
-        '''
-        User.objects.get(id=request.user.id).delete()
-        today = datetime.today()        
-        deletion_date = (today + timedelta(days=90)).strftime('%B %d, %Y')  
-        message = (
-            'Your account is scheduled for deletion. '
-            f'Log in before {deletion_date}, to restore it. '
-        )                    
-        return Response(
-            {'detail': message}, 
-            status=status.HTTP_202_ACCEPTED
-        )
 
 
 class CreateUser(APIView):
