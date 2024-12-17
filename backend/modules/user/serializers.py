@@ -13,11 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'username',
             'password',
-            'is_active',
-            'is_staff',
-            'is_superuser',
-            'date_joined',
-            'groups',
         ]
         extra_kwargs = {'password': {'write_only': True},}
 
