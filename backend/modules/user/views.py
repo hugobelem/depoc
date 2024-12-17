@@ -47,6 +47,8 @@ class CreateUser(APIView):
     '''
     API view to create a new user.
     '''
+    permission_classes = [permissions.AllowAny]
+    
     def post(self, request, format=None):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
