@@ -11,32 +11,37 @@ from .serializers import SuperUserSerializer
 User = get_user_model()
 
 
-class CreateMerchant(APIView):
+class GetMe(APIView):
     '''
-    API view to create new merchant.
+    API view to get authenticated owner's data.
     '''
     permission_classes = [permissions.AllowAny]
-    
+
+    def get(self, request, format=None):
+        user = request.user
+        serializer = SuperUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)    
+
+
+class Owner(APIView):
+    '''
+    API view to manage authenticated owner's data.
+    '''
+    def get_permissions(self):
+        method = self.request.method
+        if method == 'POST':
+            return [permissions.AllowAny()]
+        else:
+            return [permissions.IsAdminUser()]
+        
     def post(self, request, format=None):
         user = SuperUserSerializer(data=request.data)
         if user.is_valid():
             user.save()
             return Response(user.data, status=status.HTTP_200_OK)
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)        
 
-
-class Merchant(APIView):
-    '''
-    API view to manage authenticated merchant's data.
-    '''
-    permission_classes = [permissions.IsAdminUser]
-
-    def get(self, request, format=None):
-        user = request.user
-        serializer = SuperUserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, format=None):
+    def patch(self, request, format=None):
         request_fields = set(request.data.keys())
         valid_fields = set(SuperUserSerializer.Meta.fields)
         invalid_fields = request_fields - valid_fields
