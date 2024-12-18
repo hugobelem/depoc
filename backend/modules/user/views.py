@@ -15,7 +15,7 @@ class GetMe(APIView):
     '''
     API view to get authenticated owner's data.
     '''
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
     def get(self, request, format=None):
         user = request.user
