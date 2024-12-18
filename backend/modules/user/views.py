@@ -28,6 +28,14 @@ class Owner(APIView):
     '''
     API view to manage authenticated owner's data.
     '''
+    def check_invalid_fields(self, request):
+        request_fields = set(request.data.keys())
+        valid_fields = set(SuperUserSerializer.Meta.fields)
+        invalid_fields = request_fields - valid_fields
+        if invalid_fields:
+            return invalid_fields
+        return None
+
     def get_permissions(self):
         method = self.request.method
         if method == 'POST':
@@ -36,6 +44,13 @@ class Owner(APIView):
             return [permissions.IsAdminUser()]
         
     def post(self, request, format=None):
+        invalid_fields = self.check_invalid_fields(request)
+        if invalid_fields:
+            return Response(
+                {'error': f'Invalid fields: {", ".join(invalid_fields)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )            
+
         user = SuperUserSerializer(data=request.data)
         if user.is_valid():
             user.save()
@@ -43,15 +58,12 @@ class Owner(APIView):
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)        
 
     def patch(self, request, format=None):
-        request_fields = set(request.data.keys())
-        valid_fields = set(SuperUserSerializer.Meta.fields)
-        invalid_fields = request_fields - valid_fields
-
+        invalid_fields = self.check_invalid_fields(request)
         if invalid_fields:
             return Response(
                 {'error': f'Invalid fields: {", ".join(invalid_fields)}'},
                 status=status.HTTP_400_BAD_REQUEST
-            )
+            )   
 
         user = SuperUserSerializer(
             instance=request.user,
@@ -61,13 +73,8 @@ class Owner(APIView):
 
         if user.is_valid():
             if 'password' in user.validated_data:
-                return Response(
-                    {
-                        'error': 
-                        'Password modification is not allowed through this endpoint.'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                msg = 'Password modification is not allowed through this endpoint.'
+                return Response({'error': msg}, status=status.HTTP_400_BAD_REQUEST)
             user.save()
             return Response(user.data, status=status.HTTP_200_OK)
     
