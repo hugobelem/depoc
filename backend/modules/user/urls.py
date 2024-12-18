@@ -4,6 +4,6 @@ from . import views
 
 app_name = 'user'
 urlpatterns = [
-    path('', views.CreateMerchant.as_view()),
-    path('/me', views.Merchant.as_view()),
+    path('me', views.GetMe.as_view()),
+    path('owner', views.Owner.as_view()),
 ]
