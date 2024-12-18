@@ -38,7 +38,7 @@ class Owner(APIView):
         user = SuperUserSerializer(data=request.data)
         if user.is_valid():
             user.save()
-            return Response(user.data, status=status.HTTP_200_OK)
+            return Response(user.data, status=status.HTTP_201_CREATED)
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)        
 
     def patch(self, request, format=None):
@@ -75,5 +75,5 @@ class Owner(APIView):
     def delete(self, request, format=None):
         user = request.user
         user.delete()
-        return Response({'detail:': 'User deleted'}, status=status.HTTP_200_OK)
+        return Response({'detail:': 'User deleted'}, status=status.HTTP_204_NO_CONTENT)
 
