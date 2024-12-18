@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class MeViewTest(APITestCase):
+class MerchantViewTest(APITestCase):
     def setUp(self):
         self.user = User.objects.create_superuser(
             id='1',
@@ -24,8 +24,8 @@ class MeViewTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
 
-    def test_get_user_data(self):
-        response = self.client.get('http://127.0.0.1:8000/me')
+    def test_get_merchant_data(self):
+        response = self.client.get('http://127.0.0.1:8000/merchant')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], 'admin')
@@ -44,7 +44,7 @@ class MeViewTest(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
-        response = self.client.get('http://127.0.0.1:8000/me')
+        response = self.client.get('http://127.0.0.1:8000/merchant')
         
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
