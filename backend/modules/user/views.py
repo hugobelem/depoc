@@ -25,7 +25,7 @@ class CreateMerchant(APIView):
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GetMerchant(APIView):
+class Merchant(APIView):
     '''
     API view to manage authenticated merchant's data.
     '''
@@ -36,3 +36,12 @@ class GetMerchant(APIView):
         serializer = SuperUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def put(self, request, format=None):
+        user = SuperUserSerializer(
+            instance=request.user, data=request.data, partial=True
+        )
+        if user.is_valid():
+            user.save()
+            return Response(user.data, status=status.HTTP_200_OK)
+        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+    
