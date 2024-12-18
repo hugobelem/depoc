@@ -72,26 +72,34 @@ class OwnerViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['username'], 'admin2')
 
+    def test_create_owner_with_invalid_fields(self):
+        data = {
+            "id": "2",
+            "name": "admin2",
+            "email": "admin2@email.com",
+            "user": "admin2",
+            "password": "password"
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_update_owner(self):
         data = { "username": "django"}
         response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], 'django')
 
-    def test_update_owner_invalid_fields(self):
-        url = 'http://127.0.0.1:8000/owner'
+    def test_update_owner_with_invalid_fields(self):
         data = { "user": "django"}
-        response = self.client.patch(url, data, format='json')
+        response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_owner_check_password_field(self):
-        url = 'http://127.0.0.1:8000/owner'
         data = { "password": "passed"}
-        response = self.client.patch(url, data, format='json')
+        response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_owner(self):
-        url = 'http://127.0.0.1:8000/owner'
-        response = self.client.delete(url)
+        response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
