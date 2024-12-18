@@ -10,7 +10,7 @@ from .serializers import UserSerializer
 User = get_user_model()
 
 
-class Me(APIView):
+class Merchant(APIView):
     '''
     API view to manage authenticated merchant's data.
     '''
