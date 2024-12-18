@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.db.utils import IntegrityError
 
 User = get_user_model()
@@ -7,51 +7,52 @@ User = get_user_model()
 
 class UserModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create(
+        self.user = User.objects.create_user(
             id="1",
-            name="John Doe",
-            email="john.doe@example.com",
-            username="johndoe",            
+            name="Name",
+            email="name@email.com",
+            username="name",        
+            password="password",    
         )
 
     def test_user_creation(self):
-        self.assertEqual(self.user.email, "john.doe@example.com")
-        self.assertEqual(self.user.name, "John Doe")
-        self.assertEqual(self.user.username, "johndoe")
-        self.assertEqual(str(self.user), "john.doe@example.com")
+        self.assertEqual(self.user.email, "name@email.com")
+        self.assertEqual(self.user.name, "Name")
+        self.assertEqual(self.user.username, "name")
+        self.assertEqual(str(self.user), "name@email.com")
 
     def test_required_name(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
                 id="2",
                 name=None,
-                email="john.do@example.com",
-                username="johndo",
+                email="name2@email.com",
+                username="name2",
             )
 
     def test_required_email(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
                 id="3",
-                name="John Doe",
+                name="Name3",
                 email=None,
-                username="jhdo",
+                username="name3",
             )       
 
     def test_unique_email(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
                 id="4",
-                name="John Doe",
-                email="john.doe@example.com",
-                username="jamesdoe",     
+                name="Name4",
+                email="name@email.com",
+                username="name4",     
             )
 
     def test_optional_username(self):
         user_without_username = User.objects.create(
             id="5",
-            name="John Doe",
-            email="john@example.com",
+            name="Name5",
+            email="name5@email.com",
             username=None,
         )
         self.assertIsNone(user_without_username.username)
@@ -60,8 +61,18 @@ class UserModelTest(TestCase):
         with self.assertRaises(IntegrityError):
             User.objects.create(
                 id="6",
-                name="John Doe",
-                email="jxdoe@example.com",
-                username="johndoe",     
+                name="Name6",
+                email="name6@email.com",
+                username="name",     
             )
+
+    def test_authenticate_with_email(self):
+        user = authenticate(username='name@email.com', password='password')
+        self.assertIsNotNone(user)
+        self.assertEqual(user, self.user)  
+
+    def test_authenticate_with_username(self):
+        user = authenticate(username='name', password='password')
+        self.assertIsNotNone(user)
+        self.assertEqual(user, self.user)  
 
