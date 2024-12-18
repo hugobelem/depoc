@@ -79,5 +79,6 @@ class Owner(APIView):
         user.save()
         return Response(
             {'detail:': 'User is inactive'},
-            status=status.HTTP_200_OK)
+            status=status.HTTP_200_OK
+        )
 
