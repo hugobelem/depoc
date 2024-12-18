@@ -27,8 +27,7 @@ class SuperUserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data.pop('password', None)
         
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
+        User.objects.filter(id=instance.id).update(**validated_data)
+        instance.refresh_from_db()
         return instance
 
