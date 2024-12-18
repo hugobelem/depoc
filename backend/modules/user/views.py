@@ -13,7 +13,7 @@ User = get_user_model()
 
 class CreateMerchant(APIView):
     '''
-    API view to manage authenticated merchant's data.
+    API view to create new merchant.
     '''
     permission_classes = [permissions.AllowAny]
     
@@ -37,12 +37,34 @@ class Merchant(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, format=None):
+        request_fields = set(request.data.keys())
+        valid_fields = set(SuperUserSerializer.Meta.fields)
+        invalid_fields = request_fields - valid_fields
+
+        if invalid_fields:
+            return Response(
+                {'error': f'Invalid fields: {", ".join(invalid_fields)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         user = SuperUserSerializer(
-            instance=request.user, data=request.data, partial=True
+            instance=request.user,
+            data=request.data,
+            partial=True
         )
+
         if user.is_valid():
+            if 'password' in user.validated_data:
+                return Response(
+                    {
+                        'error': 
+                        'Password modification is not allowed through this endpoint.'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             user.save()
             return Response(user.data, status=status.HTTP_200_OK)
+    
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, format=None):
