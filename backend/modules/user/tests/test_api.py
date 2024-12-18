@@ -10,14 +10,12 @@ User = get_user_model()
 
 class MeViewTest(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
+        self.user = User.objects.create_superuser(
             id='1',
-            name='Name',
-            email='name@email.com',
-            username='name',
+            name='admin',
+            email='admin@email.com',
+            username='admin',
             password='password',
-            is_staff='True',
-            is_superuser='True',
         )
         refresh = RefreshToken.for_user(self.user)
         self.token = str(refresh.access_token)
@@ -30,7 +28,7 @@ class MeViewTest(APITestCase):
         response = self.client.get('http://127.0.0.1:8000/me')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], 'name')
+        self.assertEqual(response.data['username'], 'admin')
 
     def test_admin_permission(self):
         self.user = User.objects.create_user(
@@ -49,3 +47,4 @@ class MeViewTest(APITestCase):
         response = self.client.get('http://127.0.0.1:8000/me')
         
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
