@@ -93,5 +93,5 @@ class OwnerViewTest(APITestCase):
     def test_delete_owner(self):
         url = 'http://127.0.0.1:8000/owner'
         response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
