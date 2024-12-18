@@ -45,3 +45,8 @@ class Merchant(APIView):
             return Response(user.data, status=status.HTTP_200_OK)
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    def delete(self, request, format=None):
+        user = request.user
+        user.delete()
+        return Response({'detail:': 'User deleted'}, status=status.HTTP_200_OK)
+
