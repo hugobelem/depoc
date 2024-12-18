@@ -4,10 +4,11 @@ from django.db.utils import IntegrityError
 
 User = get_user_model()
 
+
 class UserModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create(
-            id="01H5ZZK61PW08F9FB3T3A6PR1",
+            id="1",
             name="John Doe",
             email="john.doe@example.com",
             username="johndoe",            
@@ -22,7 +23,7 @@ class UserModelTest(TestCase):
     def test_required_name(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
-                id="01H5ZZK61PW08F9FB3T3A6PR2",
+                id="2",
                 name=None,
                 email="john.do@example.com",
                 username="johndo",
@@ -31,7 +32,7 @@ class UserModelTest(TestCase):
     def test_required_email(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
-                id="01H5ZZK61PW08F9FB3T3A6PR2",
+                id="3",
                 name="John Doe",
                 email=None,
                 username="jhdo",
@@ -40,7 +41,7 @@ class UserModelTest(TestCase):
     def test_unique_email(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
-                id="01H5ZZK61PW08F9FB3T3A6PR6",
+                id="4",
                 name="John Doe",
                 email="john.doe@example.com",
                 username="jamesdoe",     
@@ -48,7 +49,7 @@ class UserModelTest(TestCase):
 
     def test_optional_username(self):
         user_without_username = User.objects.create(
-            id="01H5ZZK61PW08F9FB3T3A6PR5",
+            id="5",
             name="John Doe",
             email="john@example.com",
             username=None,
@@ -58,7 +59,7 @@ class UserModelTest(TestCase):
     def test_unique_username(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
-                id="01H5ZZK61PW08F9FB3T3A6PR6",
+                id="6",
                 name="John Doe",
                 email="jxdoe@example.com",
                 username="johndoe",     
