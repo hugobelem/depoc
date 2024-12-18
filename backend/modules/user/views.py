@@ -6,7 +6,7 @@ from rest_framework import status
 
 from django.contrib.auth import get_user_model
 
-from .serializers import UserSerializer
+from .serializers import SuperUserSerializer
 
 User = get_user_model()
 
@@ -18,7 +18,7 @@ class CreateMerchant(APIView):
     permission_classes = [permissions.AllowAny]
     
     def post(self, request, format=None):
-        user = UserSerializer(data=request.data)
+        user = SuperUserSerializer(data=request.data)
         if user.is_valid():
             user.save()
             return Response(user.data, status=status.HTTP_200_OK)
@@ -33,6 +33,6 @@ class GetMerchant(APIView):
 
     def get(self, request, format=None):
         user = request.user
-        serializer = UserSerializer(user)
+        serializer = SuperUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
