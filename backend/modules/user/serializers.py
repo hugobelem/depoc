@@ -25,11 +25,10 @@ class SuperUserSerializer(serializers.ModelSerializer):
         return user
     
     def update(self, instance, validated_data):
+        validated_data.pop('password', None)
+        
         for attr, value in validated_data.items():
-            if attr == 'password':
-                instance.set_password(value)
-            else:
-                setattr(instance, attr, value)
+            setattr(instance, attr, value)
         instance.save()
         return instance
 
