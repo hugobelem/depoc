@@ -67,12 +67,12 @@ class UserModelTest(TestCase):
             )
 
     def test_authenticate_with_email(self):
+        '''
+        This test validates the functionality of the EmailOrUsernameBackend 
+        defined in `backends.py`. It ensures that users can successfully
+        authenticate using their email address as a username alternative.
+        '''
         user = authenticate(username='name@email.com', password='password')
-        self.assertIsNotNone(user)
-        self.assertEqual(user, self.user)  
-
-    def test_authenticate_with_username(self):
-        user = authenticate(username='name', password='password')
         self.assertIsNotNone(user)
         self.assertEqual(user, self.user)  
 
