@@ -5,6 +5,7 @@ from rest_framework import permissions
 from rest_framework import status
 
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 
 from .serializers import SuperUserSerializer
 
@@ -73,7 +74,10 @@ class Owner(APIView):
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, format=None):
-        user = request.user
-        user.delete()
-        return Response({'detail:': 'User deleted'}, status=status.HTTP_204_NO_CONTENT)
+        user = get_object_or_404(User, id=request.user.id)
+        user.is_active = False
+        user.save()
+        return Response(
+            {'detail:': 'User is inactive'},
+            status=status.HTTP_200_OK)
 
