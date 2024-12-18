@@ -1,3 +1,4 @@
+from rest_framework.decorators import permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -10,7 +11,21 @@ from .serializers import UserSerializer
 User = get_user_model()
 
 
-class Merchant(APIView):
+class CreateMerchant(APIView):
+    '''
+    API view to manage authenticated merchant's data.
+    '''
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request, format=None):
+        user = UserSerializer(data=request.data)
+        if user.is_valid():
+            user.save()
+            return Response(user.data, status=status.HTTP_200_OK)
+        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetMerchant(APIView):
     '''
     API view to manage authenticated merchant's data.
     '''
