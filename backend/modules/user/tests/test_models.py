@@ -21,6 +21,7 @@ class UserModelTest(TestCase):
         self.assertEqual(self.user.username, "name")
         self.assertEqual(str(self.user), "name@email.com")
 
+
     def test_required_name(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
@@ -29,6 +30,7 @@ class UserModelTest(TestCase):
                 email="name2@email.com",
                 username="name2",
             )
+
 
     def test_required_email(self):
         with self.assertRaises(IntegrityError):
@@ -39,6 +41,7 @@ class UserModelTest(TestCase):
                 username="name3",
             )       
 
+
     def test_unique_email(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
@@ -47,6 +50,7 @@ class UserModelTest(TestCase):
                 email="name@email.com",
                 username="name4",     
             )
+
 
     def test_optional_username(self):
         user_without_username = User.objects.create(
@@ -57,6 +61,7 @@ class UserModelTest(TestCase):
         )
         self.assertIsNone(user_without_username.username)
 
+
     def test_unique_username(self):
         with self.assertRaises(IntegrityError):
             User.objects.create(
@@ -65,6 +70,7 @@ class UserModelTest(TestCase):
                 email="name6@email.com",
                 username="name",     
             )
+
 
     def test_authenticate_with_email(self):
         '''

@@ -23,10 +23,12 @@ class MeEndpointTest(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
+
     def test_get_owner_data(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], 'admin')
+
 
     def test_admin_permission(self):
         self.user = User.objects.create_user(
@@ -72,6 +74,7 @@ class OwnerEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['username'], 'admin2')
 
+
     def test_create_owner_with_invalid_fields(self):
         data = {
             "id": "2",
@@ -83,21 +86,25 @@ class OwnerEndpointTest(APITestCase):
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+
     def test_update_owner(self):
         data = { "username": "django"}
         response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], 'django')
 
+
     def test_update_owner_with_invalid_fields(self):
         data = { "user": "django"}
         response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+
     def test_update_owner_check_password_field(self):
         data = { "password": "passed"}
         response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
     def test_delete_owner(self):
         response = self.client.delete(self.url)
