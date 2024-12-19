@@ -86,7 +86,7 @@ class OwnerEndpoint(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        field_erros = self.check_fields_errors(request, check_missing=True)
+        field_erros = self.check_fields_errors(request)
         if field_erros:
             message = {
                     'error': f'Invalid fields: {", ".join(field_erros)}',
