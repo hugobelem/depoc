@@ -17,9 +17,11 @@ class SuperUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True},}
         required = ['name', 'email', 'username', 'password']
 
+
     def create(self, validated_data):
         user = User.objects.create_superuser(**validated_data)
         return user
+    
     
     def update(self, instance, validated_data):
         validated_data.pop('password', None)
