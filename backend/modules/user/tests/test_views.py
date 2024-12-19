@@ -87,6 +87,17 @@ class OwnerEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
+    def test_create_owner_with_missing_fields(self):
+        data = {
+            "id": "3",
+            "email": "admin3@email.com",
+            "username": "admin3",
+            "password": "password"
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)        
+
+
     def test_update_owner(self):
         data = { "username": "django"}
         response = self.client.patch(self.url, data, format='json')
