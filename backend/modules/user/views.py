@@ -53,7 +53,8 @@ class OwnerEndpoint(APIView):
 
 
     def post(self, request, format=None):    
-        if not request.data:
+        data = request.data
+        if not data:
             return Response(
                 {'error': 'No data provided for Owner creation.'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -67,7 +68,7 @@ class OwnerEndpoint(APIView):
                 },
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = SuperUserSerializer(data=request.data)
+        serializer = SuperUserSerializer(data=data)
 
         if not serializer.is_valid():
             return Response(
@@ -80,7 +81,8 @@ class OwnerEndpoint(APIView):
 
 
     def patch(self, request, format=None):
-        if not request.data:
+        data = request.data
+        if not data:
             return Response(
                 {'error': 'No data provided for the update.'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -96,7 +98,7 @@ class OwnerEndpoint(APIView):
         
         serializer = SuperUserSerializer(
             instance=request.user,
-            data=request.data,
+            data=data,
             partial=True
         )
 
