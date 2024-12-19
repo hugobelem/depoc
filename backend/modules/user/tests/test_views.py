@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class GetMeViewTest(APITestCase):
+class MeEndpointTest(APITestCase):
     def setUp(self):
         self.user = User.objects.create_superuser(
             id='1',
@@ -44,7 +44,7 @@ class GetMeViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-class OwnerViewTest(APITestCase):
+class OwnerEndpointTest(APITestCase):
     def setUp(self):
         self.user = User.objects.create_superuser(
             id='1',
