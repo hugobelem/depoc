@@ -15,7 +15,7 @@ class MeEndpointTest(APITestCase):
             name='admin',
             email='admin@email.com',
             username='admin',
-            password='password',
+            password='adminpassword',
         )
         refresh = RefreshToken.for_user(self.user)
         self.url = 'http://127.0.0.1:8000/me'
@@ -36,7 +36,7 @@ class MeEndpointTest(APITestCase):
             name='User',
             email='user@email.com',
             username='user',
-            password='password',
+            password='adminpassword',
         )
         refresh = RefreshToken.for_user(self.user)
         self.token = str(refresh.access_token)
@@ -53,7 +53,7 @@ class OwnerEndpointTest(APITestCase):
             name='admin',
             email='admin@email.com',
             username='admin',
-            password='password',
+            password='adminpassword',
         )
         refresh = RefreshToken.for_user(self.user)    
         self.url = 'http://127.0.0.1:8000/owner'
@@ -68,7 +68,7 @@ class OwnerEndpointTest(APITestCase):
             "name": "admin2",
             "email": "admin2@email.com",
             "username": "admin2",
-            "password": "password"
+            "password": "adminpassword"
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -77,11 +77,11 @@ class OwnerEndpointTest(APITestCase):
 
     def test_create_owner_with_invalid_fields(self):
         data = {
-            "id": "2",
-            "name": "admin2",
-            "email": "admin2@email.com",
-            "user": "admin2",
-            "password": "password"
+            "id": "3",
+            "name": "admin3",
+            "email": "admin3@email.com",
+            "user": "admin3",
+            "password": "adminpassword"
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -89,10 +89,10 @@ class OwnerEndpointTest(APITestCase):
 
     def test_create_owner_with_missing_fields(self):
         data = {
-            "id": "3",
-            "email": "admin3@email.com",
-            "username": "admin3",
-            "password": "password"
+            "id": "4",
+            "email": "admin4@email.com",
+            "username": "admin4",
+            "password": "adminpassword"
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)        
