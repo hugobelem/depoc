@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ALLOWED_HOSTS: '*'
     strategy:
       max-parallel: 4
       matrix:
