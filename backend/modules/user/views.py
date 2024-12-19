@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from .serializers import SuperUserSerializer
+from .logging import log_field_errors, log_password_attempt
 
 User = get_user_model()
 
@@ -27,7 +28,7 @@ class OwnerEndpoint(APIView):
     '''
     API view to manage authenticated owner's data.
     '''
-    def check_fields_errors(self, request, check_missing=False) -> set | None:
+    def check_field_errors(self, request, check_missing=False) -> set | None:
         request_fields = set(request.data.keys())
         valid_fields = set(SuperUserSerializer.Meta.fields)
 
@@ -60,10 +61,11 @@ class OwnerEndpoint(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        field_erros = self.check_fields_errors(request, check_missing=True)
-        if field_erros:
+        field_errors = self.check_field_errors(request, check_missing=True)
+        if field_errors:
+            log_field_errors(request, field_errors)
             message = {
-                    'error': f'Invalid or missing fields: {", ".join(field_erros)}',
+                    'error': f'Invalid or missing fields: {", ".join(field_errors)}',
                     'expected': SuperUserSerializer.Meta.required
                 },
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
@@ -81,6 +83,7 @@ class OwnerEndpoint(APIView):
 
 
     def patch(self, request, format=None):
+        user = request.user
         data = request.data
         if not data:
             return Response(
@@ -88,16 +91,17 @@ class OwnerEndpoint(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        field_erros = self.check_fields_errors(request)
-        if field_erros:
+        field_errors = self.check_field_errors(request)
+        if field_errors:
+            log_field_errors(request, field_errors)
             message = {
-                    'error': f'Invalid fields: {", ".join(field_erros)}',
+                    'error': f'Invalid fields: {", ".join(field_errors)}',
                     'expected': SuperUserSerializer.Meta.required
                 },
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = SuperUserSerializer(
-            instance=request.user,
+            instance=user,
             data=data,
             partial=True
         )
@@ -109,6 +113,7 @@ class OwnerEndpoint(APIView):
             )            
         
         if 'password' in serializer.validated_data:
+            log_password_attempt(request)
             return Response(
                 {
                     'error': 
