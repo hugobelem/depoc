@@ -127,7 +127,7 @@ class OwnerEndpoint(APIView):
         user.is_active = False
         user.save()
         return Response(
-            {'detail:': 'User is inactive'},
+            {'success:': 'User is inactive'},
             status=status.HTTP_200_OK
         )
 
