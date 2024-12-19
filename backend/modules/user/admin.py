@@ -18,7 +18,7 @@ class UserAdmin(admin.ModelAdmin):
         else:
             return common_fields + ['last_login', 'date_joined', 'groups']
         
-    def get_form(self, request, obj=None, **kwargs): # type: ignore
+    def get_form(self, request, obj=None, **kwargs):
         if obj is None:
             form_class = CustomUserCreationForm
         else:
