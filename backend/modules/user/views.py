@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from .serializers import SuperUserSerializer
-from .logging import log_field_errors, log_password_attempt
 
 User = get_user_model()
 
@@ -63,7 +62,6 @@ class OwnerEndpoint(APIView):
 
         field_errors = self.check_field_errors(request, check_missing=True)
         if field_errors:
-            log_field_errors(request, field_errors)
             message = {
                     'error': f'Invalid or missing fields: {", ".join(field_errors)}',
                     'expected': SuperUserSerializer.Meta.required
@@ -93,7 +91,6 @@ class OwnerEndpoint(APIView):
 
         field_errors = self.check_field_errors(request)
         if field_errors:
-            log_field_errors(request, field_errors)
             message = {
                     'error': f'Invalid fields: {", ".join(field_errors)}',
                     'expected': SuperUserSerializer.Meta.required
@@ -113,7 +110,6 @@ class OwnerEndpoint(APIView):
             )            
         
         if 'password' in serializer.validated_data:
-            log_password_attempt(request)
             return Response(
                 {
                     'error': 
