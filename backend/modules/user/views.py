@@ -43,14 +43,16 @@ class OwnerEndpoint(APIView):
 
         return None
 
+
     def get_permissions(self):
         method = self.request.method
         if method == 'POST':
             return [permissions.AllowAny()]
         else:
             return [permissions.IsAdminUser()]
-        
-    def post(self, request, format=None):
+
+
+    def post(self, request, format=None):    
         if not request.data:
             return Response(
                 {'error': 'No data provided for Owner creation.'},
@@ -59,13 +61,11 @@ class OwnerEndpoint(APIView):
 
         field_erros = self.check_fields_errors(request, check_missing=True)
         if field_erros:
-            return Response(
-                {
+            message = {
                     'error': f'Invalid or missing fields: {", ".join(field_erros)}',
                     'expected': SuperUserSerializer.Meta.required
                 },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = SuperUserSerializer(data=request.data)
 
@@ -78,6 +78,7 @@ class OwnerEndpoint(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)     
 
+
     def patch(self, request, format=None):
         if not request.data:
             return Response(
@@ -85,15 +86,13 @@ class OwnerEndpoint(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        field_erros = self.check_fields_errors(request)
+        field_erros = self.check_fields_errors(request, check_missing=True)
         if field_erros:
-            return Response(
-                {
+            message = {
                     'error': f'Invalid fields: {", ".join(field_erros)}',
                     'expected': SuperUserSerializer.Meta.required
                 },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = SuperUserSerializer(
             instance=request.user,
@@ -118,6 +117,7 @@ class OwnerEndpoint(APIView):
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
     
     def delete(self, request, format=None):
         user = get_object_or_404(User, id=request.user.id)
