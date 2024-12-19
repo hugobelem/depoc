@@ -27,12 +27,20 @@ class OwnerEndpoint(APIView):
     '''
     API view to manage authenticated owner's data.
     '''
-    def check_invalid_fields(self, request) -> set | None:
+    def check_fields_errors(self, request, check_missing=False) -> set | None:
         request_fields = set(request.data.keys())
         valid_fields = set(SuperUserSerializer.Meta.fields)
+
         invalid_fields = request_fields - valid_fields
         if invalid_fields:
             return invalid_fields
+        
+        if check_missing:
+            required_fields = set(SuperUserSerializer.Meta.required)
+            missing_fields = required_fields - request_fields
+            if missing_fields:
+                return missing_fields
+
         return None
 
     def get_permissions(self):
@@ -45,51 +53,71 @@ class OwnerEndpoint(APIView):
     def post(self, request, format=None):
         if not request.data:
             return Response(
-                {'detail': 'No data provided for Owner creation.'},
+                {'error': 'No data provided for Owner creation.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        invalid_fields = self.check_invalid_fields(request)
-        if invalid_fields:
+        field_erros = self.check_fields_errors(request, check_missing=True)
+        if field_erros:
             return Response(
-                {'error': f'Invalid fields: {", ".join(invalid_fields)}'},
+                {
+                    'error': f'Invalid or missing fields: {", ".join(field_erros)}',
+                    'expected': SuperUserSerializer.Meta.required
+                },
                 status=status.HTTP_400_BAD_REQUEST
-            )            
+            )
 
-        user = SuperUserSerializer(data=request.data)
-        if user.is_valid():
-            user.save()
-            return Response(user.data, status=status.HTTP_201_CREATED)
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)        
+        serializer = SuperUserSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(
+                {'error': 'Validation failed', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )   
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)     
 
     def patch(self, request, format=None):
         if not request.data:
             return Response(
-                {'detail': 'No data provided for the update.'},
+                {'error': 'No data provided for the update.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        invalid_fields = self.check_invalid_fields(request)
-        if invalid_fields:
+        field_erros = self.check_fields_errors(request)
+        if field_erros:
             return Response(
-                {'error': f'Invalid fields: {", ".join(invalid_fields)}'},
+                {
+                    'error': f'Invalid fields: {", ".join(field_erros)}',
+                    'expected': SuperUserSerializer.Meta.required
+                },
                 status=status.HTTP_400_BAD_REQUEST
-            )   
-
-        user = SuperUserSerializer(
+            )
+        
+        serializer = SuperUserSerializer(
             instance=request.user,
             data=request.data,
             partial=True
         )
 
-        if user.is_valid():
-            if 'password' in user.validated_data:
-                msg = 'Password modification is not allowed through this endpoint.'
-                return Response({'error': msg}, status=status.HTTP_400_BAD_REQUEST)
-            user.save()
-            return Response(user.data, status=status.HTTP_200_OK)
-    
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not serializer.is_valid():
+            return Response(
+                {'error': 'Validation failed', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )            
+        
+        if 'password' in serializer.validated_data:
+            return Response(
+                {
+                    'error': 
+                    'Password modification is not allowed through this endpoint.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )            
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def delete(self, request, format=None):
         user = get_object_or_404(User, id=request.user.id)
