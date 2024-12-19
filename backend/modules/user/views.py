@@ -1,4 +1,3 @@
-from rest_framework.decorators import permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -12,7 +11,7 @@ from .serializers import SuperUserSerializer
 User = get_user_model()
 
 
-class GetMe(APIView):
+class MeEndpoint(APIView):
     '''
     API view to get authenticated owner's data.
     '''
@@ -24,11 +23,11 @@ class GetMe(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)    
 
 
-class Owner(APIView):
+class OwnerEndpoint(APIView):
     '''
     API view to manage authenticated owner's data.
     '''
-    def check_invalid_fields(self, request):
+    def check_invalid_fields(self, request) -> set | None:
         request_fields = set(request.data.keys())
         valid_fields = set(SuperUserSerializer.Meta.fields)
         invalid_fields = request_fields - valid_fields
@@ -44,6 +43,12 @@ class Owner(APIView):
             return [permissions.IsAdminUser()]
         
     def post(self, request, format=None):
+        if not request.data:
+            return Response(
+                {'detail': 'No data provided for Owner creation.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         invalid_fields = self.check_invalid_fields(request)
         if invalid_fields:
             return Response(
@@ -58,6 +63,12 @@ class Owner(APIView):
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)        
 
     def patch(self, request, format=None):
+        if not request.data:
+            return Response(
+                {'detail': 'No data provided for the update.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         invalid_fields = self.check_invalid_fields(request)
         if invalid_fields:
             return Response(

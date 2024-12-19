@@ -4,6 +4,6 @@ from . import views
 
 app_name = 'user'
 urlpatterns = [
-    path('me', views.GetMe.as_view()),
-    path('owner', views.Owner.as_view()),
+    path('me', views.MeEndpoint.as_view()),
+    path('owner', views.OwnerEndpoint.as_view()),
 ]
