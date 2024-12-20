@@ -31,6 +31,7 @@ class BusinessEndpoint(APIView):
 
         return None    
 
+
     def post(self, request):
         owner = request.user
         if owner.business:
