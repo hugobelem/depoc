@@ -7,8 +7,6 @@ on:
 jobs:
   quality-assurance:
     name: QA
-
-    build:
     runs-on: ubuntu-latest
     env:
       ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
