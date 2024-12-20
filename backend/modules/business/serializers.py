@@ -31,10 +31,13 @@ class BusinessSerializer(serializers.ModelSerializer):
         
     
     def create(self, validated_data):
+        owner = self.context['owner']
         business = Business.objects.create(
             id=ulid.new().str,
             **validated_data
         )
+        
+        BusinessOwner.objects.create(owner=owner, business=business)
         return business
     
     
