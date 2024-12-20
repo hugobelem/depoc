@@ -33,7 +33,6 @@ class BusinessEndpoint(APIView):
 
     def post(self, request):
         owner = request.user
-
         if owner.business:
             return Response(
                 {
@@ -42,7 +41,6 @@ class BusinessEndpoint(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
 
         data = request.data
         if not data:
