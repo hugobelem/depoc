@@ -18,7 +18,8 @@ class SuperUserSerializer(serializers.ModelSerializer):
             'password',
         ]
         extra_kwargs = {'password': {'write_only': True},}
-        required = ['name', 'email', 'username', 'password']
+        post_required = ['name', 'email', 'username', 'password']
+        patch_required = ['name', 'email', 'username']
 
 
     def validate_password(self, value):

@@ -36,7 +36,7 @@ class OwnerEndpoint(APIView):
             return invalid_fields
         
         if check_missing:
-            required_fields = set(SuperUserSerializer.Meta.required)
+            required_fields = set(SuperUserSerializer.Meta.post_required)
             missing_fields = required_fields - request_fields
             if missing_fields:
                 return missing_fields
@@ -64,7 +64,7 @@ class OwnerEndpoint(APIView):
         if field_errors:
             message = {
                     'error': f'Invalid or missing fields: {", ".join(field_errors)}',
-                    'expected': SuperUserSerializer.Meta.required
+                    'expected': SuperUserSerializer.Meta.post_required
                 },
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
@@ -93,7 +93,7 @@ class OwnerEndpoint(APIView):
         if field_errors:
             message = {
                     'error': f'Invalid fields: {", ".join(field_errors)}',
-                    'expected': SuperUserSerializer.Meta.required
+                    'expected': SuperUserSerializer.Meta.patch_required
                 },
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         
