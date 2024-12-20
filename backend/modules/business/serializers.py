@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from .models import Business, BusinessOwner # type: ignore
 
+import ulid
+
 
 class BusinessSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,7 +30,10 @@ class BusinessSerializer(serializers.ModelSerializer):
         
     
     def create(self, validated_data):
-        business = Business.objects.create(**validated_data)
+        business = Business.objects.create(
+            id=ulid.new().str,
+            **validated_data
+        )
         return business
     
     
