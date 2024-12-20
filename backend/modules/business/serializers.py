@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Business, BusinessOwner # type: ignore
+from modules.business.models import Business, BusinessOwner
 
 import ulid
 

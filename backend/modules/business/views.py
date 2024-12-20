@@ -5,8 +5,9 @@ from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 
+from modules.business.models import Business, BusinessOwner
 from .serializers import BusinessSerializer
-from .models import Business, BusinessOwner # type: ignore
+
 
 
 class BusinessEndpoint(APIView):

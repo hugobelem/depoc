@@ -1,8 +1,6 @@
-# type: ignore
-
 from django.contrib import admin
 
-from .models import Business, BusinessOwner
+from modules.business.models import Business, BusinessOwner
 
 
 class BusinessAdmin(admin.ModelAdmin):
