@@ -12,9 +12,6 @@ class Business(models.Model):
     id = models.CharField(
         primary_key=True, max_length=26, default=ulid.new().str
     )
-    owner = models.OneToOneField(
-        User, related_name='businesses', on_delete=models.CASCADE
-    )
     legalName = models.CharField(max_length=150)
     tradeName = models.CharField(max_length=150)
     registrationNumber = models.CharField(max_length=14, unique=True)
@@ -35,4 +32,17 @@ class Business(models.Model):
         verbose_name_plural = 'Businesses'
 
     def __str__(self):
-        return self.cnpj
+        return self.tradeName
+
+
+class BusinessOwner(models.Model):
+    owner = models.OneToOneField(
+        User, related_name='business', on_delete=models.CASCADE
+    )
+    business = models.OneToOneField(
+        Business, related_name='owner', on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f'{self.owner} owns {self.business}'
+    
