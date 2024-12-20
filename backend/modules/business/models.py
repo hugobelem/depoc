@@ -32,7 +32,7 @@ class Business(models.Model):
         verbose_name_plural = 'Businesses'
 
     def __str__(self):
-        return self.tradeName
+        return self.legalName
 
 
 class BusinessOwner(models.Model):
