@@ -25,7 +25,7 @@ class Business(models.Model):
     state = models.CharField(max_length=2, blank=True)
     postCode = models.CharField(max_length=8, blank=True)
     phone = models.CharField(max_length=11, blank=True)
-    email = models.EmailField(blank=True)    
+    email = models.EmailField(blank=True, null=True)    
     category = models.CharField(max_length=255, blank=True)
     active = models.BooleanField(default=True)
 
