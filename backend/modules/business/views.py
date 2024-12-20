@@ -32,6 +32,7 @@ class BusinessEndpoint(APIView):
         return None    
 
     def post(self, request):
+        owner = request.user
         data = request.data
         if not data:
             return Response(
@@ -48,7 +49,7 @@ class BusinessEndpoint(APIView):
                 }, 
                 status=status.HTTP_400_BAD_REQUEST)
         
-        serializer = BusinessSerializer(data=data)
+        serializer = BusinessSerializer(data=data, context={'owner': owner})
         if not serializer.is_valid():
             return Response(
                 {'error': 'Validation failed', 'details': serializer.errors},
