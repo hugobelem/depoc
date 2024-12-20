@@ -27,6 +27,7 @@ class Business(models.Model):
     phone = models.CharField(max_length=11, blank=True)
     email = models.EmailField(blank=True)    
     category = models.CharField(max_length=255, blank=True)
+    active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = 'Businesses'
