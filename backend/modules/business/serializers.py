@@ -27,6 +27,7 @@ class BusinessSerializer(serializers.ModelSerializer):
             'email',            
         ]
         required = ['legalName', 'tradeName', 'registrationNumber']
+        expected = [field for field in fields if field != 'id']
         
     
     def create(self, validated_data):
