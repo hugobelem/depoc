@@ -64,7 +64,6 @@ class OwnerEndpointTest(APITestCase):
 
     def test_create_owner(self):
         data = {
-            "id": "2",
             "name": "admin2",
             "email": "admin2@email.com",
             "username": "admin2",
@@ -77,7 +76,6 @@ class OwnerEndpointTest(APITestCase):
 
     def test_create_owner_with_invalid_fields(self):
         data = {
-            "id": "3",
             "name": "admin3",
             "email": "admin3@email.com",
             "user": "admin3",
@@ -89,7 +87,6 @@ class OwnerEndpointTest(APITestCase):
 
     def test_create_owner_with_missing_fields(self):
         data = {
-            "id": "4",
             "email": "admin4@email.com",
             "username": "admin4",
             "password": "adminpassword"
