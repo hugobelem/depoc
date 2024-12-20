@@ -33,6 +33,17 @@ class BusinessEndpoint(APIView):
 
     def post(self, request):
         owner = request.user
+
+        if owner.business:
+            return Response(
+                {
+                    'error': 'The owner is associated with an existing business.',
+                    'detail': f'{owner.business}'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
         data = request.data
         if not data:
             return Response(
