@@ -25,7 +25,7 @@ class BusinessEndpoint(APIView):
             return invalid_fields
         
         if check_missing:
-            missing_fields = required_fields - request_fields
+            missing_fields = request_fields - required_fields
             if missing_fields:
                 return missing_fields
 
@@ -44,7 +44,7 @@ class BusinessEndpoint(APIView):
             return Response(
                 {
                     'error': f'Invalid or missing required fields: {", ".join(field_errors)}',
-                    'expected': BusinessSerializer.Meta.fields
+                    'expected': BusinessSerializer.Meta.expected
                 }, 
                 status=status.HTTP_400_BAD_REQUEST)
         
