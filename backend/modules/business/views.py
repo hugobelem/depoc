@@ -77,6 +77,12 @@ class BusinessEndpoint(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
+        if not business.active:
+            return Response(
+                {'error': 'The business is deactivated.'},
+                status=status.HTTP_404_NOT_FOUND
+            )            
+        
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -91,6 +97,12 @@ class BusinessEndpoint(APIView):
                 {'error': 'Owner does not have a registered business.'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        
+        if not business.active:
+            return Response(
+                {'error': 'The business is deactivated.'},
+                status=status.HTTP_404_NOT_FOUND
+            )             
         
         if not data:
             return Response(
@@ -127,6 +139,12 @@ class BusinessEndpoint(APIView):
                 {'error': 'Owner does not have a registered business.'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        
+        if not business.active:
+            return Response(
+                {'error': 'The business is already inactive.'},
+                status=status.HTTP_404_NOT_FOUND
+            )             
         
         business.active = False
         business.save()
