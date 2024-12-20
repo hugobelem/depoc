@@ -31,6 +31,7 @@ class Business(models.Model):
 
     class Meta:
         verbose_name_plural = 'Businesses'
+        app_label = 'modules_business'
 
     def __str__(self):
         return self.legalName
@@ -43,6 +44,9 @@ class BusinessOwner(models.Model):
     business = models.OneToOneField(
         Business, related_name='owner', on_delete=models.CASCADE
     )
+
+    class Meta:
+        app_label = 'modules_business'   
 
     def __str__(self):
         return f'{self.owner} owns {self.business}'
