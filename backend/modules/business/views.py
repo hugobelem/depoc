@@ -16,19 +16,13 @@ class BusinessEndpoint(APIView):
     '''    
     permission_classes = [permissions.IsAdminUser]
 
-    def check_field_errors(self, request, check_missing=False) -> set | None:
+    def check_field_errors(self, request) -> set | None:
         request_fields = set(request.data.keys())
         valid_fields = set(BusinessSerializer.Meta.fields)
-        required_fields = set(BusinessSerializer.Meta.required)
 
         invalid_fields = request_fields - valid_fields
         if invalid_fields:
             return invalid_fields
-        
-        if check_missing:
-            missing_fields = request_fields - required_fields
-            if missing_fields:
-                return missing_fields
 
         return None    
 
@@ -52,7 +46,7 @@ class BusinessEndpoint(APIView):
                 status=status.HTTP_400_BAD_REQUEST                
             )
         
-        field_errors = self.check_field_errors(request, check_missing=True)
+        field_errors = self.check_field_errors(request)
         if field_errors:
             return Response(
                 {
