@@ -5,9 +5,10 @@ on:
     branches: [ "backend" ]
 
 jobs:
-  name: QA
+  quality-assurance:
+    name: QA
 
-  build:
+    build:
     runs-on: ubuntu-latest
     env:
       ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
