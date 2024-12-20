@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from .serializers import BusinessSerializer
+from modules.business.models import Business, BusinessOwner
 
 
 class BusinessEndpoint(APIView):
@@ -34,14 +35,15 @@ class BusinessEndpoint(APIView):
 
     def post(self, request):
         owner = request.user
-        if owner.business:
+
+        try:
+            owner.business
             return Response(
-                {
-                    'error': 'The owner is associated with an existing business.',
-                    'detail': f'{owner.business}'
-                },
+                {'error': 'The owner is associated with an existing business.'},
                 status=status.HTTP_400_BAD_REQUEST
-            )
+            )                 
+        except:
+            pass
 
         data = request.data
         if not data:
@@ -71,7 +73,17 @@ class BusinessEndpoint(APIView):
 
 
     def get(self, request):
-        ...
+        try:
+            owner = get_object_or_404(BusinessOwner, owner=request.user)
+        except:
+            return Response(
+                {'error': 'Owner does not have a registered business.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        business = get_object_or_404(Business, id=owner.business.id)
+        serializer = BusinessSerializer(business)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
     def patch(self, request):
