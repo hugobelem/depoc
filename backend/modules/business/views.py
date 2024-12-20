@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from .serializers import BusinessSerializer
-from modules.business.models import Business, BusinessOwner
+from .models import Business, BusinessOwner # type: ignore
 
 
 class BusinessEndpoint(APIView):
@@ -119,4 +119,18 @@ class BusinessEndpoint(APIView):
 
 
     def delete(self, request):
-        ...
+        try:
+            owner = get_object_or_404(BusinessOwner, owner=request.user)
+            business = get_object_or_404(Business, id=owner.business.id)
+        except:
+            return Response(
+                {'error': 'Owner does not have a registered business.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        business.active = False
+        business.save()
+        return Response(
+            {'success:': 'The business has been successfully deactivated'},
+            status=status.HTTP_200_OK
+        )               
