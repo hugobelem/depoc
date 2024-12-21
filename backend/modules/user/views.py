@@ -12,9 +12,6 @@ User = get_user_model()
 
 
 class MeEndpoint(APIView):
-    '''
-    API view to get authenticated owner's data.
-    '''
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request, format=None):
@@ -24,9 +21,6 @@ class MeEndpoint(APIView):
 
 
 class OwnerEndpoint(APIView):
-    '''
-    API view to manage authenticated owner's data.
-    '''
     def check_field_errors(self, request, check_missing=False) -> set | None:
         request_fields = set(request.data.keys())
         valid_fields = set(SuperUserSerializer.Meta.fields)

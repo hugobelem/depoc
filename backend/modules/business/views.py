@@ -10,10 +10,7 @@ from .serializers import BusinessSerializer
 
 
 
-class BusinessEndpoint(APIView):
-    '''
-    API view to manage authenticated owner's business data.
-    '''    
+class BusinessEndpoint(APIView): 
     permission_classes = [permissions.IsAdminUser]
 
     def check_field_errors(self, request) -> set | None:
