@@ -12,9 +12,6 @@ User = get_user_model()
 
 
 class MeEndpoint(APIView):
-    '''
-    API view to get authenticated owner's data.
-    '''
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request, format=None):
@@ -24,22 +21,17 @@ class MeEndpoint(APIView):
 
 
 class OwnerEndpoint(APIView):
-    '''
-    API view to manage authenticated owner's data.
-    '''
     def check_field_errors(self, request, check_missing=False) -> set | None:
         request_fields = set(request.data.keys())
         valid_fields = set(SuperUserSerializer.Meta.fields)
-
         invalid_fields = request_fields - valid_fields
         if invalid_fields:
             return invalid_fields
         
-        if check_missing:
-            required_fields = set(SuperUserSerializer.Meta.post_required)
-            missing_fields = required_fields - request_fields
-            if missing_fields:
-                return missing_fields
+        required_fields = set(SuperUserSerializer.Meta.post_required)
+        missing_fields = required_fields - request_fields
+        if missing_fields and check_missing:
+            return missing_fields
 
         return None
 
@@ -55,22 +47,19 @@ class OwnerEndpoint(APIView):
     def post(self, request, format=None):    
         data = request.data
         if not data:
-            return Response(
-                {'error': 'No data provided for Owner creation.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            message = 'No data provided for Owner creation.'
+            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
         field_errors = self.check_field_errors(request, check_missing=True)
         if field_errors:
+            message = f'Invalid or missing fields: {", ".join(field_errors)}'
+            expected_fields = SuperUserSerializer.Meta.fields
             return Response(
-                {
-                    'error': f'Invalid or missing fields: {", ".join(field_errors)}',
-                    'expected': SuperUserSerializer.Meta.fields
-                }, 
-                status=status.HTTP_400_BAD_REQUEST)
+                {'error': message, 'expected': expected_fields},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         serializer = SuperUserSerializer(data=data)
-
         if not serializer.is_valid():
             return Response(
                 {'error': 'Validation failed', 'details': serializer.errors},
@@ -82,29 +71,22 @@ class OwnerEndpoint(APIView):
 
 
     def patch(self, request, format=None):
-        user = request.user
         data = request.data
         if not data:
-            return Response(
-                {'error': 'No data provided for the update.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            message = 'No data provided for the update.'
+            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
         field_errors = self.check_field_errors(request)
         if field_errors:
+            message = f'Invalid fields: {", ".join(field_errors)}'
+            expected_fields = SuperUserSerializer.Meta.patch_required
             return Response(
-                {
-                    'error': f'Invalid fields: {", ".join(field_errors)}',
-                    'expected': SuperUserSerializer.Meta.patch_required                    
-                },
-                status=status.HTTP_400_BAD_REQUEST)
+                {'error': message, 'expected': expected_fields},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
-        serializer = SuperUserSerializer(
-            instance=user,
-            data=data,
-            partial=True
-        )
-
+        user = request.user
+        serializer = SuperUserSerializer(instance=user, data=data, partial=True)
         if not serializer.is_valid():
             return Response(
                 {'error': 'Validation failed', 'details': serializer.errors},
@@ -112,13 +94,8 @@ class OwnerEndpoint(APIView):
             )            
         
         if 'password' in serializer.validated_data:
-            return Response(
-                {
-                    'error': 
-                    'Password modification is not allowed through this endpoint.'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )            
+            message = 'Password modification is not allowed through this endpoint.'
+            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -129,7 +106,7 @@ class OwnerEndpoint(APIView):
         user.is_active = False
         user.save()
         return Response(
-            {'success:': 'User is inactive'},
+{'success:': 'User is inactive'},
             status=status.HTTP_200_OK
         )
 
