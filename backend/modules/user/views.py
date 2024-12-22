@@ -1,19 +1,21 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions, throttling
+from rest_framework import permissions
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework import status
 
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from .serializers import SuperUserSerializer
+from .throttling import BurstRateThrottle, SustainedRateThrottle
 
 User = get_user_model()
 
 
 class MeEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
-    throttle_classes = [throttling.UserRateThrottle]
+    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def get(self, request, format=None):
         user = request.user
@@ -25,9 +27,9 @@ class OwnerEndpoint(APIView):
     def get_throttles(self):
         method = self.request.method
         if method == 'POST':
-            return [throttling.AnonRateThrottle()]
+            return [AnonRateThrottle()]
         else:
-            return [throttling.UserRateThrottle()]
+            return [BurstRateThrottle(), SustainedRateThrottle()]
     
 
     def get_permissions(self):
