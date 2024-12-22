@@ -7,12 +7,12 @@ from django.shortcuts import get_object_or_404
 
 from modules.business.models import Business, BusinessOwner
 from .serializers import BusinessSerializer
-from .throttles import BurstRateTrottle, SustainedRateThrottle
+from .throttles import BurstRateThrottle, SustainedRateThrottle
 
 
 class BusinessEndpoint(APIView): 
     permission_classes = [permissions.IsAdminUser]
-    throttle_classes = [BurstRateTrottle, SustainedRateThrottle]
+    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def check_field_errors(self, request) -> set | None:
         request_fields = set(request.data.keys())

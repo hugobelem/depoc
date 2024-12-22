@@ -1,7 +1,7 @@
 from rest_framework.throttling import UserRateThrottle
 
-
-class BurstRateTrottle(UserRateThrottle):
+# The actual throttle limit is functioning at half the defined rate.
+class BurstRateThrottle(UserRateThrottle):
     rate = '60/min'
 
 
