@@ -7,14 +7,14 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from .serializers import SuperUserSerializer
-from .throttles import BurstRateThrottle, SustainedRateThrottle
 
 User = get_user_model()
 
 
 class MeEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
-    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
+    throttle_classes = [throttling.ScopedRateThrottle]
+    throttle_scope = 'me'
 
     def get(self, request, format=None):
         user = request.user
@@ -23,7 +23,8 @@ class MeEndpoint(APIView):
 
 
 class OwnerEndpoint(APIView):
-    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
+    throttle_classes = [throttling.ScopedRateThrottle]
+    throttle_scope = 'owner'
     
     def get_permissions(self):
         method = self.request.method

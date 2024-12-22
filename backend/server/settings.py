@@ -67,6 +67,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_THROTTLE_RATES': {
+        'me': '5/min',
+        'owner': '5/min',
+        'business': '5/min',
+    }
 }
 
 SIMPLE_JWT = {
