@@ -1,8 +1,12 @@
 from rest_framework import serializers
 
+from django.contrib.auth import get_user_model
+
 from modules.members.models import Members, MembersCredentials
 
 import ulid
+
+User = get_user_model()
 
 
 class MemberSerializer(serializers.ModelSerializer):
@@ -63,12 +67,20 @@ class MemberSerializer(serializers.ModelSerializer):
         
     
     def create(self, validated_data):
-        credentials = self.context['credentials']
         member = Members.objects.create(id=ulid.new().str, **validated_data)
-
         if member.access:
-            MembersCredentials.objects.create(
-                member=member,
-                credentials=credentials
+            name = f'{validated_data['firstName']} {validated_data['lastName']}'
+            email= f'{validated_data['firstName']}@depoc.com.br'
+            username = f'{validated_data['firstName']}@depoc'
+            password = f'{validated_data['firstName']}{validated_data['lastName']}'
+
+            credentials = User.objects.create(
+                id=ulid.new().str,
+                name=name,
+                email=email,
+                username=username,
+                password=password
             )
+
+            MembersCredentials.objects.create(member=member, credentials=credentials)
         return member
