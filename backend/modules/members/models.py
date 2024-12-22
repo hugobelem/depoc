@@ -27,7 +27,7 @@ class Members(models.Model):
     state = models.CharField(max_length=2, blank=True)
     postCode = models.CharField(max_length=8, blank=True)
     phone = models.CharField(max_length=11, blank=True)
-    email = models.EmailField(blank=True, null=True)
+    email = models.EmailField()
     access = models.BooleanField(default=False)    
 
     class Meta:
