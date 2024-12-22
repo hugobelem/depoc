@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 from modules.members.models import Members, MembersCredentials
@@ -70,16 +72,15 @@ class MemberSerializer(serializers.ModelSerializer):
         member = Members.objects.create(id=ulid.new().str, **validated_data)
         if member.access:
             name = f'{validated_data['firstName']} {validated_data['lastName']}'
-            email= f'{validated_data['firstName']}@depoc.com.br'
-            username = f'{validated_data['firstName']}@depoc'
-            password = f'{validated_data['firstName']}{validated_data['lastName']}'
+            email= f'{validated_data['email']}'
+            username = f'{validated_data['firstName'].lower()}@depoc'
 
             credentials = User.objects.create(
                 id=ulid.new().str,
                 name=name,
                 email=email,
                 username=username,
-                password=password
+                is_staff=True
             )
 
             MembersCredentials.objects.create(member=member, credentials=credentials)
