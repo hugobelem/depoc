@@ -23,7 +23,7 @@ class MembersEndpoint(APIView):
 
     def post(self, request):
         try:
-            owner = request.post
+            owner = request.user
             owner.business         
         except:
             message = 'Owner does not have a registered business.'
