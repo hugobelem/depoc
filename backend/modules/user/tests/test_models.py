@@ -19,7 +19,7 @@ class UserModelTest(TestCase):
         self.assertEqual(self.user.email, 'name@email.com')
         self.assertEqual(self.user.name, 'Name')
         self.assertEqual(self.user.username, 'name')
-        self.assertEqual(str(self.user), 'Name')
+        self.assertEqual(str(self.user), 'name@email.com')
 
 
     def test_required_name(self):
