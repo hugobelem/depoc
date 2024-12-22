@@ -13,7 +13,6 @@ class SuperUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 
             'name', 
             'email', 
             'username', 
@@ -23,6 +22,14 @@ class SuperUserSerializer(serializers.ModelSerializer):
         post_required = ['name', 'email', 'username', 'password']
         patch_required = ['name', 'email', 'username']
 
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return {
+            "id": instance.id,
+            "details": representation,
+        }
+    
 
     def validate_password(self, value):
         try:
