@@ -21,6 +21,14 @@ class MeEndpoint(APIView):
 
 
 class OwnerEndpoint(APIView):
+    def get_permissions(self):
+        method = self.request.method
+        if method == 'POST':
+            return [permissions.AllowAny()]
+        else:
+            return [permissions.IsAdminUser()]
+                
+
     def check_field_errors(self, request, check_missing=False) -> set | None:
         request_fields = set(request.data.keys())
         valid_fields = set(SuperUserSerializer.Meta.fields)
@@ -34,14 +42,6 @@ class OwnerEndpoint(APIView):
             return missing_fields
 
         return None
-
-
-    def get_permissions(self):
-        method = self.request.method
-        if method == 'POST':
-            return [permissions.AllowAny()]
-        else:
-            return [permissions.IsAdminUser()]
 
 
     def post(self, request, format=None):    
