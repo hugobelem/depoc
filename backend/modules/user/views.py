@@ -13,8 +13,7 @@ User = get_user_model()
 
 class MeEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
-    throttle_classes = [throttling.ScopedRateThrottle]
-    throttle_scope = 'me'
+    throttle_classes = [throttling.UserRateThrottle]
 
     def get(self, request, format=None):
         user = request.user
@@ -23,9 +22,14 @@ class MeEndpoint(APIView):
 
 
 class OwnerEndpoint(APIView):
-    throttle_classes = [throttling.ScopedRateThrottle]
-    throttle_scope = 'owner'
+    def get_throttles(self):
+        method = self.request.method
+        if method == 'POST':
+            return [throttling.AnonRateThrottle()]
+        else:
+            return [throttling.UserRateThrottle()]
     
+
     def get_permissions(self):
         method = self.request.method
         if method == 'POST':

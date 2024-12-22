@@ -11,8 +11,7 @@ from .serializers import BusinessSerializer
 
 class BusinessEndpoint(APIView): 
     permission_classes = [permissions.IsAdminUser]
-    throttle_classes = [throttling.ScopedRateThrottle]
-    throttle_scope = 'business'
+    throttle_classes = [throttling.UserRateThrottle]
 
     def check_field_errors(self, request) -> set | None:
         request_fields = set(request.data.keys())
