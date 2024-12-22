@@ -38,6 +38,10 @@ class Members(models.Model):
         return f'{self.firstName} {self.lastName}'    
 
 
-# class MembersCredentials(models.Model):
-#     member = models.OneToOneField(Members, on_delete=models.CASCADE)
-#     credentials = models.OneToOneField(User, on_delete=models.CASCADE)
+class MembersCredentials(models.Model):
+    member = models.OneToOneField(Members, on_delete=models.CASCADE)
+    credentials = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = 'Credentials'
+        app_label = 'modules_members'
