@@ -72,7 +72,7 @@ class BusinessEndpoint(APITestCase):
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['legalName'], 'Business2 Inc')
+        self.assertEqual(response.data['details']['legalName'], 'Business2 Inc')
 
 
     def test_create_business_when_owner_already_has_one(self):
@@ -127,7 +127,7 @@ class BusinessEndpoint(APITestCase):
 
     def test_retrieve_business(self):
         response = self.client.get(self.url, format='json')
-        self.assertEqual(response.data['legalName'], 'Business Inc')
+        self.assertEqual(response.data['details']['legalName'], 'Business Inc')
 
 
     def test_retrieve_business_when_owner_dont_have_one(self):

@@ -27,7 +27,7 @@ class MeEndpointTest(APITestCase):
     def test_get_owner_data(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], 'admin')
+        self.assertEqual(response.data['details']['username'], 'admin')
 
 
     def test_admin_permission(self):
@@ -71,7 +71,7 @@ class OwnerEndpointTest(APITestCase):
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['username'], 'admin2')
+        self.assertEqual(response.data['details']['username'], 'admin2')
 
 
     def test_create_owner_with_invalid_fields(self):
@@ -99,7 +99,7 @@ class OwnerEndpointTest(APITestCase):
         data = { "username": "django"}
         response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], 'django')
+        self.assertEqual(response.data['details']['username'], 'django')
 
 
     def test_update_owner_with_invalid_fields(self):
