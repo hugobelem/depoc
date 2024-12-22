@@ -1,18 +1,21 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework import status
 
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from .serializers import SuperUserSerializer
+from .throttling import BurstRateThrottle, SustainedRateThrottle
 
 User = get_user_model()
 
 
 class MeEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
+    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def get(self, request, format=None):
         user = request.user
@@ -21,6 +24,22 @@ class MeEndpoint(APIView):
 
 
 class OwnerEndpoint(APIView):
+    def get_throttles(self):
+        method = self.request.method
+        if method == 'POST':
+            return [AnonRateThrottle()]
+        else:
+            return [BurstRateThrottle(), SustainedRateThrottle()]
+    
+
+    def get_permissions(self):
+        method = self.request.method
+        if method == 'POST':
+            return [permissions.AllowAny()]
+        else:
+            return [permissions.IsAdminUser()]
+                
+
     def check_field_errors(self, request, check_missing=False) -> set | None:
         request_fields = set(request.data.keys())
         valid_fields = set(SuperUserSerializer.Meta.fields)
@@ -34,14 +53,6 @@ class OwnerEndpoint(APIView):
             return missing_fields
 
         return None
-
-
-    def get_permissions(self):
-        method = self.request.method
-        if method == 'POST':
-            return [permissions.AllowAny()]
-        else:
-            return [permissions.IsAdminUser()]
 
 
     def post(self, request, format=None):    
@@ -105,8 +116,5 @@ class OwnerEndpoint(APIView):
         user = get_object_or_404(User, id=request.user.id)
         user.is_active = False
         user.save()
-        return Response(
-{'success:': 'User is inactive'},
-            status=status.HTTP_200_OK
-        )
+        return Response({'success:': 'User is inactive'}, status=status.HTTP_200_OK)
 
