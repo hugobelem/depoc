@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework import permissions, throttling
 from rest_framework import status
 
 from django.contrib.auth import get_user_model
@@ -105,8 +105,5 @@ class OwnerEndpoint(APIView):
         user = get_object_or_404(User, id=request.user.id)
         user.is_active = False
         user.save()
-        return Response(
-{'success:': 'User is inactive'},
-            status=status.HTTP_200_OK
-        )
+        return Response({'success:': 'User is inactive'}, status=status.HTTP_200_OK)
 
