@@ -9,7 +9,6 @@ class BusinessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
         fields = [
-            'id',
             'legalName',
             'tradeName',
             'registrationNumber',
@@ -27,7 +26,34 @@ class BusinessSerializer(serializers.ModelSerializer):
             'email',            
         ]
         required = ['legalName', 'tradeName', 'registrationNumber']
-        expected = [field for field in fields if field != 'id']
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return {
+            'id': instance.id,
+            'details': {
+                'legalName': representation.pop('legalName'),
+                'tradeName': representation.pop('tradeName'),   
+                'registrationNumber': representation.pop('registrationNumber'),
+                'stateRegistration': representation.pop('stateRegistration'),
+                'cityRegistration': representation.pop('cityRegistration'),
+                'companyType': representation.pop('companyType'),
+                'category': representation.pop('category'),
+                'address': {
+                    'streetAddress': representation.pop('streetAddress'),
+                    'addressNumber': representation.pop('addressNumber'),
+                    'neighborhood': representation.pop('neighborhood'),
+                    'city': representation.pop('city'),
+                    'state': representation.pop('state'),
+                    'postCode': representation.pop('postCode'),
+                },
+                'contact': {
+                    'phone': representation.pop('phone'),
+                    'email': representation.pop('email'),                    
+                }
+            },
+        }        
         
     
     def create(self, validated_data):

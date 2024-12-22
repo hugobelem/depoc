@@ -40,7 +40,7 @@ class BusinessEndpoint(APIView):
         field_errors = self.check_field_errors(request)
         if field_errors:
             message = f'Invalid fields: {", ".join(field_errors)}'
-            expected_fields = BusinessSerializer.Meta.expected
+            expected_fields = BusinessSerializer.Meta.fields
             return Response(
                 {'error': message, 'expected': expected_fields}, 
                 status=status.HTTP_400_BAD_REQUEST
@@ -92,7 +92,7 @@ class BusinessEndpoint(APIView):
         field_errors = self.check_field_errors(request)
         if field_errors:
             message = f'Invalid fields: {", ".join(field_errors)}'
-            expected_fields = BusinessSerializer.Meta.expected
+            expected_fields = BusinessSerializer.Meta.fields
             return Response(
                 {'error': message, 'expected': expected_fields}, 
                 status=status.HTTP_400_BAD_REQUEST
