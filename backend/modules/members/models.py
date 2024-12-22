@@ -14,12 +14,11 @@ class Members(models.Model):
     firstName = models.CharField(max_length=150)
     lastName = models.CharField(max_length=150)
     personalId = models.CharField(max_length=11, blank=True)
-    dateOfBirth = models.DateField()    
-    role = models.CharField(max_length=150)
-    status = models.CharField(max_length=150)
-    access = models.BooleanField(default=False)    
-    hireDate = models.DateTimeField(blank=True, null=True)
-    position = models.CharField(max_length=150)    
+    dateOfBirth = models.DateField(blank=True, null=True)    
+    role = models.CharField(max_length=150, blank=True)
+    status = models.CharField(max_length=150, blank=True)
+    hireDate = models.DateField(blank=True, null=True)
+    position = models.CharField(max_length=150, blank=True)    
     salary = models.DecimalField(max_digits=10, decimal_places=2)
     streetAddress = models.CharField(max_length=150, blank=True)
     addressNumber = models.CharField(max_length=10, blank=True)
@@ -29,10 +28,11 @@ class Members(models.Model):
     postCode = models.CharField(max_length=8, blank=True)
     phone = models.CharField(max_length=11, blank=True)
     email = models.EmailField(blank=True, null=True)
+    access = models.BooleanField(default=False)    
 
     class Meta:
         verbose_name_plural = 'Members'
-        app_label = 'modules_business'
+        app_label = 'modules_members'
 
     def __str__(self):
         return f'{self.firstName} {self.lastName}'    
