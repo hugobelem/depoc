@@ -30,7 +30,7 @@ class Business(models.Model):
     active = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name_plural = 'Business'
+        verbose_name_plural = 'Businesses'
         app_label = 'modules_business'
 
     def __str__(self):
@@ -50,7 +50,7 @@ class BusinessOwner(models.Model):
     )
 
     class Meta:
-        verbose_name_plural = 'Business Owner'
+        verbose_name_plural = 'Business Owners'
         app_label = 'modules_business'   
 
     def __str__(self):

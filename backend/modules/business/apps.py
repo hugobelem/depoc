@@ -5,4 +5,4 @@ class BusinessConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'modules.business'
     label = 'modules_business'
-    verbose_name = 'Business'
+    verbose_name = 'Businesses'
