@@ -1,16 +1,16 @@
-# type: ignore
-
 from django.db import models
 from django.contrib.auth import get_user_model
 
-import ulid
 
 User = get_user_model()
 
 
 class Business(models.Model):
     id = models.CharField(
-        primary_key=True, max_length=26, default=ulid.new().str
+        max_length=26,
+        primary_key=True,
+        unique=True,
+        editable=False
     )
     legalName = models.CharField(max_length=150)
     tradeName = models.CharField(max_length=150)
@@ -39,10 +39,14 @@ class Business(models.Model):
 
 class BusinessOwner(models.Model):
     owner = models.OneToOneField(
-        User, related_name='business', on_delete=models.CASCADE
+        User,
+        related_name='business',
+        on_delete=models.CASCADE
     )
     business = models.OneToOneField(
-        Business, related_name='owner', on_delete=models.CASCADE
+        Business,
+        related_name='owner',
+        on_delete=models.CASCADE
     )
 
     class Meta:
