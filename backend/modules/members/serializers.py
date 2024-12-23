@@ -87,7 +87,7 @@ class MemberSerializer(serializers.ModelSerializer):
         ) 
 
         if member.access:
-            name = f'{validated_data['firstName']} {validated_data['lastName']}'
+            name = str(validated_data['firstName']) + str(validated_data['lastName'])
             email= validated_data['email']
             credentials = User.objects.create(
                 id=ulid.new().str,
