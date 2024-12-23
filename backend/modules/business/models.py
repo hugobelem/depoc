@@ -73,4 +73,4 @@ class BusinessMembers(models.Model):
         app_label = 'modules_business'   
 
     def __str__(self):
-        return f'{self.members} - {self.business}'
+        return f'{self.member} - {self.business}'
