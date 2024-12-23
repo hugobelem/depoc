@@ -17,7 +17,7 @@ class MemberSerializer(serializers.ModelSerializer):
         fields = [
             'firstName',
             'lastName',
-            'personalId',
+            'taxId',
             'dateOfBirth',
             'role',
             'status',
@@ -44,7 +44,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'details': {
                 'firstName': representation.pop('firstName'),
                 'lastName': representation.pop('lastName'),
-                'personalId': representation.pop('personalId'),
+                'taxId': representation.pop('taxId'),
                 'dateOfBirth': representation.pop('dateOfBirth'),
                 'role': representation.pop('role'),
                 'status': representation.pop('status'),
