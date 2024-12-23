@@ -4,7 +4,7 @@ from .models import Members, MembersCredentials
 
 
 class MembersAdmin(admin.ModelAdmin):
-    list_display = ['id', 'firstName', 'role', 'status']
+    list_display = ['id', 'taxId', 'email', 'role', 'status']
 
 class MembersCredentialsAdmin(admin.ModelAdmin):
     list_display = ['member', 'credentials']
