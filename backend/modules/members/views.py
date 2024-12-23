@@ -70,10 +70,15 @@ class MembersEndpoint(APIView):
         try:
             owner = get_object_or_404(BusinessOwner, owner=request.user)
             business = get_object_or_404(Business, id=owner.business.id)
-            business_members = BusinessMembers.objects.filter(business=business.id)
         except:
             message = 'Owner does not have a registered business.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND) 
+
+        try:
+            business_members = BusinessMembers.objects.filter(business=business.id)
+        except:
+            message = 'Owner does not registered members.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)          
         
         if id:
             member = get_object_or_404(Members, id=id)
