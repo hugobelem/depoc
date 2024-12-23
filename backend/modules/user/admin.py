@@ -6,7 +6,7 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 User = get_user_model()
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('name', 'username', 'email', 'id')
+    list_display = ('name', 'is_superuser', 'username', 'email', 'id')
     readonly_fields = ['last_login', 'date_joined']
 
     def get_fields(self, request, obj=None):
