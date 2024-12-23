@@ -7,7 +7,7 @@ class MembersAdmin(admin.ModelAdmin):
     list_display = ['id', 'taxId', 'email', 'role', 'status']
 
 class MembersCredentialsAdmin(admin.ModelAdmin):
-    list_display = ['member', 'credentials']
+    list_display = ['member', 'credential']
 
 
 admin.site.register(Members, MembersAdmin)

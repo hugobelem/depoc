@@ -6,3 +6,6 @@ class MembersConfig(AppConfig):
     name = 'modules.members'
     label = 'modules_members'
     verbose_name = 'Members'
+
+    def ready(self):
+        from . import signals

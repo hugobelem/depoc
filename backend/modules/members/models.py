@@ -45,12 +45,20 @@ class MembersCredentials(models.Model):
         unique=True,
         editable=False
     )    
-    member = models.OneToOneField(Members, on_delete=models.CASCADE)
-    credentials = models.OneToOneField(User, on_delete=models.CASCADE)
+    member = models.OneToOneField(
+        Members,
+        related_name='credentials',
+        on_delete=models.CASCADE
+    )
+    credential = models.OneToOneField(
+        User,
+        related_name='member',
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         verbose_name_plural = 'Credentials'
         app_label = 'modules_members'
 
     def __str__(self):
-        return f'{self.member} - {self.credentials}'  
+        return f'{self.member} - {self.credential}'  
