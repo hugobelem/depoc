@@ -66,16 +66,21 @@ class MembersEndpoint(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)   
 
 
-    def get(self, request):
+    def get(self, request, id=None):
         try:
             owner = get_object_or_404(BusinessOwner, owner=request.user)
             business = get_object_or_404(Business, id=owner.business.id)
             business_members = BusinessMembers.objects.filter(business=business.id)
-            members = [business.member for business in business_members]
-            serializer = MemberSerializer(members, many=True)
         except:
             message = 'Owner does not have a registered business.'
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
+        
+        if id:
+            member = get_object_or_404(Members, id=id)
+            serializer = MemberSerializer(member)
+        else:
+            members = [business.member for business in business_members]
+            serializer = MemberSerializer(members, many=True)        
              
         if not business.active:
             message = 'The business is deactivated.'
