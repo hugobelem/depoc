@@ -85,3 +85,10 @@ class MemberSerializer(serializers.ModelSerializer):
                 credentials=credentials
             )
         return member
+
+
+    def update(self, instance, validated_data):
+        member = self.context['member']
+        Members.objects.filter(id=member.id).update(**validated_data)
+        instance.refresh_from_db()
+        return instance
