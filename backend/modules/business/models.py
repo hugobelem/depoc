@@ -62,7 +62,7 @@ class BusinessMembers(models.Model):
         related_name='business',
         on_delete=models.CASCADE
     )
-    business = models.OneToOneField(
+    business = models.ForeignKey(
         Business,
         related_name='members',
         on_delete=models.CASCADE
