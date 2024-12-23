@@ -5,10 +5,10 @@ from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 from django.apps import apps
+from django.http import Http404
 
 from .throttling import BurstRateThrottle, SustainedRateThrottle
 from .serializers import MemberSerializer
-from .models import Members
 
 Business = apps.get_model('modules_business', 'Business')
 BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
@@ -30,16 +30,15 @@ class MembersEndpoint(APIView):
 
     def post(self, request):
         try:
-            owner = request.user
-            get_owner = get_object_or_404(BusinessOwner, owner=owner)
-            business = get_object_or_404(Business, id=get_owner.business.id)              
-        except:
+            owner = get_object_or_404(BusinessOwner, owner=request.user)
+            business = owner.business
+        except Http404:
             message = 'Owner does not have a registered business.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND) 
         
         if not business.active:
             message = 'The business is deactivated.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)        
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)       
 
         data = request.data
         if not data:
@@ -55,7 +54,7 @@ class MembersEndpoint(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )      
         
-        serializer = MemberSerializer(data=data, context={'owner': owner})
+        serializer = MemberSerializer(data=data, context={'business': business})
         if not serializer.is_valid():
             return Response(
                 {'error': 'Validation failed', 'details': serializer.errors},
@@ -69,31 +68,34 @@ class MembersEndpoint(APIView):
     def get(self, request, id=None):
         try:
             owner = get_object_or_404(BusinessOwner, owner=request.user)
-            business = get_object_or_404(Business, id=owner.business.id)
-        except:
+            business = owner.business
+        except Http404:
             message = 'Owner does not have a registered business.'
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND) 
-
-        try:
-            business_members = BusinessMembers.objects.filter(business=business.id)
-        except:
-            message = 'Owner does not registered members.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)          
         
-        if id:
-            member = get_object_or_404(Members, id=id)
-            serializer = MemberSerializer(member)
-        else:
-            members = [business.member for business in business_members]
-            serializer = MemberSerializer(members, many=True)        
-             
         if not business.active:
             message = 'The business is deactivated.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)                  
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+
+        business_members = BusinessMembers.objects.filter(business=business.id)
+        if not business_members.exists():
+            message = 'Owner does not have registered members.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+
+        if id:
+            members = business_members.filter(member__id=id).first()
+            if not members:
+                message = 'Member not found.'
+                return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+            serializer = MemberSerializer(members.member)
+        else:
+            members = [bm.member for bm in business_members]
+            serializer = MemberSerializer(members, many=True)            
+                              
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-    def patch(self, request, id=None):
+    def patch(self, request, id):
         try:
             owner = request.user
             get_owner = get_object_or_404(BusinessOwner, owner=owner)
@@ -104,18 +106,22 @@ class MembersEndpoint(APIView):
         
         if not business.active:
             message = 'The business is deactivated.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)   
-
-        try:
-            member = Members.objects.get(id=id)    
-        except:
-            message = 'Member not found.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)          
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+        
+        business_members = BusinessMembers.objects.filter(business=business.id)
+        if not business_members:
+            message = 'Owner does not have registered members.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
 
         data = request.data
         if not data:
             message = 'No data provided for member update.'
             return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
+        
+        members = business_members.filter(member__id=id).first()
+        if not members:
+            message = 'Member not found.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)       
         
         field_errors = self.check_field_errors(request)
         if field_errors:
@@ -127,10 +133,10 @@ class MembersEndpoint(APIView):
             )
          
         serializer = MemberSerializer(
-            instance=member, 
+            instance=members.member, 
             data=data,
             partial=True,
-            context={'member':member}
+            context={'members': members}
         )
         if not serializer.is_valid():
             return Response(
@@ -153,14 +159,18 @@ class MembersEndpoint(APIView):
         
         if not business.active:
             message = 'The business is deactivated.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)   
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND) 
 
-        try:
-            member = Members.objects.get(id=id)    
-        except:
+        business_members = BusinessMembers.objects.filter(business=business.id)
+        if not business_members:
+            message = 'Owner does not have registered members.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)        
+        
+        members = business_members.filter(member__id=id).first()
+        if not members:
             message = 'Member not found.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND) 
 
-        member.delete()
+        members.member.delete()
         message = 'The member has been successfully deleted'
         return Response({'success:': message}, status=status.HTTP_200_OK)
