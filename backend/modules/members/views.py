@@ -84,7 +84,7 @@ class MembersEndpoint(APIView):
     def patch(self, request, id=None):
         try:
             owner = request.user
-            get_owner = get_object_or_404(BusinessOwner, owner=request.user)
+            get_owner = get_object_or_404(BusinessOwner, owner=owner)
             business = get_object_or_404(Business, id=get_owner.business.id)              
         except:
             message = 'Owner does not have a registered business.'
