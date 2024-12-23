@@ -10,7 +10,7 @@ class BusinessOwnerAdmin(admin.ModelAdmin):
     list_display = ('owner', 'business')
 
 class BusinessMembersAdmin(admin.ModelAdmin):
-    list_display = ('members', 'business')
+    list_display = ('member', 'business')
 
 
 admin.site.register(Business, BusinessAdmin)

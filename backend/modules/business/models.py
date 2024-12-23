@@ -57,7 +57,7 @@ class BusinessOwner(models.Model):
     
 
 class BusinessMembers(models.Model):
-    members = models.ForeignKey(
+    member = models.ForeignKey(
         'modules_members.Members',
         related_name='business',
         on_delete=models.CASCADE

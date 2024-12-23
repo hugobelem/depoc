@@ -82,7 +82,7 @@ class MemberSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'error': message})      
 
         member = Members.objects.create(id=ulid.new().str, **validated_data)
-        BusinessMembers.objects.create(members=member, business=business) 
+        BusinessMembers.objects.create(member=member, business=business) 
 
         if member.access:
             name = f'{validated_data['firstName']} {validated_data['lastName']}'
