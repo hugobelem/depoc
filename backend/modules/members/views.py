@@ -6,6 +6,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.apps import apps
 
+from .throttling import BurstRateThrottle, SustainedRateThrottle
 from .serializers import MemberSerializer
 from .models import Members
 
@@ -16,6 +17,7 @@ BusinessMembers = apps.get_model('modules_business', 'BusinessMembers')
 
 class MembersEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
+    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def check_field_errors(self, request) -> set | None:
         request_fields = set(request.data.keys())
