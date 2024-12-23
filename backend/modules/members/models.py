@@ -13,7 +13,7 @@ class Members(models.Model):
     )
     firstName = models.CharField(max_length=150)
     lastName = models.CharField(max_length=150)
-    personalId = models.CharField(max_length=11, blank=True)
+    taxId = models.CharField(max_length=11, blank=True, unique=True)
     dateOfBirth = models.DateField(blank=True, null=True)    
     role = models.CharField(max_length=150, blank=True)
     status = models.CharField(max_length=150, blank=True)
@@ -27,7 +27,7 @@ class Members(models.Model):
     state = models.CharField(max_length=2, blank=True)
     postCode = models.CharField(max_length=8, blank=True)
     phone = models.CharField(max_length=11, blank=True)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     access = models.BooleanField(default=False)    
 
     class Meta:
