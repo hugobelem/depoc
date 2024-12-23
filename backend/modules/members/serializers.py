@@ -71,15 +71,13 @@ class MemberSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         member = Members.objects.create(id=ulid.new().str, **validated_data)
         if member.access:
-            name = f'{validated_data['firstName']} {validated_data['lastName']}'
-            email= f'{validated_data['email']}'
-            username = f'{validated_data['firstName'].lower()}@depoc'
+            name = str(validated_data['firstName']) + str(validated_data['lastName'])
+            email= validated_data['email']
 
             credentials = User.objects.create(
                 id=ulid.new().str,
                 name=name,
                 email=email,
-                username=username,
                 is_staff=True
             )
 
