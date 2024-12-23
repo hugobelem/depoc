@@ -39,6 +39,12 @@ class Members(models.Model):
 
 
 class MembersCredentials(models.Model):
+    id = models.CharField(
+        max_length=26,
+        primary_key=True,
+        unique=True,
+        editable=False
+    )    
     member = models.OneToOneField(Members, on_delete=models.CASCADE)
     credentials = models.OneToOneField(User, on_delete=models.CASCADE)
 

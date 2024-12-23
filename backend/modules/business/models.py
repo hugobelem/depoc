@@ -37,6 +37,12 @@ class Business(models.Model):
 
 
 class BusinessOwner(models.Model):
+    id = models.CharField(
+        max_length=26,
+        primary_key=True,
+        unique=True,
+        editable=False
+    )    
     owner = models.OneToOneField(
         User,
         related_name='business',
@@ -57,6 +63,12 @@ class BusinessOwner(models.Model):
     
 
 class BusinessMembers(models.Model):
+    id = models.CharField(
+        max_length=26,
+        primary_key=True,
+        unique=True,
+        editable=False
+    )    
     member = models.ForeignKey(
         'modules_members.Members',
         related_name='business',

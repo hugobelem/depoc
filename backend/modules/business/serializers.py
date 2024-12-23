@@ -62,8 +62,11 @@ class BusinessSerializer(serializers.ModelSerializer):
             id=ulid.new().str,
             **validated_data
         )
-        
-        BusinessOwner.objects.create(owner=owner, business=business)
+        BusinessOwner.objects.create(
+            id=ulid.new().str,
+            owner=owner,
+            business=business
+        )
         return business
     
     
