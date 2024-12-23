@@ -43,7 +43,7 @@ class MembersEndpoint(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )      
         
-        serializer = MemberSerializer(data=data)
+        serializer = MemberSerializer(data=data, context={'owner': owner})
         if not serializer.is_valid():
             return Response(
                 {'error': 'Validation failed', 'details': serializer.errors},
