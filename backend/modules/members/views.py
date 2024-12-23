@@ -29,10 +29,15 @@ class MembersEndpoint(APIView):
     def post(self, request):
         try:
             owner = request.user
-            owner.business         
+            get_owner = get_object_or_404(BusinessOwner, owner=owner)
+            business = get_object_or_404(Business, id=get_owner.business.id)              
         except:
             message = 'Owner does not have a registered business.'
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
+        
+        if not business.active:
+            message = 'The business is deactivated.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)        
 
         data = request.data
         if not data:
@@ -79,10 +84,15 @@ class MembersEndpoint(APIView):
     def patch(self, request, id=None):
         try:
             owner = request.user
-            owner.business         
+            get_owner = get_object_or_404(BusinessOwner, owner=request.user)
+            business = get_object_or_404(Business, id=get_owner.business.id)              
         except:
             message = 'Owner does not have a registered business.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND) 
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
+        
+        if not business.active:
+            message = 'The business is deactivated.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)   
 
         try:
             member = Members.objects.get(id=id)    
@@ -123,10 +133,15 @@ class MembersEndpoint(APIView):
     def delete(self, request, id):
         try:
             owner = request.user
-            owner.business         
+            get_owner = get_object_or_404(BusinessOwner, owner=owner)
+            business = get_object_or_404(Business, id=get_owner.business.id)              
         except:
             message = 'Owner does not have a registered business.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND) 
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
+        
+        if not business.active:
+            message = 'The business is deactivated.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)   
 
         try:
             member = Members.objects.get(id=id)    
