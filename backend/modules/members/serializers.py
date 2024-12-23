@@ -1,14 +1,18 @@
 from rest_framework import serializers
+from rest_framework import status
 
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.apps import apps
+from django.shortcuts import get_object_or_404
 
 from modules.members.models import Members, MembersCredentials
 
 import ulid
 
 User = get_user_model()
+Business = apps.get_model('modules_business', 'Business')
+BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
+BusinessMembers = apps.get_model('modules_business', 'BusinessMembers')
 
 
 class MemberSerializer(serializers.ModelSerializer):
@@ -69,11 +73,20 @@ class MemberSerializer(serializers.ModelSerializer):
         
     
     def create(self, validated_data):
+        try:
+            owner = self.context['owner']
+            get_owner = BusinessOwner.objects.get(owner=owner)
+            business = get_owner.business
+        except BusinessOwner.DoesNotExist:
+            message = 'Failed to associate member.'
+            raise serializers.ValidationError({'error': message})      
+
         member = Members.objects.create(id=ulid.new().str, **validated_data)
+        BusinessMembers.objects.create(members=member, business=business) 
+
         if member.access:
             name = f'{validated_data['firstName']} {validated_data['lastName']}'
             email= validated_data['email']
-
             credentials = User.objects.create(
                 id=ulid.new().str,
                 name=name,
@@ -84,6 +97,7 @@ class MemberSerializer(serializers.ModelSerializer):
                 member=member,
                 credentials=credentials
             )
+
         return member
 
 
