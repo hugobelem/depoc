@@ -36,7 +36,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'email',
             'access',   
         ]
-        required = ['firstName', 'lastName', 'salary']
+        required = ['firstName', 'lastName', 'taxId', 'salary', 'email']
 
 
     def to_representation(self, instance):
