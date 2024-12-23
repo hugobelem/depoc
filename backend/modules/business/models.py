@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-
 User = get_user_model()
 
 
@@ -56,3 +55,22 @@ class BusinessOwner(models.Model):
     def __str__(self):
         return f'{self.owner} owns {self.business}'
     
+
+class BusinessMembers(models.Model):
+    members = models.ForeignKey(
+        'modules_members.Members',
+        related_name='business',
+        on_delete=models.CASCADE
+    )
+    business = models.OneToOneField(
+        Business,
+        related_name='members',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name_plural = 'Business Members'
+        app_label = 'modules_business'   
+
+    def __str__(self):
+        return f'{self.members} - {self.business}'

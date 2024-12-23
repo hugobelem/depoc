@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from modules.business.models import Business, BusinessOwner
+from modules.business.models import Business, BusinessOwner, BusinessMembers
 
 
 class BusinessAdmin(admin.ModelAdmin):
@@ -9,6 +9,10 @@ class BusinessAdmin(admin.ModelAdmin):
 class BusinessOwnerAdmin(admin.ModelAdmin):
     list_display = ('owner', 'business')
 
+class BusinessMembersAdmin(admin.ModelAdmin):
+    list_display = ('members', 'business')
+
 
 admin.site.register(Business, BusinessAdmin)
 admin.site.register(BusinessOwner, BusinessOwnerAdmin)
+admin.site.register(BusinessMembers, BusinessMembersAdmin)
