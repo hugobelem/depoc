@@ -86,7 +86,7 @@ class BusinessEndpoint(APIView):
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
                       
         if not data:
-            message = 'No data provided for business creation.'
+            message = 'No data provided for business update.'
             return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
              
         field_errors = self.check_field_errors(request)
