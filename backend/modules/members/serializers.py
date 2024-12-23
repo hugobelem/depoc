@@ -71,14 +71,7 @@ class MemberSerializer(serializers.ModelSerializer):
         
     
     def create(self, validated_data):
-        owner = self.context['owner']
-        try:
-            get_owner = BusinessOwner.objects.get(owner=owner)
-            business = get_owner.business
-        except BusinessOwner.DoesNotExist:
-            message = 'Failed to associate member.'
-            raise serializers.ValidationError({'error': message})      
-        
+        business = self.context['business']  
         member_id = ulid.new().str
         member = Members.objects.create(id=member_id, **validated_data)
 
@@ -107,7 +100,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        member = self.context['member']
-        Members.objects.filter(id=member.id).update(**validated_data)
+        members = self.context['members']
+        Members.objects.filter(id=members.member.id).update(**validated_data)
         instance.refresh_from_db()
         return instance
