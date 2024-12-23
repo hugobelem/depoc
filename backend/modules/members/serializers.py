@@ -75,23 +75,28 @@ class MemberSerializer(serializers.ModelSerializer):
         member_id = ulid.new().str
         member = Members.objects.create(id=member_id, **validated_data)
 
+        business_members_id = ulid.new().str
         BusinessMembers.objects.create(
-            id=ulid.new().str,
+            id=business_members_id,
             member=member,
             business=business
         )
 
         if member.access:
-            name = str(validated_data['firstName']) + str(validated_data['lastName'])
+            name = f"{validated_data['firstName']} {validated_data['lastName']}"
             email= validated_data['email']
+
+            credentials_id = ulid.new().str
             credentials = User.objects.create(
-                id=ulid.new().str,
+                id=credentials_id,
                 name=name,
                 email=email,
                 is_staff=True
             )
+            
+            credentials_id = ulid.new().str
             MembersCredentials.objects.create(
-                id=ulid.new().str,
+                id=credentials_id,
                 member=member,
                 credentials=credentials
             )
