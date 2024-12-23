@@ -4,9 +4,14 @@ from rest_framework import permissions
 from rest_framework import status
 
 from django.shortcuts import get_object_or_404
+from django.apps import apps
 
 from .serializers import MemberSerializer
 from .models import Members
+
+Business = apps.get_model('modules_business', 'Business')
+BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
+BusinessMembers = apps.get_model('modules_business', 'BusinessMembers')
 
 
 class MembersEndpoint(APIView):
@@ -52,6 +57,23 @@ class MembersEndpoint(APIView):
         
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)   
+
+
+    def get(self, request):
+        try:
+            owner = get_object_or_404(BusinessOwner, owner=request.user)
+            business = get_object_or_404(Business, id=owner.business.id)
+            business_members = BusinessMembers.objects.filter(business=business.id)
+            members = [business.member for business in business_members]
+            serializer = MemberSerializer(members, many=True)
+        except:
+            message = 'Owner does not have a registered business.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
+             
+        if not business.active:
+            message = 'The business is deactivated.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)                  
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
     def patch(self, request, id=None):
