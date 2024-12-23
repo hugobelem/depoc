@@ -1,9 +1,7 @@
 from rest_framework import serializers
-from rest_framework import status
 
 from django.contrib.auth import get_user_model
 from django.apps import apps
-from django.shortcuts import get_object_or_404
 
 from modules.members.models import Members, MembersCredentials
 
