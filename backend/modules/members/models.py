@@ -45,3 +45,6 @@ class MembersCredentials(models.Model):
     class Meta:
         verbose_name_plural = 'Credentials'
         app_label = 'modules_members'
+
+    def __str__(self):
+        return f'{self.member} - {self.credentials}'  
