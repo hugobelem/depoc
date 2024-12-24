@@ -1,9 +1,10 @@
 from django.test import TestCase
 from django.db.utils import IntegrityError
+from django.contrib.auth import get_user_model
 
 from modules.members.models import Members, MembersCredentials
 
-import ulid
+User = get_user_model()
 
 
 class MembersTest(TestCase):
@@ -95,12 +96,28 @@ class MembersTest(TestCase):
     
 class MembersCredentialsTest(TestCase):
     def setUp(self):
-        return super().setUp()
+        self.member = Members.objects.create(
+            id='J23O4K2J3R93URP2OI3J2323KJ',
+            firstName="Member",
+            lastName="Self",
+            email="memberself@email.com",
+        )
+        self.member.full_clean()        
+        self.credential = User.objects.create(
+            id='J23O4K2J3R93URP2OI3J7323KJ',
+            name='member',
+            username='member',
+            email='member@email.com',
+            password='member@password'
+        )
+        self.credential.full_clean()
     
 
     def test_members_credentials_creation(self):
-        ...
-
-    
-    def test_foreign_key(self):
-        ...
+        members_credentials = MembersCredentials.objects.create(
+            member=self.member,
+            credential=self.credential
+        )
+        members_credentials.full_clean()
+        self.assertEqual(self.member.id, 'J23O4K2J3R93URP2OI3J2323KJ')
+        self.assertEqual(self.credential.id, 'J23O4K2J3R93URP2OI3J7323KJ')
