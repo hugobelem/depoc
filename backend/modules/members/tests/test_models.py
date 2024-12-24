@@ -50,7 +50,7 @@ class MembersTest(TestCase):
         self.assertIn('lastName', str(context.exception))
 
     
-    def test_unique_tax_id(self):
+    def test_unique_tax_id_constraint(self):
         with self.assertRaises(IntegrityError):
             Members.objects.create(
                 id='J23O4K2J3R93URP2OI3J2323KL',
@@ -61,7 +61,7 @@ class MembersTest(TestCase):
             )
 
     
-    def test_unique_email(self):
+    def test_unique_email_constraint(self):
         with self.assertRaises(IntegrityError):
             Members.objects.create(
                 id='J23O4K2J3R93URP2OI3J2323KM',
@@ -72,7 +72,7 @@ class MembersTest(TestCase):
             )
 
 
-    def test_unique_ulid(self):
+    def test_unique_ulid_constraint(self):
         with self.assertRaises(IntegrityError):
             Members.objects.create(
                 id='J23O4K2J3R93URP2OI3J2323KJ',
