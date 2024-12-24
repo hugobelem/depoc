@@ -11,8 +11,8 @@ class Members(models.Model):
         unique=True,
         editable=False
     )
-    firstName = models.CharField(max_length=150)
-    lastName = models.CharField(max_length=150)
+    firstName = models.CharField(max_length=150, blank=False)
+    lastName = models.CharField(max_length=150, blank=False)
     taxId = models.CharField(max_length=11, blank=True, unique=True)
     dateOfBirth = models.DateField(blank=True, null=True)    
     role = models.CharField(max_length=150, blank=True)
@@ -27,8 +27,8 @@ class Members(models.Model):
     state = models.CharField(max_length=2, blank=True)
     postCode = models.CharField(max_length=8, blank=True)
     phone = models.CharField(max_length=11, blank=True)
-    email = models.EmailField(unique=True)
-    access = models.BooleanField(default=False)    
+    email = models.EmailField(unique=True, blank=False, null=False)
+    access = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = 'Members'
