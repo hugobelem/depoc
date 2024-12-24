@@ -19,7 +19,12 @@ class Members(models.Model):
     status = models.CharField(max_length=150, blank=True)
     hireDate = models.DateField(blank=True, null=True)
     position = models.CharField(max_length=150, blank=True)    
-    salary = models.DecimalField(max_digits=10, decimal_places=2)
+    salary = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        blank=True, 
+        null=True
+    )
     streetAddress = models.CharField(max_length=150, blank=True)
     addressNumber = models.CharField(max_length=10, blank=True)
     neighborhood = models.CharField(max_length=50, blank=True)
