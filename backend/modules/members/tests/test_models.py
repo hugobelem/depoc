@@ -88,6 +88,7 @@ class MembersTest(TestCase):
             id='J23O4K2J3R94URP2OI3J2323KJ',
             firstName="Member",
             lastName="Self",
+            taxId='12345678903',
             email="memberself5@email.com",
         )
         member.full_clean()
@@ -100,6 +101,7 @@ class MembersCredentialsTest(TestCase):
             id='J23O4K2J3R93URP2OI3J2323KJ',
             firstName="Member",
             lastName="Self",
+            taxId='11234567890',
             email="memberself@email.com",
         )
         self.member.full_clean()        
