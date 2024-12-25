@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.apps import apps
 
 from modules.members.models import Members
+from modules.members.throttling import BurstRateThrottle
 
 User = get_user_model()
 Business = apps.get_model('modules_business', 'Business')
@@ -14,6 +15,8 @@ BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 
 class MembersEndpointTest(APITestCase):
     def setUp(self):
+        BurstRateThrottle.rate = '100/min'
+
         self.owner = User.objects.create_superuser(
             id='J23O4K2J3R93URP2OI3J2323KK',
             name='Owner',
