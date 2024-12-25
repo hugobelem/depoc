@@ -86,19 +86,19 @@ class MemberSerializer(serializers.ModelSerializer):
             name = f"{validated_data['firstName']} {validated_data['lastName']}"
             email= validated_data['email']
 
-            credentials_id = ulid.new().str
-            credentials = User.objects.create(
-                id=credentials_id,
+            credential_id = ulid.new().str
+            credential = User.objects.create(
+                id=credential_id,
                 name=name,
                 email=email,
                 is_staff=True
             )
             
-            credentials_id = ulid.new().str
+            credential_id = ulid.new().str
             MembersCredentials.objects.create(
-                id=credentials_id,
+                id=credential_id,
                 member=member,
-                credentials=credentials
+                credential=credential
             )
 
         return member
