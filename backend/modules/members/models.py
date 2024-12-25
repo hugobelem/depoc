@@ -52,7 +52,7 @@ class MembersCredentials(models.Model):
     )    
     member = models.OneToOneField(
         Members,
-        related_name='credentials',
+        related_name='credential',
         on_delete=models.CASCADE
     )
     credential = models.OneToOneField(
