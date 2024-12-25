@@ -13,7 +13,7 @@ class Members(models.Model):
     )
     firstName = models.CharField(max_length=150, blank=False)
     lastName = models.CharField(max_length=150, blank=False)
-    taxId = models.CharField(max_length=11, blank=True, unique=True)
+    taxId = models.CharField(max_length=11, blank=False, unique=True)
     dateOfBirth = models.DateField(blank=True, null=True)    
     role = models.CharField(max_length=150, blank=True)
     status = models.CharField(max_length=150, blank=True)
