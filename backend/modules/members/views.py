@@ -79,7 +79,7 @@ class MembersEndpoint(APIView):
 
         business_members = BusinessMembers.objects.filter(business=business.id)
         if not business_members.exists():
-            message = 'Owner does not have registered members.'
+            message = 'The business does not have registered members.'
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
 
         if id:
@@ -110,7 +110,7 @@ class MembersEndpoint(APIView):
         
         business_members = BusinessMembers.objects.filter(business=business.id)
         if not business_members:
-            message = 'Owner does not have registered members.'
+            message = 'The business does not have registered members.'
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)  
 
         data = request.data
@@ -163,7 +163,7 @@ class MembersEndpoint(APIView):
 
         business_members = BusinessMembers.objects.filter(business=business.id)
         if not business_members:
-            message = 'Owner does not have registered members.'
+            message = 'The business does not have registered members.'
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)        
         
         members = business_members.filter(member__id=id).first()
