@@ -29,7 +29,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'streetAddress',
             'addressNumber',
             'neighborhood',
-            'additionalInfo'
+            'additionalInfo',
             'city',
             'state',
             'postCode',
