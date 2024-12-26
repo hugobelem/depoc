@@ -12,7 +12,7 @@ class Contacts(models.Model):
     alias = models.CharField(max_length=150, blank=True)
     code = models.CharField(max_length=50, blank=False, unique=True)
     entityType = models.CharField(max_length=10, blank=False)
-    taxId = models.CharField(max_length=14, blank=False, unique=True)
+    entityId = models.CharField(max_length=14, blank=False, unique=True)
     taxPayer = models.CharField(max_length=150, blank=True)
     companyTaxCategory = models.CharField(max_length=50, blank=True)
     stateRegistration = models.CharField(max_length=14, blank=True)
@@ -40,4 +40,4 @@ class Contacts(models.Model):
         app_label = 'modules_contacts'
 
     def __str__(self):
-        return f'{self.name} - {self.taxId}'   
+        return f'{self.name} - {self.entityId}'   
