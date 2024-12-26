@@ -32,6 +32,7 @@ class Contacts(models.Model):
     maritalStatus = models.CharField(max_length=50, blank=True)
     notes = models.CharField(max_length=255, blank=True)
     status = models.CharField(max_length=150, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
 
 
     class Meta:
