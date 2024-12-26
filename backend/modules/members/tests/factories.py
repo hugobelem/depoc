@@ -49,3 +49,12 @@ class MembersFactory(factory.django.DjangoModelFactory):
     phone = faker('phone_number')
     email = faker('company_email')
     access = True
+
+
+class MembersCredentialsFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = MembersCredentials
+
+    member = factory.SubFactory(MembersFactory)
+    credential = factory.SubFactory(CredentialsFactory)
+
