@@ -26,7 +26,7 @@ class Contacts(models.Model):
     neighborhood = models.CharField(max_length=50, blank=True)
     additionalInfo = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=11, blank=True)
-    email = models.EmailField(unique=True, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
     dateOfBirth = models.DateField(blank=True, null=True) 
     gender = models.CharField(max_length=50, blank=True)
     maritalStatus = models.CharField(max_length=50, blank=True)
