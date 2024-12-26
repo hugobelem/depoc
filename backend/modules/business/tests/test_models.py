@@ -22,3 +22,9 @@ class TestBusinessOwnerModel(TestCase):
             'owner@email.com owns Owner LTDA'
         )
 
+    def test_business_owner_association(self):
+        owner = factories.OwnerFactory()
+        business = factories.BusinessFactory()
+        business_owner = factories.BusinessOwner(owner=owner, business=business)
+        self.assertTrue(hasattr(owner, 'business'))
+        self.assertTrue(hasattr(business, 'owner'))
