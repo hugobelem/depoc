@@ -20,6 +20,7 @@ class Business(models.Model):
     streetAddress = models.CharField(max_length=150, blank=True)
     addressNumber = models.CharField(max_length=10, blank=True)
     neighborhood = models.CharField(max_length=50, blank=True)
+    additionalInfo = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=150, blank=True)
     state = models.CharField(max_length=2, blank=True)
     postCode = models.CharField(max_length=8, blank=True)
