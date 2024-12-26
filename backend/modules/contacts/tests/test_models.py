@@ -1,16 +1,9 @@
 from django.test import TestCase
 
-from modules.contacts.models import Contacts
+from .factories import CustomerFactory
 
 
 class TestContactsModel(TestCase):
-    def setUp(self):
-        self.customer = Contacts.objects.create(
-         name='Customer',
-         code='1',
-         entityType='PERSON',
-         contactType='CUSTOMER',   
-        )
-    
     def test_str_return(self):
-        self.assertEqual(self.customer.__str__(), 'Customer')
+        customer = CustomerFactory(name='Customer')
+        self.assertEqual(customer.__str__(), 'Customer')
