@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.apps import apps
 
-from modules.members.models import Members
+from modules.members.models import Members, MembersCredentials
 from modules.members.throttling import BurstRateThrottle
 
 User = get_user_model()
@@ -66,6 +66,23 @@ class MembersEndpointTest(APITestCase):
         }
         response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+
+    def test_member_creation_with_credential(self):
+        data = {
+            'firstName': 'The',
+            'lastName': 'Member',
+            'taxId': '12345678901',
+            'email': 'member@email.com',
+            'access': 'True',
+        }
+        response = self.client.post(self.url, data=data, format='json')
+        response_json = response.json()
+        member_id = response_json['id']
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        member = Members.objects.get(id=member_id)
+        self.assertTrue(member.member_credentials)
 
 
     def test_member_creation_whithout_registered_business(self):
@@ -483,3 +500,30 @@ class MembersEndpointTest(APITestCase):
         url = f'http://127.0.0.1:8000/members/0'
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    def test_delete_credential_on_member_deletion(self):
+        data = {
+            'firstName': 'The',
+            'lastName': 'Member',
+            'taxId': '12345678901',
+            'email': 'member@email.com',
+            'access': 'True',
+        }
+        response = self.client.post(self.url, data=data, format='json')
+        response_json = response.json()
+        member_id = response_json['id']
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        member = Members.objects.get(id=member_id)
+        self.assertTrue(member.member_credentials)
+
+        member.delete()
+        member.save()
+
+        with self.assertRaises(MembersCredentials.DoesNotExist):
+            MembersCredentials.objects.get(member=member)
+
+        credentials_id = member.member_credentials.credential.id
+        with self.assertRaises(User.DoesNotExist):        
+            User.objects.get(id=credentials_id)
