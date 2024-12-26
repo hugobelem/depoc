@@ -29,6 +29,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'streetAddress',
             'addressNumber',
             'neighborhood',
+            'additionalInfo'
             'city',
             'state',
             'postCode',
@@ -57,6 +58,7 @@ class MemberSerializer(serializers.ModelSerializer):
                     'streetAddress': representation.pop('streetAddress'),
                     'addressNumber': representation.pop('addressNumber'),
                     'neighborhood': representation.pop('neighborhood'),
+                    'additionalInfo': representation.pop('additionalInfo'),
                     'city': representation.pop('city'),
                     'state': representation.pop('state'),
                     'postCode': representation.pop('postCode'),
