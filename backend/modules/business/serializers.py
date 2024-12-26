@@ -5,6 +5,14 @@ from modules.business.models import Business, BusinessOwner
 import ulid
 
 
+def assign_business_to_owner(owner, business) -> None:
+    BusinessOwner.objects.create(
+        id=ulid.new().str,
+        owner=owner,
+        business=business
+    )
+
+
 class BusinessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
@@ -64,11 +72,7 @@ class BusinessSerializer(serializers.ModelSerializer):
             id=ulid.new().str,
             **validated_data
         )
-        BusinessOwner.objects.create(
-            id=ulid.new().str,
-            owner=owner,
-            business=business
-        )
+        assign_business_to_owner(owner=owner, business=business)
         return business
     
     
