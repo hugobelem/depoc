@@ -7,28 +7,20 @@ from django.contrib.auth import get_user_model
 
 from modules.business.models import Business, BusinessOwner
 
+from . import factories
+
 User = get_user_model()
 
 
-class BusinessEndpoint(APITestCase):
+class TestBusinessEndpointView(APITestCase):
     def setUp(self):
-        self.owner = User.objects.create_superuser(
-            id='1',
-            name='owner',
-            email='owner@email.com',
-            username='owner',
-            password='ownerpassword',
-        )
-        self.business = Business.objects.create(
-            legalName='Business Inc',
-            tradeName='Biz',
-            registrationNumber='01234567891230',
-            active=True,
-        )
-        self.business_owner = BusinessOwner.objects.create(
+        self.owner = factories.OwnerFactory()
+        self.business = factories.BusinessFactory(legalName='The Main Biz')
+        self.business_owner = factories.BusinessOwnerFactory(
             owner=self.owner,
             business=self.business
         )
+
         refresh = RefreshToken.for_user(self.owner)
         self.url = 'http://127.0.0.1:8000/business'
         self.token = str(refresh.access_token)
@@ -36,128 +28,123 @@ class BusinessEndpoint(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
 
-    def test_business_endpoint_permission(self):
-        self.user = User.objects.create_user(
-            id='2',
-            name='User',
-            email='user@email.com',
-            username='user',
-            password='adminpassword',
-        )
-        refresh = RefreshToken.for_user(self.user)
-        self.token = str(refresh.access_token)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
-        response = self.client.get(self.url)
+    def test_permission(self):
+        '''
+        The permission class for the BusinessEndpoint view is [IsAdminUser].
+        Test if a member with no permision can access the endpoint.
+        '''
+        member = factories.MemberFactory()
+
+        refresh = RefreshToken.for_user(member)
+        token = str(refresh.access_token)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
+        response = client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-    def test_create_business(self):
-        self.admin = User.objects.create_superuser(
-            id='3',
-            name='admin',
-            email='admin@email.com',
-            username='admin',
-            password='adminpassword',
-        )        
-        refresh = RefreshToken.for_user(self.admin)
-        self.token = str(refresh.access_token)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
+    def test_post_business(self):
+        '''
+        Send a POST request to create a business.
+        - Only owners can create a business.
+        - An owner is a User model instance with
+          the is_superuser attribute set to True.
+        '''
+        owner = factories.OwnerFactory()
+
+        refresh = RefreshToken.for_user(owner)
+        token = str(refresh.access_token)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         
         data = {
-            'legalName': 'Business2 Inc',
-            'tradeName': 'Biz2',
+            'legalName': 'Business Inc',
+            'tradeName': 'Biz',
             'registrationNumber': '01234567891234',
         }
-        response = self.client.post(self.url, data, format='json')
+        
+        response = client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['details']['legalName'], 'Business2 Inc')
+        self.assertEqual(response.data['details']['legalName'], 'Business Inc')
 
 
-    def test_create_business_when_owner_already_has_one(self):
+    def test_post_business_when_owner_has_one(self):
+        '''
+        Send a POST request to create a business when the Owner making 
+        the request is already linked to an existing business.
+        '''
         data = {
-            'legalName': 'Business3 Inc',
-            'tradeName': 'Biz3',
+            'legalName': 'Business Inc',
+            'tradeName': 'Biz',
             'registrationNumber': '01234567891235',
         }
         response = self.client.post(self.url, data, format='json') 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-    def test_create_business_with_empty_data(self):
-        self.admin = User.objects.create_superuser(
-            id='4',
-            name='adminnew',
-            email='adminnew@email.com',
-            username='adminnew',
-            password='adminpassword',
-        )        
-        refresh = RefreshToken.for_user(self.admin)
-        self.token = str(refresh.access_token)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
+    def test_post_business_with_empty_data(self):
+        '''
+        Send a POST request with empy data to create a business.
+        '''
+        owner = factories.OwnerFactory()
+
+        refresh = RefreshToken.for_user(owner)
+        token = str(refresh.access_token)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         
         data = {}
-        response = self.client.post(self.url, data, format='json')
+
+        response = client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-    def test_create_business_with_invalid_fields(self):
-        self.admin = User.objects.create_superuser(
-            id='5',
-            name='newadmin',
-            email='newadmin@email.com',
-            username='newadmin',
-            password='adminpassword',
-        )        
-        refresh = RefreshToken.for_user(self.admin)
-        self.token = str(refresh.access_token)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
+    def test_post_business_with_invalid_fields(self):
+        owner = factories.OwnerFactory()
+
+        refresh = RefreshToken.for_user(owner)
+        token = str(refresh.access_token)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         
         data = {
-            'name': 'Business4 Inc',
-            'tradeName': 'Biz4',
+            'name': 'Business Inc',
+            'tradeName': 'Biz',
             'registrationNumber': '01234567891236',
         }
-        response = self.client.post(self.url, data, format='json')
+
+        response = client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-    def test_retrieve_business(self):
+    def test_get_business(self):
         response = self.client.get(self.url, format='json')
-        self.assertEqual(response.data['details']['legalName'], 'Business Inc')
+        self.assertEqual(response.data['details']['legalName'], 'The Main Biz')
 
 
-    def test_retrieve_business_when_owner_dont_have_one(self):
-        self.admin = User.objects.create_superuser(
-            id='6',
-            name='admin6',
-            email='admin6@email.com',
-            username='admin6',
-            password='adminpassword',
-        )        
-        refresh = RefreshToken.for_user(self.admin)
-        self.token = str(refresh.access_token)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token) 
+    def test_get_business_when_owner_dont_have_one(self):
+        owner = factories.OwnerFactory()
+             
+        refresh = RefreshToken.for_user(owner)
+        token = str(refresh.access_token)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + token) 
 
-        response = self.client.get(self.url, format='json')
+        response = client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_retrieve_inactive_business(self):
+    def test_get_inactive_business(self):
         self.business.active = False
         self.business.save()
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)        
 
 
-    def test_update_business(self):
-        data = {
-            'tradeName': 'Corporate Biz'
-        }
+    def test_patch_business(self):
+        data = {'tradeName': 'Corporate Biz'}
+
         response = self.client.patch(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)   
 
@@ -165,43 +152,38 @@ class BusinessEndpoint(APITestCase):
         self.assertEqual(updated_business.tradeName, data['tradeName'])
     
 
-    def test_update_business_when_owner_dont_have_one(self):
-        self.admin = User.objects.create_superuser(
-            id='7',
-            name='admin7',
-            email='admin7@email.com',
-            username='admin7',
-            password='adminpassword',
-        )        
-        refresh = RefreshToken.for_user(self.admin)
-        self.token = str(refresh.access_token)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token) 
+    def test_patch_business_when_owner_dont_have_one(self):
+        owner = factories.OwnerFactory()
 
-        response = self.client.patch(self.url, format='json')
+        refresh = RefreshToken.for_user(owner)
+        token = str(refresh.access_token)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + token) 
+
+        response = client.patch(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)        
 
 
-    def test_update_inactive_business(self):
+    def test_patch_inactive_business(self):
         self.business.active = False
         self.business.save()
+
         data = {
             'tradeName': 'Corporate Biz'
         }
+
         response = self.client.patch(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)        
 
 
-    def test_update_business_with_empty_data(self):
+    def test_patch_business_with_empty_data(self):
         data = {}
         response = self.client.patch(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)   
 
 
-    def test_update_business_with_invalid_fields(self):
-        data = {
-            'name': 'Corporate Biz'
-        }
+    def test_patch_business_with_invalid_fields(self):
+        data = {'name': 'Corporate Biz'}
         response = self.client.patch(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)       
 
@@ -212,19 +194,14 @@ class BusinessEndpoint(APITestCase):
          
 
     def test_delete_business_when_owner_dont_have_one(self):
-        self.admin = User.objects.create_superuser(
-            id='8',
-            name='admin8',
-            email='admin8@email.com',
-            username='admin8',
-            password='adminpassword',
-        )        
-        refresh = RefreshToken.for_user(self.admin)
-        self.token = str(refresh.access_token)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token) 
+        owner = factories.OwnerFactory()
 
-        response = self.client.delete(self.url, format='json')
+        refresh = RefreshToken.for_user(owner)
+        token = str(refresh.access_token)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + token) 
+
+        response = client.delete(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)    
          
 
