@@ -13,6 +13,36 @@ BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 BusinessMembers = apps.get_model('modules_business', 'BusinessMembers')
 
 
+def assign_member_to_business(member, business):
+    business_members_id = ulid.new().str
+    BusinessMembers.objects.create(
+        id=business_members_id,
+        member=member,
+        business=business
+    )
+
+
+def create_member_credential(member, validated_data):
+    if member.access:
+        name = f"{validated_data['firstName']} {validated_data['lastName']}"
+        email= validated_data['email']
+
+    credential_id = ulid.new().str
+    credential = User.objects.create(
+        id=credential_id,
+        name=name,
+        email=email,
+        is_staff=True
+    )
+
+    credential_id = ulid.new().str
+    MembersCredentials.objects.create(
+        id=credential_id,
+        member=member,
+        credential=credential
+    )
+
+
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Members
@@ -77,31 +107,8 @@ class MemberSerializer(serializers.ModelSerializer):
         member_id = ulid.new().str
         member = Members.objects.create(id=member_id, **validated_data)
 
-        business_members_id = ulid.new().str
-        BusinessMembers.objects.create(
-            id=business_members_id,
-            member=member,
-            business=business
-        )
-
-        if member.access:
-            name = f"{validated_data['firstName']} {validated_data['lastName']}"
-            email= validated_data['email']
-
-            credential_id = ulid.new().str
-            credential = User.objects.create(
-                id=credential_id,
-                name=name,
-                email=email,
-                is_staff=True
-            )
-            
-            credential_id = ulid.new().str
-            MembersCredentials.objects.create(
-                id=credential_id,
-                member=member,
-                credential=credential
-            )
+        assign_member_to_business(member=member, business=business)
+        create_member_credential(member=member, validated_data=validated_data)
 
         return member
 
