@@ -28,3 +28,5 @@ class TestBusinessOwnerModel(TestCase):
         business_owner = factories.BusinessOwner(owner=owner, business=business)
         self.assertTrue(hasattr(owner, 'business'))
         self.assertTrue(hasattr(business, 'owner'))
+        self.assertTrue(business_owner.owner == owner)
+        self.assertTrue(business_owner.business == business)
