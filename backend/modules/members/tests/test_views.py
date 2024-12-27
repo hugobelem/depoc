@@ -3,36 +3,27 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from django.contrib.auth import get_user_model
-from django.apps import apps
-
-from modules.members.models import Members, MembersCredentials
 from modules.members.throttling import BurstRateThrottle
+from modules.members.models import Members, MembersCredentials
+
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
-Business = apps.get_model('modules_business', 'Business')
-BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 
-class MembersEndpointTest(APITestCase):
+from . import factories
+
+
+class TestMembersEndpointView(APITestCase):
     def setUp(self):
         BurstRateThrottle.rate = '100/min'
 
-        self.owner = User.objects.create_superuser(
-            id='J23O4K2J3R93URP2OI3J2323KK',
-            name='Owner',
-            username='owner',
-            email='owner@email.com',
-            password='theownerpassword',
-        )
-        self.business = Business.objects.create(
-            legalName='Business Inc',
-            tradeName='Biz',
-            registrationNumber='01234567891230',
-        )
-        self.business_owner = BusinessOwner.objects.create(
+        self.owner = factories.OwnerFactory()
+        self.business = factories.BusinessFactory()
+        self.business_owner = factories.BusinessOwnerFactory(
             owner=self.owner,
             business=self.business
-        )        
+        )
+
         refresh = RefreshToken.for_user(self.owner)
         self.url = 'http://127.0.0.1:8000/members'
         self.token = str(refresh.access_token)
@@ -40,23 +31,19 @@ class MembersEndpointTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
 
-    def test_members_endpoint_permission(self):
-        user = User.objects.create_user(
-            id='1',
-            name='User',
-            email='user@email.com',
-            username='user',
-            password='adminpassword',
-        )
-        refresh = RefreshToken.for_user(user)
+    def test_permission(self):
+        member = factories.UserFactory()
+
+        refresh = RefreshToken.for_user(member)
         self.token = str(refresh.access_token)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
+
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-    def test_member_creation(self):
+    def test_post_member(self):
         data = {
             'firstName': 'The',
             'lastName': 'Member',
@@ -68,7 +55,12 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
-    def test_member_creation_with_credential(self):
+    def test_post_member_generate_credentials(self):
+        '''
+        Send POST request to test if the credentials are generated
+        using the member's first name, last name, and email when the member
+        is created with the "access" attribute set to True.
+        '''
         data = {
             'firstName': 'The',
             'lastName': 'Member',
@@ -76,27 +68,35 @@ class MembersEndpointTest(APITestCase):
             'email': 'member@email.com',
             'access': 'True',
         }
+        
         response = self.client.post(self.url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Get the member created
         response_json = response.json()
         member_id = response_json['id']
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
         member = Members.objects.get(id=member_id)
-        self.assertTrue(member.member_credentials)
+
+        # Get the member's credential
+        credential = member.member_credentials.credential
+
+        # Check member and credential matching fields
+        self.assertEqual(credential.name, 'The Member')
+        self.assertEqual(credential.email, 'member@email.com')
 
 
-    def test_member_creation_whithout_registered_business(self):
-        second_owner = User.objects.create_superuser(
-            id='J23O4K2J3R93URP2OI3J23239K',
-            name='Second Owner',
-            username='secondowner',
-            email='secondowner@email.com',
-            password='thesecondownerpassword',
-        )
-        refresh = RefreshToken.for_user(second_owner)
+    def test_post_member_whithout_associated_business(self):
+        '''
+        Send POST request to test member creation when
+        the Owner is not associated with a business.
+        '''
+        owner = factories.OwnerFactory()
+
+        refresh = RefreshToken.for_user(owner)
         token = str(refresh.access_token)
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
         data = {
             'firstName': 'The Second',
             'lastName': 'Member',
@@ -104,11 +104,12 @@ class MembersEndpointTest(APITestCase):
             'email': 'secondmember@email.com',
             'access': 'True',
         }
+
         response = client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_member_creation_with_deactivated_business(self):
+    def test_post_member_with_deactivated_business(self):
         self.business.active = False
         self.business.save()
 
@@ -119,17 +120,18 @@ class MembersEndpointTest(APITestCase):
             'email': 'thirdmember@email.com',
             'access': 'True',
         }
+
         response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_member_creation_with_no_data(self):
+    def test_post_member_with_no_data(self):
         data = {}
         response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-    def test_member_creation_with_invalid_fields(self):
+    def test_post_member_with_invalid_fields(self):
         data = {
             'first_name': 'The Fourth',
             'lastName': 'Member',
@@ -141,25 +143,26 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-    def test_member_creation_with_failed_validation(self):
-        Members.objects.create(
-            firstName='The Fifth',
-            lastName='Member',
-            email='fifthmember@email.com',
-            access='True',
-        )
+    def test_post_member_with_failed_validation(self):
+        '''
+        Send a POST request to create a member with an email
+        that is already associated with a registered member.
+        '''
+        factories.MembersFactory(email='user@email.com')
+
         data = {
-            'firstName': 'The Fifth',
-            'lastName': 'Member',
+            'firstName': 'The',
+            'lastName': 'User',
             'taxId': '12345678905',
-            'email': 'fifthmember@email.com',
-            'access': 'True',
+            'email': 'user@email.com',
         }
+        
         response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-    def test_retrieve_members(self):
+    def test_get_members(self):
+        factories.Members(firstName='The One')
         data = {
             'firstName': 'The Sixth',
             'lastName': 'Member',
@@ -168,6 +171,7 @@ class MembersEndpointTest(APITestCase):
             'access': 'True',
         }
         self.client.post(self.url, data=data, format='json')
+
         data = {
             'firstName': 'The Seventh',
             'lastName': 'Member',
@@ -184,23 +188,23 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response_json[1]['details']['firstName'], 'The Seventh')
 
 
-    def test_retrieve_member_whithout_registered_business(self):
-        third_owner = User.objects.create_superuser(
-            id='J23O4K2J3R93URP2OI3J23239K',
-            name='Third Owner',
-            username='thirdowner',
-            email='thirdowner@email.com',
-            password='thethirdownerpassword',
-        )
-        refresh = RefreshToken.for_user(third_owner)
+    def test_get_members_whithout_associated_business(self):
+        '''
+        Send GET request to test member retrieval when
+        the Owner is not associated with a business.
+        '''
+        owner = factories.OwnerFactory()
+        
+        refresh = RefreshToken.for_user(owner)
         token = str(refresh.access_token)
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
         response = client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_get_member_with_deactivated_business(self):
+    def test_get_members_with_deactivated_business(self):
         data = {
             'firstName': 'The Eighth',
             'lastName': 'Member',
@@ -208,6 +212,7 @@ class MembersEndpointTest(APITestCase):
             'email': 'eighthmember@email.com',
             'access': 'True',
         }
+
         response = self.client.post(self.url, data=data, format='json')
         response_json = response.json()
         self.assertEqual(response_json['details']['firstName'], 'The Eighth')
@@ -219,7 +224,7 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_retrieve_one_member(self):
+    def test_get_one_member(self):
         data = {
             'firstName': 'The Nineth',
             'lastName': 'Member',
@@ -238,13 +243,17 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response_json['details']['firstName'], 'The Nineth')
 
 
-    def test_retrieve_business_with_no_registered_members(self):
+    def test_get_members_when_business_has_no_members(self):
+        '''
+        This test sends a GET request to retrieve the members of a business
+        that has no registered members.
+        '''
         url = f'http://127.0.0.1:8000/members/23432'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_retrieve_not_existing_member(self):
+    def test_get_non_existing_member(self):
         data = {
             'firstName': 'The Nineth',
             'lastName': 'Member',
@@ -259,7 +268,7 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
     
 
-    def test_update_member(self):
+    def test_patch_member(self):
         data = {
             'firstName': 'The 14',
             'lastName': 'Member',
@@ -282,15 +291,10 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response_json['details']['firstName'], 'The Tenth')
 
 
-    def test_update_member_whithout_registered_business(self):
-        fourth_owner = User.objects.create_superuser(
-            id='J23O4K2J3R93URP2OI3J23239K',
-            name='fourth Owner',
-            username='fourthowner',
-            email='fourthowner@email.com',
-            password='thefourthownerpassword',
-        )
-        refresh = RefreshToken.for_user(fourth_owner)
+    def test_patch_member_whithout_associated_business(self):
+        owner = factories.OwnerFactory()
+
+        refresh = RefreshToken.for_user(owner)
         token = str(refresh.access_token)
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
@@ -304,7 +308,7 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         
 
-    def test_update_member_with_deactivated_business(self):
+    def test_patch_member_with_deactivated_business(self):
         data = {
             'firstName': 'The 2',
             'lastName': 'Member',
@@ -326,7 +330,7 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_update_business_with_no_registered_members(self):
+    def test_patch_member_without_registered_members(self):
         data = {
             'firstName': 'The 72',
         }
@@ -335,7 +339,7 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_update_member_with_no_data(self):
+    def test_patch_member_with_no_data(self):
         data = {
             'firstName': 'The 12',
             'lastName': 'Member',
@@ -355,7 +359,7 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-    def test_update_not_existing_member(self):
+    def test_patch_non_existing_member(self):
         data = {
             'firstName': 'The 13',
             'lastName': 'Member',
@@ -372,7 +376,7 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_update_member_with_invalid_fields(self):
+    def test_patch_member_with_invalid_fields(self):
         data = {
             'firstName': 'The 14',
             'lastName': 'Member',
@@ -394,13 +398,8 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-    def test_update_member_with_failed_validation(self):
-        Members.objects.create(
-            firstName='The 1000',
-            lastName='Member',
-            email='1000member@email.com',
-            access='True',
-        )
+    def test_patch_member_with_failed_validation(self):
+        factories.MembersFactory(email='1000member@email.com')
 
         data = {
             'firstName': 'The 15',
@@ -446,14 +445,9 @@ class MembersEndpointTest(APITestCase):
 
 
     def test_delete_member_whithout_registered_business(self):
-        fifth_owner = User.objects.create_superuser(
-            id='J23O4K2J3R93URP2OI3J23239K',
-            name='Fifth Owner',
-            username='fifthowner',
-            email='fifthowner@email.com',
-            password='thefifthownerpassword',
-        )
-        refresh = RefreshToken.for_user(fifth_owner)
+        owner = factories.OwnerFactory()
+        
+        refresh = RefreshToken.for_user(owner)
         token = str(refresh.access_token)
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
@@ -481,13 +475,13 @@ class MembersEndpointTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_update_business_with_no_registered_members(self):
+    def test_delete_member_without_registered_members(self):
         url = f'http://127.0.0.1:8000/members/72'
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    def test_delete_not_existing_member(self):
+    def test_delete_non_existing_member(self):
         data = {
             'firstName': 'The 17',
             'lastName': 'Member',
