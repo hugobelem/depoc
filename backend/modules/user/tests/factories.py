@@ -22,3 +22,15 @@ class UserFactory(factory.django.DjangoModelFactory):
     password = faker('name')
     is_active = True
 
+class OwnerFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+
+    id = factory.Sequence(lambda _: ulid.new().str)
+    name = faker('name')
+    username = faker('user_name')
+    email = faker('company_email')
+    password = faker('name')
+    is_superuser = True
+    is_staff = True
+    is_active = True
