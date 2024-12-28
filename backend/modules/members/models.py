@@ -16,7 +16,7 @@ class Members(models.Model):
     taxId = models.CharField(max_length=11, blank=False, unique=True)
     dateOfBirth = models.DateField(blank=True, null=True)    
     role = models.CharField(max_length=150, blank=True)
-    status = models.CharField(max_length=150, blank=True)
+    status = models.CharField(max_length=150, blank=True, default='ACTIVE')
     hireDate = models.DateField(blank=True, null=True)
     position = models.CharField(max_length=150, blank=True)    
     salary = models.DecimalField(
