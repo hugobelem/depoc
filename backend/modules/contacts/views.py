@@ -81,11 +81,11 @@ class ContactsEndpoint(APIView):
             return error_response
 
         contacts = business_contacts.filter(contact__id=id).first()
-        contact = contacts.contact
         if not contact:
             message = 'Contact not found.'
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
 
+        contact = contacts.contact
         serializer = ContactSerializer(
             instance=contact,
             data=data,
