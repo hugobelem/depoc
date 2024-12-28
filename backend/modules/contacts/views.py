@@ -81,12 +81,13 @@ class ContactsEndpoint(APIView):
             return error_response
 
         contacts = business_contacts.filter(contact__id=id).first()
-        if not contacts:
+        contact = contacts.contact
+        if not contact:
             message = 'Contact not found.'
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = ContactSerializer(
-            instance=contacts.contact,
+            instance=contact,
             data=data,
             partial=True
             )
@@ -99,3 +100,26 @@ class ContactsEndpoint(APIView):
         
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def delete(self, request, id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        business_contacts = services.get_business_contacts(business)
+        if isinstance(business_contacts, Response):
+            error_response = business_contacts
+            return error_response
+        
+        contacts = business_contacts.filter(contact__id=id).first()
+        contact = contacts.contact
+        if not contact:
+            message = 'Contact not found.'
+            return Response({'erro': message}, status=status.HTTP_404_NOT_FOUND)
+        
+        contact.status = 'DELETED'
+        contact.save()
+        
+        return Response({'success': 'Contact deleted'})
