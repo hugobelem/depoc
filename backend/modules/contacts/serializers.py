@@ -21,7 +21,7 @@ def assign_contact_to_business(contact, business):
     )
 
 
-class ContactsSerializer(serializers.ModelSerializer):
+class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contacts
         fields = [
@@ -51,6 +51,7 @@ class ContactsSerializer(serializers.ModelSerializer):
             'status',
         ]
         required = ['name', 'code', 'entityType', 'entityId', 'contactType']
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -93,6 +94,7 @@ class ContactsSerializer(serializers.ModelSerializer):
             },
         }
 
+
     def create(self, validated_data):
         business = self.context['business']
 
@@ -103,3 +105,9 @@ class ContactsSerializer(serializers.ModelSerializer):
         )
         assign_contact_to_business(contact, business=business)
         return contact
+    
+
+    def update(self, instance, validated_data):
+        Contacts.objects.filter(id=instance.id).update(**validated_data)
+        instance.refresh_from_db()
+        return instance
