@@ -119,7 +119,11 @@ class ContactsEndpoint(APIView):
             return Response({'erro': message}, status=status.HTTP_404_NOT_FOUND)
         
         contact = contacts.contact
-        contact.status = 'DELETED'
-        contact.save()
+        if contact.status == 'DELETED':
+            message = 'Contact already marked as deleted.'
+            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            contact.status = 'DELETED'
+            contact.save()
         
-        return Response({'success': 'Contact deleted'})
+        return Response({'success': 'Contact deleted'}, status=status.HTTP_200_OK)
