@@ -166,12 +166,17 @@ class MembersEndpoint(APIView):
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)        
         
         members = business_members.filter(member__id=id).first()
-        member = members.member
         if not members:
             message = 'Member not found.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND) 
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+        
+        member = members.member
+        if member.status == 'DELETED':
+            message = 'Member already marked as deleted'
+            return Response({'error': message})
+        else:
+            member.status = 'DELETED'
+            member.save()
 
-        member.status = 'DELETED'
-        member.save()
         message = 'The member has been successfully deleted'
         return Response({'success:': message}, status=status.HTTP_200_OK)
