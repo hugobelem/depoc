@@ -27,20 +27,20 @@ def create_member_credential(member, validated_data):
         name = f"{validated_data['firstName']} {validated_data['lastName']}"
         email= validated_data['email']
 
-    credential_id = ulid.new().str
-    credential = User.objects.create(
-        id=credential_id,
-        name=name,
-        email=email,
-        is_staff=True
-    )
+        credential_id = ulid.new().str
+        credential = User.objects.create(
+            id=credential_id,
+            name=name,
+            email=email,
+            is_staff=True
+        )
 
-    credential_id = ulid.new().str
-    MembersCredentials.objects.create(
-        id=credential_id,
-        member=member,
-        credential=credential
-    )
+        members_credential_id = ulid.new().str
+        MembersCredentials.objects.create(
+            id=members_credential_id,
+            member=member,
+            credential=credential
+        )
 
 
 class MemberSerializer(serializers.ModelSerializer):
