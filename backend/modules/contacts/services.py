@@ -23,6 +23,7 @@ def check_field_errors(request):
             {'error': message, 'expected': expected_fields}, 
             status=status.HTTP_400_BAD_REQUEST
         )
+    
     return None
 
 
@@ -37,6 +38,7 @@ def get_business(request):
     if not business.active:
         message = 'The business is deactivated.'
         return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+    
     return business
 
 
@@ -44,7 +46,8 @@ def get_data(request):
     data = request.data
     if not data:
         message = 'No data provided for contact creation or update.'
-        return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)     
+        return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)   
+      
     return data
 
 
