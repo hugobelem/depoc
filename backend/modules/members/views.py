@@ -136,7 +136,6 @@ class MembersEndpoint(APIView):
             instance=members.member, 
             data=data,
             partial=True,
-            context={'members': members}
         )
         if not serializer.is_valid():
             return Response(

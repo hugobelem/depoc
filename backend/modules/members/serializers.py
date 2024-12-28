@@ -114,7 +114,6 @@ class MemberSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        members = self.context['members']
-        Members.objects.filter(id=members.member.id).update(**validated_data)
+        Members.objects.filter(id=instance.id).update(**validated_data)
         instance.refresh_from_db()
         return instance
