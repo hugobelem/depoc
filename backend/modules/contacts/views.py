@@ -114,11 +114,11 @@ class ContactsEndpoint(APIView):
             return error_response
         
         contacts = business_contacts.filter(contact__id=id).first()
-        contact = contacts.contact
         if not contact:
             message = 'Contact not found.'
             return Response({'erro': message}, status=status.HTTP_404_NOT_FOUND)
         
+        contact = contacts.contact
         contact.status = 'DELETED'
         contact.save()
         
