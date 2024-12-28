@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.apps import apps
 from django.http import Http404
 
-from .serializers import ContactsSerializer
+from .serializers import ContactSerializer
 
 BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 BusinessContacts = apps.get_model('modules_business', 'BusinessContacts')
@@ -13,12 +13,12 @@ BusinessContacts = apps.get_model('modules_business', 'BusinessContacts')
 
 def check_field_errors(request):
     request_fields = set(request.data.keys())
-    valid_fields = set(ContactsSerializer.Meta.fields)
+    valid_fields = set(ContactSerializer.Meta.fields)
     invalid_fields = request_fields - valid_fields
 
     if invalid_fields:
         message = f'Invalid fields: {", ".join(invalid_fields)}'
-        expected_fields = ContactsSerializer.Meta.fields
+        expected_fields = ContactSerializer.Meta.fields
         return Response(
             {'error': message, 'expected': expected_fields}, 
             status=status.HTTP_400_BAD_REQUEST
