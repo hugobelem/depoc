@@ -173,7 +173,7 @@ class MembersEndpoint(APIView):
         member = members.member
         if member.status == 'DELETED':
             message = 'Member already marked as deleted'
-            return Response({'error': message})
+            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
         else:
             member.status = 'DELETED'
             member.save()
