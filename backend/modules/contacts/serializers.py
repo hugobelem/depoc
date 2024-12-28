@@ -1,6 +1,24 @@
 from rest_framework import serializers
 
+from django.contrib.auth import get_user_model
+from django.apps import apps
+
+import ulid
+
 from .models import Contacts
+
+User = get_user_model()
+Business = apps.get_model('modules_business', 'Business')
+BusinessContacts = apps.get_model('modules_business', 'BusinessContacts')
+
+
+def assign_contact_to_business(contact, business):
+    business_contacts_id = ulid.new().str
+    BusinessContacts.objects.create(
+        id=business_contacts_id,
+        contact=contact,
+        business=business
+    )
 
 
 class ContactsSerializer(serializers.ModelSerializer):
@@ -74,3 +92,14 @@ class ContactsSerializer(serializers.ModelSerializer):
                 }
             },
         }
+
+    def create(self, validated_data):
+        business = self.context['business']
+
+        contact_id = ulid.new().str
+        contact = Contacts.objects.create(
+            id=contact_id,
+            **validated_data,
+        )
+        assign_contact_to_business(contact, business=business)
+        return contact
