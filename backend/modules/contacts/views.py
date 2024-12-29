@@ -81,7 +81,7 @@ class ContactsEndpoint(APIView):
             return error_response
 
         contacts = business_contacts.filter(contact__id=id).first()
-        if not contact:
+        if not contacts:
             message = 'Contact not found.'
             return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
 
@@ -114,7 +114,7 @@ class ContactsEndpoint(APIView):
             return error_response
         
         contacts = business_contacts.filter(contact__id=id).first()
-        if not contact:
+        if not contacts:
             message = 'Contact not found.'
             return Response({'erro': message}, status=status.HTTP_404_NOT_FOUND)
         
