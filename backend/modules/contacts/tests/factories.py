@@ -14,8 +14,14 @@ Business = apps.get_model('modules_business', 'Business')
 BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 
 
+# Generate Mock Data for Model Testing
+def faker(provider):
+    return factory.Faker(provider=provider, locale='pt_BR')
+
+# Generate Mock Data for API Testing
 fakey = Faker(locale='pt_BR')
 
+# Utility Class for Simplifying API Request Data
 class ContactData:
     def __init__(
             self,
@@ -42,10 +48,6 @@ class ContactData:
             'contactType': self.contactType,
             **self.extra_attrs,
         }
-
-
-def faker(provider):
-    return factory.Faker(provider=provider, locale='pt_BR')
 
 
 class UserFactory(factory.django.DjangoModelFactory):
