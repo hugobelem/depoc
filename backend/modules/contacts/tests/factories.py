@@ -2,6 +2,8 @@ import factory
 
 import ulid
 
+from faker import Faker
+
 from modules.contacts.models import Contacts
 
 from django.contrib.auth import get_user_model
@@ -10,6 +12,36 @@ from django.apps import apps
 User = get_user_model()
 Business = apps.get_model('modules_business', 'Business')
 BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
+
+
+fakey = Faker(locale='pt_BR')
+
+class ContactData:
+    def __init__(
+            self,
+            name: str | Faker = None,
+            code: str | Faker = None,
+            entityType: str = 'PERSON',
+            contactType: str = 'CUSTOMER',
+            **kwargs: str,
+        ):
+        self.name = name if name is not None else fakey.name()
+        self.code = code if code is not None else fakey.ssn()
+        self.entityType = entityType
+        self.contactType = contactType
+        self.extra_attrs = kwargs
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def data(self):
+        return {
+            'name': self.name,
+            'code': self.code,
+            'entityType': self.entityType,
+            'contactType': self.contactType,
+            **self.extra_attrs,
+        }
 
 
 def faker(provider):
@@ -75,7 +107,7 @@ class BusinessOwnerFactory(factory.django.DjangoModelFactory):
     business = factory.SubFactory(BusinessFactory)
 
 
-class CustomerFactory(factory.django.DjangoModelFactory):
+class ContactFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Contacts
 
@@ -99,32 +131,4 @@ class CustomerFactory(factory.django.DjangoModelFactory):
     gender = 'MALE'
     maritalStatus = 'SINGLE'
     notes = 'Customer is a faker'
-    status = 'ACTIVE'
-
-
-class SupplierFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Contacts
-
-    id = factory.Sequence(lambda _: ulid.new().str)
-    name = faker('company')
-    code = factory.Sequence(lambda n: f'{n + 1}')
-    entityType = 'BUSINESS'
-    contactType = 'SUPPLIER'
-    alias = faker('catch_phrase_noun')
-    entityId = faker('cnpj')
-    taxPayer = 'CONTRIBUINTE'
-    companyTaxCategory = faker('company_suffix')
-    stateRegistration = faker('ssn')
-    cityRegistration = faker('ssn')
-    streetAddress = faker('street_name')
-    addressNumber = faker('building_number')
-    neighborhood = faker('bairro')
-    additionalInfo = 'complemento:'
-    city = faker('city')
-    state = faker('state')
-    postCode = faker('postcode')
-    phone = faker('phone_number')
-    email = faker('company_email')
-    dateOfBirth = faker('date')
     status = 'ACTIVE'
