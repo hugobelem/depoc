@@ -1,9 +1,9 @@
 from django.test import TestCase
 
-from .factories import CustomerFactory
+from .factories import ContactFactory
 
 
 class TestContactsModel(TestCase):
     def test_str_return(self):
-        customer = CustomerFactory(name='Customer')
+        customer = ContactFactory(name='Customer')
         self.assertEqual(customer.__str__(), 'Customer')
