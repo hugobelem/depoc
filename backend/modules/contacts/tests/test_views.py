@@ -61,6 +61,21 @@ class TestContactsEndpointView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+    def test_post_contact_whithout_associated_business(self):
+        owner = factories.OwnerFactory()
+        
+        refresh = RefreshToken.for_user(owner)
+        token = str(refresh.access_token)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
+        contact = factories.ContactData()
+        data = contact.data()
+
+        response = client.post(self.url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
     def test_post_contact_with_no_data(self):
         data = {}
         response = self.client.post(self.url, data=data, format='json')
