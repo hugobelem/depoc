@@ -119,7 +119,7 @@ class CostHistory(models.Model):
         return f"Cost History for {self.product} on {self.effectiveDate}"
 
 
-class ProductSource(models.Model):
+class ProductSupplier(models.Model):
     id = models.CharField(
         max_length=26,
         primary_key=True,
@@ -128,20 +128,18 @@ class ProductSource(models.Model):
     )
     product = models.OneToOneField(
         Products,
-        related_name='source',
+        related_name='sources',
         on_delete=models.CASCADE,
     )
-    source_content_type = models.ForeignKey(
-        ContentType,
-        related_name='product_sources',
+    supplier= models.ForeignKey(
+        'modules_contacts.Contacts',
+        related_name='products',
         on_delete=models.CASCADE,
     )
-    source_object_id = models.CharField(max_length=50)
-    source = GenericForeignKey('source_content_type', 'source_object_id')
 
     class Meta:
-        verbose_name_plural = 'Sources'
+        verbose_name_plural = 'Suppliers'
         app_label = 'modules_products'
 
     def __str__(self):
-        return f"{self.product.name} - {self.source}"
+        return f"{self.product} - {self.supplier}"
