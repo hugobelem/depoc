@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'modules.business',
     'modules.members',
     'modules.contacts',
+    'modules.products',
     'rest_framework',
 ]
 
