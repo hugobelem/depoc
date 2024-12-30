@@ -10,15 +10,14 @@ class Products(models.Model):
         unique=True,
         editable=False
     )
-    category = models.ForeignKey(
-        'modules_products.Category', 
-        on_delete=models.PROTECT, 
-        related_name='products'
-    )
     name = models.CharField(max_length=150, blank=False)
-    description = models.TextField(blank=True)
     sku = models.CharField(max_length=100, blank=True, unique=True)
-    weight = models.DecimalField(max_digits=6, decimal_places=2)
+    weight = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
     unit = models.CharField(max_length=50, blank=True)
     stock = models.IntegerField(default=0)
     available = models.BooleanField(default=True)
@@ -28,6 +27,13 @@ class Products(models.Model):
     ncm = models.CharField(max_length=10, blank=True)
     barcode = models.IntegerField(blank=True, null=True)
     cest = models.CharField(max_length=20, blank=True)
+    category = models.ForeignKey(
+        'modules_products.Category', 
+        on_delete=models.PROTECT, 
+        related_name='products',
+        blank=True,
+        null=True,
+    )
     costPrice = models.DecimalField(
 	    max_digits=10,
         decimal_places=2,
@@ -72,7 +78,7 @@ class Category(models.Model):
     )
 
     class Meta:
-        verbose_name_plural = 'Product Categories'
+        verbose_name_plural = 'Categories'
         app_label = 'modules_products'
     
     def __str__(self):
@@ -105,6 +111,10 @@ class CostHistory(models.Model):
     )
     created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name_plural = 'Cost History'
+        app_label = 'modules_products'
+
     def __str__(self):
         return f"Cost History for {self.product} on {self.effectiveDate}"
 
@@ -128,6 +138,10 @@ class ProductSource(models.Model):
     )
     source_object_id = models.CharField(max_length=50)
     source = GenericForeignKey('source_content_type', 'source_object_id')
+
+    class Meta:
+        verbose_name_plural = 'Sources'
+        app_label = 'modules_products'
 
     def __str__(self):
         return f"{self.product.name} - {self.source}"
