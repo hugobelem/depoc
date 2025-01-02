@@ -5,7 +5,11 @@ from rest_framework import status
 
 from . import services
 from .throttling import BurstRateThrottle, SustainedRateThrottle
-from .serializers import ProductSerializer, CategorySerializer
+from .serializers import (
+    ProductSerializer,
+    CategorySerializer,
+    CostHistorySerializer
+)
 from .models import Category
 
 
@@ -237,3 +241,36 @@ class ProductCategoryEndpoint(APIView):
             sub.save()
 
         return Response({'success': 'Category deleted'}, status=status.HTTP_200_OK)
+    
+
+class ProductCostHistoryEndpoint(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
+
+    def post(self, request):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        data = services.get_data(request)
+        if isinstance(data, Response):
+            error_response = data
+            return error_response
+        
+        if field_errors := services.check_field_errors(
+            request,
+            CostHistorySerializer
+        ):
+            return field_errors
+
+        
+        serializer = CostHistorySerializer(data=data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': 'Validation failed', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
