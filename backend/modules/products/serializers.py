@@ -107,13 +107,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        parent = instance.parent
         return {
             'id': instance.id,
             'details': {
                 'name': representation.pop('name'),
                 'parent': {
                     'parentId': representation.pop('parent'),
-                    'parentName': f'{instance.parent}',
+                    'parentName': parent.name if parent else ''
                 }
             },
         }
