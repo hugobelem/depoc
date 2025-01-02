@@ -23,8 +23,9 @@ def assign_product_to_business(product, business):
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
-        models = Products
+        model = Products
         fields = [
+            'status',
             'name',
             'sku',
             'weight',
@@ -50,6 +51,7 @@ class ProductSerializer(serializers.ModelSerializer):
         return {
             'id': instance.id,
             'details': {
+                'status': representation.pop('status'),
                 'name': representation.pop('name'),
                 'sku': representation.pop('sku'),
                 'unit': representation.pop('unit'),
@@ -83,7 +85,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
         product_id = ulid.new().str
         product = Products.objects.create(id=product_id, **validated_data)
-        assign_product_to_business(business)
+        assign_product_to_business(product, business)
 
         return product
     
