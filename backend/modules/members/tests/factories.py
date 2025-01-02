@@ -1,7 +1,5 @@
 import factory
 
-import ulid
-
 from modules.members.models import Members, MembersCredentials
 
 from django.contrib.auth import get_user_model
@@ -20,7 +18,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
 
-    id = factory.Sequence(lambda _: ulid.new().str)
     name = faker('name')
     username = faker('user_name')
     email = faker('company_email')
@@ -32,7 +29,6 @@ class OwnerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
 
-    id = factory.Sequence(lambda _: ulid.new().str)
     name = faker('name')
     username = faker('user_name')
     email = faker('company_email')
@@ -46,7 +42,6 @@ class BusinessFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Business
 
-    id = factory.Sequence(lambda _: ulid.new().str)
     tradeName = faker('catch_phrase_noun')
     legalName = faker('company')
     companyType = faker('company_suffix')
@@ -70,7 +65,6 @@ class BusinessOwnerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BusinessOwner
 
-    id = factory.Sequence(lambda _: ulid.new().str)
     owner = factory.SubFactory(OwnerFactory)
     business = factory.SubFactory(BusinessFactory)
 
@@ -79,7 +73,6 @@ class CredentialsFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
 
-    id = factory.Sequence(lambda _: ulid.new().str)
     name = faker('name')
     username = faker('user_name')
     email = faker('company_email')
@@ -91,7 +84,6 @@ class MembersFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Members
 
-    id = factory.Sequence(lambda _: ulid.new().str)
     firstName = faker('first_name')
     lastName = faker('last_name')
     taxId = faker('cpf')
