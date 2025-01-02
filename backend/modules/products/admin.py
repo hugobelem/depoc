@@ -4,7 +4,7 @@ from .models import Products, Category, CostHistory
 
 
 class ProductsAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sku', 'retailPrice')
+    list_display = ('name', 'sku', 'unit', 'retailPrice', 'id')
 
 
 class CategoryAdmin(admin.ModelAdmin):
