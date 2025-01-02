@@ -11,14 +11,14 @@ BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 BusinessProducts = apps.get_model('modules_business', 'BusinessProducts')
 
 
-def check_field_errors(request):
+def check_field_errors(request, serializer):
     request_fields = set(request.data.keys())
-    valid_fields = set(ProductSerializer.Meta.fields)
+    valid_fields = set(serializer.Meta.fields)
     invalid_fields = request_fields - valid_fields
 
     if invalid_fields:
         message = f'Invalid fields: {", ".join(invalid_fields)}'
-        expected_fields = ProductSerializer.Meta.fields
+        expected_fields = serializer.Meta.fields
         return Response(
             {'error': message, 'expected': expected_fields}, 
             status=status.HTTP_400_BAD_REQUEST
