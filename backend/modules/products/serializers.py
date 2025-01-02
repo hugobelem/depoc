@@ -150,8 +150,8 @@ class CostHistorySerializer(serializers.ModelSerializer):
             'id': instance.id,
             'details': {
                 'product': {
-                    'id': representation.pop('product_id'),
-                    'name': representation.pop('product'),
+                    'id': instance.product.id,
+                    'name': instance.product.name,
                 },
                 'quatity': representation.pop('quatity'),
                 'pricing': {
