@@ -1,6 +1,4 @@
 from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 
 
 class Products(models.Model):
@@ -84,6 +82,7 @@ class Category(models.Model):
         null=True, 
         related_name='subcategories',
     )
+    status = models.CharField(max_length=150, blank=True, default='ACTIVE')
 
     class Meta:
         verbose_name_plural = 'Categories'
