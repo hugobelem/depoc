@@ -6,3 +6,6 @@ class ContactsConfig(AppConfig):
     name = 'modules.contacts'
     label = 'modules_contacts'
     verbose_name = 'Contacts'
+
+    def ready(self):
+        from . import signals

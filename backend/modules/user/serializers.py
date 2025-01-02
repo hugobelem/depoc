@@ -6,8 +6,6 @@ from rest_framework import serializers
 
 User = get_user_model()
 
-import ulid
-
 
 class SuperUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,10 +38,8 @@ class SuperUserSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        user = User.objects.create_superuser(
-            id=ulid.new().str,
-            **validated_data
-        )
+        user = User.objects.create_superuser(**validated_data)
+
         return user
     
     

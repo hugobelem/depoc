@@ -3,9 +3,6 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.apps import apps
 
-import ulid
-import json
-
 from .models import Products, Category, CostHistory
 
 User = get_user_model()
@@ -14,9 +11,7 @@ BusinessProducts = apps.get_model('modules_business', 'BusinessProducts')
 
 
 def assign_product_to_business(product, business):
-    business_products_id = ulid.new().str
     BusinessProducts.objects.create(
-        id=business_products_id,
         product=product,
         business=business
     )
@@ -84,9 +79,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         business = self.context['business']
-
-        product_id = ulid.new().str
-        product = Products.objects.create(id=product_id, **validated_data)
+        product = Products.objects.create(**validated_data)
         assign_product_to_business(product, business)
 
         return product
@@ -123,8 +116,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
 
     def create(self, validated_data):
-        category_id = ulid.new().str
-        category = Category.objects.create(id=category_id, **validated_data)
+        category = Category.objects.create(**validated_data)
 
         return category
     
@@ -175,11 +167,7 @@ class CostHistorySerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        cost_history_id = ulid.new().str
-        cost_history = CostHistory.objects.create(
-            id=cost_history_id,
-            **validated_data
-        )
+        cost_history = CostHistory.objects.create(**validated_data)
 
         return cost_history
     

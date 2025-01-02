@@ -8,4 +8,4 @@ class ProductsConfig(AppConfig):
     verbose_name = 'Products'
 
     def ready(self):
-        from .signals import generate_ulids
+        from . import signals

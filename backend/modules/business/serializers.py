@@ -2,12 +2,9 @@ from rest_framework import serializers
 
 from modules.business.models import Business, BusinessOwner
 
-import ulid
-
 
 def assign_business_to_owner(owner, business) -> None:
     BusinessOwner.objects.create(
-        id=ulid.new().str,
         owner=owner,
         business=business
     )
@@ -68,10 +65,7 @@ class BusinessSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         owner = self.context['owner']
-        business = Business.objects.create(
-            id=ulid.new().str,
-            **validated_data
-        )
+        business = Business.objects.create(**validated_data)
         assign_business_to_owner(owner=owner, business=business)
         return business
     

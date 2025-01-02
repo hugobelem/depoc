@@ -6,3 +6,6 @@ class BusinessConfig(AppConfig):
     name = 'modules.business'
     label = 'modules_business'
     verbose_name = 'Businesses'
+
+    def ready(self):
+        from . import signals
