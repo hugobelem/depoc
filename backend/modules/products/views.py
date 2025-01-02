@@ -211,3 +211,29 @@ class ProductCategoryEndpoint(APIView):
         
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def delete(self, request, id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        category = Category.objects.filter(id=id).first()
+        if not category:
+            message = 'Category not found.'
+            return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
+        
+        if category.status == 'DELETED':
+            message = 'Category already marked as deleted.'
+            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            category.status = 'DELETED'
+            category.save()
+
+        subcategories = category.subcategories.all()
+        for sub in subcategories:
+            sub.status = 'DELETED'
+            sub.save()
+
+        return Response({'success': 'Category deleted'}, status=status.HTTP_200_OK)
