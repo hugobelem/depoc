@@ -25,7 +25,7 @@ class Products(models.Model):
     brand = models.CharField(max_length=100, blank=True)
     origin = models.CharField(max_length=100, blank=True)
     ncm = models.CharField(max_length=10, blank=True)
-    barcode = models.IntegerField(blank=True, null=True)
+    barcode = models.CharField(max_length=255, blank=True)
     cest = models.CharField(max_length=20, blank=True)
     category = models.ForeignKey(
         'modules_products.Category', 
@@ -59,6 +59,7 @@ class Products(models.Model):
         blank=True,
         null=True,
     )
+    status = models.CharField(max_length=150, blank=True, default='ACTIVE')
 
     class Meta:
         verbose_name_plural = 'Products'
