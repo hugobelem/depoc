@@ -102,7 +102,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['name', 'parent']
+        fields = ['name', 'parent', 'status']
         required = ['name']
 
 
@@ -116,7 +116,8 @@ class CategorySerializer(serializers.ModelSerializer):
                 'parent': {
                     'parentId': representation.pop('parent'),
                     'parentName': parent.name if parent else ''
-                }
+                },
+                'status': representation.pop('status'),
             },
         }
     
