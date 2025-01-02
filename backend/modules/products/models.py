@@ -34,6 +34,13 @@ class Products(models.Model):
         blank=True,
         null=True,
     )
+    supplier= models.ForeignKey(
+        'modules_contacts.Contacts',
+        related_name='products',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     costPrice = models.DecimalField(
 	    max_digits=10,
         decimal_places=2,
@@ -118,28 +125,3 @@ class CostHistory(models.Model):
     def __str__(self):
         return f"Cost History for {self.product} on {self.effectiveDate}"
 
-
-class ProductSupplier(models.Model):
-    id = models.CharField(
-        max_length=26,
-        primary_key=True,
-        unique=True,
-        editable=False
-    )
-    product = models.OneToOneField(
-        Products,
-        related_name='sources',
-        on_delete=models.CASCADE,
-    )
-    supplier= models.ForeignKey(
-        'modules_contacts.Contacts',
-        related_name='products',
-        on_delete=models.CASCADE,
-    )
-
-    class Meta:
-        verbose_name_plural = 'Suppliers'
-        app_label = 'modules_products'
-
-    def __str__(self):
-        return f"{self.product} - {self.supplier}"
