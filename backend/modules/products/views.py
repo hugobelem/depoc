@@ -167,16 +167,47 @@ class ProductCategoryEndpoint(APIView):
         
         categories = Category.objects.all()
         if not categories.exists():
-            message = 'The business does not have registered categories.'
-            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+            message = 'No product category was found.'
+            return Response({'details': message}, status=status.HTTP_404_NOT_FOUND)
         
         if id:
             product = categories.filter(id=id).first()
             if not product:
-                message = 'Product not found.'
+                message = 'Category not found.'
                 return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
             serializer = CategorySerializer(product)
         else:
             serializer = CategorySerializer(categories, many=True)
 
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def patch(self, request, id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        data = services.get_data(request)
+        if isinstance(data, Response):
+            error_response = data
+            return error_response
+        
+        if field_errors := services.check_field_errors(request, CategorySerializer):
+            return field_errors
+        
+        category = Category.objects.filter(id=id).first()
+        if not category:
+            message = 'Category not found.'
+            return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = CategorySerializer(instance=category, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(
+                {'error': 'Validation failed', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
