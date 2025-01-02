@@ -6,3 +6,6 @@ class ProductsConfig(AppConfig):
     name = 'modules.products'
     label = 'modules_products'
     verbose_name = 'Products'
+
+    def ready(self):
+        from .signals import generate_ulids
