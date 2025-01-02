@@ -49,6 +49,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        category = instance.category
         return {
             'id': instance.id,
             'details': {
@@ -64,7 +65,7 @@ class ProductSerializer(serializers.ModelSerializer):
                 'specifications': {
                     'weight': representation.pop('weight'),
                     'brand': representation.pop('brand'),
-                    'category': representation.pop('category'),
+                    'category': category.name if category else '',
                 },
                 'fiscal': {
                     'origin': representation.pop('origin'),
