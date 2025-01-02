@@ -51,7 +51,7 @@ def get_data(request):
     return data
 
 
-def get_business_contacts(business):
+def get_business_products(business):
     business_products = BusinessProducts.objects.filter(business=business.id)
     if not business_products.exists():
         message = 'The business does not have registered products.'
