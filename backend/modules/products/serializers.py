@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.apps import apps
 
 import ulid
+import json
 
 from .models import Products, Category, CostHistory
 
@@ -111,9 +112,9 @@ class CategorySerializer(serializers.ModelSerializer):
             'details': {
                 'name': representation.pop('name'),
                 'parent': {
-                    'id': representation.pop('parent_id'),
-                    'name': representation.pop('parent'),
-                },
+                    'parentId': representation.pop('parent'),
+                    'parentName': f'{instance.parent}',
+                }
             },
         }
     
