@@ -169,17 +169,18 @@ class ProductCategoryEndpoint(APIView):
             error_response = business
             return error_response
         
-        categories = Category.objects.all()
-        if not categories.exists():
-            message = 'No product category was found.'
-            return Response({'details': message}, status=status.HTTP_404_NOT_FOUND)
+        product_categories = services.get_business_products_categories(business)
+        if isinstance(product_categories, Response):
+            error_response = product_categories
+            return error_response
         
+        categories = [product.category for product in product_categories]
         if id:
-            product = categories.filter(id=id).first()
-            if not product:
+            selected_category = product_categories.filter(category__id=id).first()
+            if not selected_category:
                 message = 'Category not found.'
                 return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
-            serializer = CategorySerializer(product)
+            serializer = CategorySerializer(selected_category.category)
         else:
             serializer = CategorySerializer(categories, many=True)
 
@@ -200,11 +201,17 @@ class ProductCategoryEndpoint(APIView):
         if field_errors := services.check_field_errors(request, CategorySerializer):
             return field_errors
         
-        category = Category.objects.filter(id=id).first()
-        if not category:
+        product_categories = services.get_business_products_categories(business)
+        if isinstance(product_categories, Response):
+            error_response = product_categories
+            return error_response
+        
+        selected_category = product_categories.filter(category__id=id).first()
+        if not selected_category:
             message = 'Category not found.'
             return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
         
+        category = selected_category.category
         serializer = CategorySerializer(instance=category, data=data, partial=True)
 
         if not serializer.is_valid():
@@ -223,7 +230,17 @@ class ProductCategoryEndpoint(APIView):
             error_response = business
             return error_response
         
-        category = Category.objects.filter(id=id).first()
+        product_categories = services.get_business_products_categories(business)
+        if isinstance(product_categories, Response):
+            error_response = product_categories
+            return error_response
+        
+        selected_category = product_categories.filter(category__id=id).first()
+        if not selected_category:
+            message = 'Category not found.'
+            return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
+        
+        category = selected_category.category
         if not category:
             message = 'Category not found.'
             return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
@@ -236,9 +253,9 @@ class ProductCategoryEndpoint(APIView):
             category.save()
 
         subcategories = category.subcategories.all()
-        for sub in subcategories:
-            sub.status = 'DELETED'
-            sub.save()
+        for categories in subcategories:
+            categories.status = 'DELETED'
+            categories.save()
 
         return Response({'success': 'Category deleted'}, status=status.HTTP_200_OK)
     
