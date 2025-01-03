@@ -145,7 +145,6 @@ class CostHistorySerializer(serializers.ModelSerializer):
         model = CostHistory
         fields = [
             'product',
-            'source',
             'quatity',
             'effectiveDate',
             'costPrice',
@@ -173,7 +172,6 @@ class CostHistorySerializer(serializers.ModelSerializer):
                     'markup': representation.pop('markup'),
                 },
                 'effectiveDate': representation.pop('effectiveDate'),
-                'source': representation.pop('source'),
             },
         }
 
