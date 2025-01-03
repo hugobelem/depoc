@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404
 from django.apps import apps
 from django.http import Http404
 
+from decimal import Decimal, InvalidOperation
+
 from .models import Products
 
 BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
@@ -75,13 +77,13 @@ def get_business_products_categories(business):
 
 def calculate_markup(data):
     try:
-        cost_price = int(data.get('costPrice', 0))
-        retail_price = int(data.get('retailPrice', 0))
+        cost_price = Decimal(data.get('costPrice', 0))
+        retail_price = Decimal(data.get('retailPrice', 0))
 
         if cost_price > 0 and retail_price > 0:
             markup = ((retail_price - cost_price) / cost_price) * 100
-            return markup
-    except (ValueError, TypeError):
+            return round(markup, 2)
+    except (InvalidOperation, ValueError, TypeError):
         pass
     
     return None
