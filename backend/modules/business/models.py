@@ -139,3 +139,22 @@ class BusinessProducts(models.Model):
 
     def __str__(self):
         return f'{self.product} - {self.business}'
+
+
+class BusinessProductsCategories(models.Model):
+    id = models.CharField(
+        max_length=26,
+        primary_key=True,
+        unique=True,
+        editable=False
+    )
+    category = models.ForeignKey(
+        'modules_products.Category',
+        related_name='product_categories',
+        on_delete=models.CASCADE
+    )
+    business = models.ForeignKey(
+        Business,
+        related_name='categories',
+        on_delete=models.CASCADE
+    )
