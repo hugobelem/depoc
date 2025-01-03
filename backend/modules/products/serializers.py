@@ -180,6 +180,9 @@ class CostHistorySerializer(serializers.ModelSerializer):
         if 'markup' not in validated_data:
             validated_data['markup'] = self.context['markup']
 
+        if 'costAverage' not in validated_data:
+            validated_data['costAverage'] = self.context['average_cost']
+
         cost_history = CostHistory.objects.create(**validated_data)
 
         return cost_history
