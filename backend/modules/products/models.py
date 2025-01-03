@@ -32,12 +32,10 @@ class Products(models.Model):
         blank=True,
         null=True,
     )
-    supplier= models.ForeignKey(
+    supplier= models.ManyToManyField(
         'modules_contacts.Contacts',
         related_name='products',
-        on_delete=models.CASCADE,
         blank=True,
-        null=True,
     )
     costPrice = models.DecimalField(
 	    max_digits=10,
