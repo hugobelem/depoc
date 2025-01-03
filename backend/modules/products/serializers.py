@@ -177,6 +177,9 @@ class CostHistorySerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        if 'markup' not in validated_data:
+            validated_data['markup'] = self.context['markup']
+
         cost_history = CostHistory.objects.create(**validated_data)
 
         return cost_history
