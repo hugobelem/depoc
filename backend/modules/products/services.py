@@ -9,6 +9,10 @@ from .serializers import ProductSerializer
 
 BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 BusinessProducts = apps.get_model('modules_business', 'BusinessProducts')
+BusinessProductsCategories = apps.get_model(
+    'modules_business',
+    'BusinessProductsCategories'
+)
 
 
 def check_field_errors(request, serializer):
@@ -58,3 +62,12 @@ def get_business_products(business):
         return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
     
     return business_products
+
+
+def get_business_products_categories(business):
+    bp_categories = BusinessProductsCategories.objects.filter(business=business.id)
+    if not bp_categories.exists():
+        message = 'No product category was found.'
+        return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+    
+    return bp_categories
