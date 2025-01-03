@@ -8,11 +8,21 @@ from .models import Products, Category, CostHistory
 User = get_user_model()
 Business = apps.get_model('modules_business', 'Business')
 BusinessProducts = apps.get_model('modules_business', 'BusinessProducts')
+BusinessProductsCategories = apps.get_model(
+    'modules_business', 
+    'BusinessProductsCategories'
+)
 
 
 def assign_product_to_business(product, business):
     BusinessProducts.objects.create(
         product=product,
+        business=business
+    )
+
+def assign_category_to_business(category, business):
+    BusinessProductsCategories.objects.create(
+        category=category,
         business=business
     )
 
@@ -116,7 +126,9 @@ class CategorySerializer(serializers.ModelSerializer):
     
 
     def create(self, validated_data):
+        business = self.context['business']
         category = Category.objects.create(**validated_data)
+        assign_category_to_business(category, business)
 
         return category
     
