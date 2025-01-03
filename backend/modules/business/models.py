@@ -158,3 +158,10 @@ class BusinessProductsCategories(models.Model):
         related_name='categories',
         on_delete=models.CASCADE
     )
+
+    class Meta:
+        verbose_name_plural = 'Business Products Categories'
+        app_label = 'modules_business'
+
+    def __str__(self):
+        return f'{self.category} - {self.business}'
