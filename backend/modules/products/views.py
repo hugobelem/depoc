@@ -10,7 +10,7 @@ from .serializers import (
     CategorySerializer,
     CostHistorySerializer
 )
-from .models import Category
+from .models import Products
 
 
 class ProductsEndpoint(APIView):
@@ -281,12 +281,13 @@ class ProductCostHistoryEndpoint(APIView):
         ):
             return field_errors
 
-        cost_price = int(data['costPrice'])
-        retail_price = int(data['retailPrice'])
-        if cost_price > 0 and retail_price > 0:
-            markup = ((retail_price - cost_price) / cost_price) * 100
+        markup = services.calculate_markup(data)
+        average_cost = services.calculate_average_cost(data)
         
-        serializer = CostHistorySerializer(data=data, context={'markup': markup})
+        serializer = CostHistorySerializer(
+            data=data,
+            context={'markup': markup, 'average_cost': average_cost}
+        )
         if not serializer.is_valid():
             return Response(
                 {'error': 'Validation failed', 'details': serializer.errors},
