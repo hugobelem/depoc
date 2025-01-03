@@ -102,7 +102,7 @@ class CostHistory(models.Model):
         related_name='cost_history',
         on_delete=models.CASCADE,
     )
-    quatity = models.PositiveIntegerField(default=0)
+    quantity = models.PositiveIntegerField(default=0)
     effectiveDate = models.DateField()
     costPrice = models.DecimalField(max_digits=10, decimal_places=2)
     costAverage = models.DecimalField(max_digits=10, decimal_places=2)
