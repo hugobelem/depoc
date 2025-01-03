@@ -281,8 +281,12 @@ class ProductCostHistoryEndpoint(APIView):
         ):
             return field_errors
 
+        cost_price = int(data['costPrice'])
+        retail_price = int(data['retailPrice'])
+        if cost_price > 0 and retail_price > 0:
+            markup = ((retail_price - cost_price) / cost_price) * 100
         
-        serializer = CostHistorySerializer(data=data)
+        serializer = CostHistorySerializer(data=data, context={'markup': markup})
         if not serializer.is_valid():
             return Response(
                 {'error': 'Validation failed', 'details': serializer.errors},
