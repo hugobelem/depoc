@@ -12,7 +12,15 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class CostHistoryAdmin(admin.ModelAdmin):
-    list_display = ['product', 'quatity', 'effectiveDate', 'costPrice']
+    list_display = [
+        'product',
+        'quantity',
+        'effectiveDate',
+        'costPrice',
+        'costAverage',
+        'retailPrice',
+        'markup',
+    ]
 
 
 admin.site.register(Products, ProductsAdmin)
