@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.apps import apps
 from django.http import Http404
 
-from .serializers import ProductSerializer
+from .models import Products
 
 BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 BusinessProducts = apps.get_model('modules_business', 'BusinessProducts')
@@ -71,3 +71,44 @@ def get_business_products_categories(business):
         return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
     
     return bp_categories
+
+
+def calculate_markup(data):
+    try:
+        cost_price = int(data.get('costPrice', 0))
+        retail_price = int(data.get('retailPrice', 0))
+
+        if cost_price > 0 and retail_price > 0:
+            markup = ((retail_price - cost_price) / cost_price) * 100
+            return markup
+    except (ValueError, TypeError):
+        pass
+    
+    return None
+
+
+def calculate_average_cost(data):
+    product_quantity = data.get('quantity', 0)
+    product_cost = data.get('costPrice', 0)
+    product_total_cost = product_cost * product_quantity
+    
+    try:
+        product_id = data.get('product', '')
+        product = Products.objects.filter(id=product_id).first()
+    except (ValueError, TypeError):
+        pass
+
+    cost_history = product.cost_history.all()
+
+    history_cost_list = [product_total_cost]
+    history_quantity_list = [product_quantity]
+    for history in cost_history:
+        history_cost = history.costPrice * history.quantity
+        history_cost_list.append(history_cost)
+        history_quantity_list.append(history.quantity)
+
+    total_cost = sum(history_cost_list)
+    total_quantity = sum(history_quantity_list)
+    average_cost = round(total_cost / total_quantity, 2)
+
+    return average_cost
