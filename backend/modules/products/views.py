@@ -153,7 +153,7 @@ class ProductCategoryEndpoint(APIView):
         if field_errors := services.check_field_errors(request, CategorySerializer):
             return field_errors
         
-        serializer = CategorySerializer(data=data)
+        serializer = CategorySerializer(data=data, context={'business': business})
         if not serializer.is_valid():
             return Response(
                 {'error': 'Validation failed', 'details': serializer.errors},
