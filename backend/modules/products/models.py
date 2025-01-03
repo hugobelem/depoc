@@ -105,7 +105,12 @@ class CostHistory(models.Model):
     quantity = models.PositiveIntegerField(default=0)
     effectiveDate = models.DateField()
     costPrice = models.DecimalField(max_digits=10, decimal_places=2)
-    costAverage = models.DecimalField(max_digits=10, decimal_places=2)
+    costAverage = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
     retailPrice = models.DecimalField(max_digits=10, decimal_places=2)
     markup = models.DecimalField(
         max_digits=5,
