@@ -321,3 +321,52 @@ class ProductCostHistoryEndpoint(APIView):
             serializer = CostHistorySerializer(cost_histories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def patch(self, request, product_id, cost_id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        cost_histories = CostHistory.objects.filter(product__id=product_id)
+        if not cost_histories.exists():
+            message = 'No cost found for the specified product.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+        
+        cost_history = cost_histories.filter(id=cost_id).first()
+        if not cost_history:
+            message = 'Cost History not found.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+        
+        data = services.get_data(request)
+        if isinstance(data, Response):
+            error_response = data
+            return error_response
+        
+        data['product'] = product_id
+        
+        if field_errors := services.check_field_errors(
+            request,
+            CostHistorySerializer,
+        ):
+            return field_errors
+
+        markup = services.calculate_markup(data)
+        average_cost = services.calculate_average_cost(data)
+
+        serializer = CostHistorySerializer(
+            instance=cost_history,
+            data=data,
+            partial=True,
+            context={'markup': markup, 'average_cost': average_cost},
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                {'error': 'Validation failed', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
