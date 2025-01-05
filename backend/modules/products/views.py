@@ -10,7 +10,7 @@ from .serializers import (
     CategorySerializer,
     CostHistorySerializer
 )
-from .models import CostHistory
+from .models import Products, CostHistory
 
 
 class ProductsEndpoint(APIView):
@@ -370,3 +370,29 @@ class ProductCostHistoryEndpoint(APIView):
         
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def delete(self, request, product_id, cost_id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        product = Products.objects.filter(id=product_id).first()
+        if not product:
+            message = 'The specified product does not exists.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)    
+        
+        cost_histories = CostHistory.objects.filter(product__id=product_id)
+        if not cost_histories.exists():
+            message = 'The specified product does not have cost history.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+        
+        cost_history = cost_histories.filter(id=cost_id).first()
+        if not cost_history:
+            message = 'Cost History not found.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+        
+        cost_history.delete()
+
+        return Response({'success': 'Cost deleted'}, status=status.HTTP_200_OK)
