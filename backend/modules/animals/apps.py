@@ -6,3 +6,6 @@ class AnimalsConfig(AppConfig):
     name = 'modules.animals'
     label = 'modules_animals'
     verbose_name = 'Animals'
+
+    def ready(self):
+        from . import signals
