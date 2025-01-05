@@ -10,7 +10,7 @@ from .serializers import (
     CategorySerializer,
     CostHistorySerializer
 )
-from .models import Products
+from .models import CostHistory
 
 
 class ProductsEndpoint(APIView):
@@ -298,3 +298,26 @@ class ProductCostHistoryEndpoint(APIView):
         
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+
+    def get(self, request, product_id, cost_id=None):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        cost_histories = CostHistory.objects.filter(product__id=product_id)
+        if not cost_histories.exists():
+            message = 'No cost found for the specified product.'
+            return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+        
+        if cost_id:
+            cost_history = cost_histories.filter(id=cost_id).first()
+            if not cost_history:
+                message = 'Cost History not found.'
+                return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+            serializer = CostHistorySerializer(cost_history)
+        else:
+            serializer = CostHistorySerializer(cost_histories, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
