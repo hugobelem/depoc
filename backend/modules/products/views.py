@@ -264,7 +264,7 @@ class ProductCostHistoryEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
-    def post(self, request):
+    def post(self, request, product_id):
         business = services.get_business(request)
         if isinstance(business, Response):
             error_response = business
@@ -280,6 +280,8 @@ class ProductCostHistoryEndpoint(APIView):
             CostHistorySerializer
         ):
             return field_errors
+        
+        data['product'] = product_id
 
         markup = services.calculate_markup(data)
         average_cost = services.calculate_average_cost(data)
