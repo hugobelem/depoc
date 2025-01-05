@@ -11,7 +11,7 @@ urlpatterns = [
         views.ProductCostHistoryEndpoint.as_view()
     ),
     path(
-        '/<str:product_id>/costs/<str:id>',
+        '/<str:product_id>/costs/<str:cost_id>',
         views.ProductCostHistoryEndpoint.as_view()
     ),
     path('', views.ProductsEndpoint.as_view()),
