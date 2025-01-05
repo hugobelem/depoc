@@ -127,3 +127,17 @@ class CostHistory(models.Model):
     def __str__(self):
         return f"Cost History for {self.product} on {self.effectiveDate}"
 
+
+class ProductAnimal(models.Model):
+    animal = models.ForeignKey(
+        'modules_animals.Animal',
+        on_delete=models.CASCADE,
+        related_name='products',
+    )
+    product = models.ForeignKey(
+        Products,
+        on_delete=models.CASCADE,
+        related_name='animal',
+    )
+    packagingDate = models.DateField(blank=True, null=True)
+    expirationDate = models.DateField(blank=True, null=True)
