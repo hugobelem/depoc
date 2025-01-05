@@ -24,7 +24,8 @@ def check_field_errors(request, serializer):
 
     if invalid_fields:
         message = f'Invalid fields: {", ".join(invalid_fields)}'
-        expected_fields = serializer.Meta.fields
+        valid_fields.discard('product')
+        expected_fields = valid_fields
         return Response(
             {'error': message, 'expected': expected_fields}, 
             status=status.HTTP_400_BAD_REQUEST
