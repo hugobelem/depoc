@@ -141,3 +141,10 @@ class ProductAnimal(models.Model):
     )
     packagingDate = models.DateField(blank=True, null=True)
     expirationDate = models.DateField(blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = 'Animal Product'
+        app_label = 'modules_products'
+    
+    def __str__(self):
+        return f'{self.animal} - {self.product}'
