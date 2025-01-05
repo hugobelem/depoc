@@ -25,4 +25,4 @@ class CostHistoryAdmin(admin.ModelAdmin):
 
 @register(ProductAnimal)
 class ProductAnimalAdmin(admin.ModelAdmin):
-    list_display = ['animal', 'product', 'packagingDate', 'expirationDate']
+    list_display = ['product', 'packagingDate', 'expirationDate']
