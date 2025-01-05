@@ -129,9 +129,8 @@ class CostHistory(models.Model):
 
 
 class ProductAnimal(models.Model):
-    animal = models.ForeignKey(
+    animal = models.ManyToManyField(
         'modules_animals.Animal',
-        on_delete=models.CASCADE,
         related_name='products',
     )
     product = models.ForeignKey(
