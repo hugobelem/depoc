@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'modules.members',
     'modules.contacts',
     'modules.products',
+    'modules.animals',
     'rest_framework',
 ]
 
