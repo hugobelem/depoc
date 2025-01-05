@@ -129,6 +129,12 @@ class CostHistory(models.Model):
 
 
 class ProductAnimal(models.Model):
+    id = models.CharField(
+        max_length=26,
+        primary_key=True,
+        unique=True,
+        editable=False
+    )
     animal = models.ManyToManyField(
         'modules_animals.Animal',
         related_name='products',
