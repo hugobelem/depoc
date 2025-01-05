@@ -265,6 +265,10 @@ class AnimalMeatQuality(models.Model):
         null=True,
     )
 
+    class Meta:
+        verbose_name_plural = 'Animals Meat Quality'
+        app_label = 'modules_animals'
+
     def __str__(self):
         return f"Meat Quality Info for {self.animal.tagNumber}"
 
@@ -283,6 +287,10 @@ class AnimalHealth(models.Model):
     )
     healthStatus = models.CharField(max_length=255, blank=True)
     notes = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name_plural = 'Animals Health'
+        app_label = 'modules_animals'
 
     def __str__(self):
         return f"Health Info for {self.animal.tagNumber}"
