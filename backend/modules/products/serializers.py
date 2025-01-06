@@ -62,7 +62,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'retailPrice',
             'discountedPrice',
         ]
-        required = ['name']
 
 
     def to_representation(self, instance):
@@ -120,7 +119,6 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['name', 'parent', 'status']
-        required = ['name']
 
 
     def to_representation(self, instance):
@@ -166,7 +164,6 @@ class CostHistorySerializer(serializers.ModelSerializer):
             'retailPrice',
             'markup',
         ]
-        required = [field for field in fields if field != 'markup']
 
 
     def to_representation(self, instance):
