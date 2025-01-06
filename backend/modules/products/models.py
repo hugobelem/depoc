@@ -152,4 +152,4 @@ class ProductAnimal(models.Model):
         app_label = 'modules_products'
     
     def __str__(self):
-        return f'{self.animal} - {self.product}'
+        return f'{self.product}'
