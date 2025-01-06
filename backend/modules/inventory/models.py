@@ -27,9 +27,9 @@ class Inventory(models.Model):
 
 class InventoryTransaction(models.Model):
     TRANSACTION_TYPE = [
-        ('entrada', 'Entrada'),
-        ('saída', 'Saída'),
-        ('balanço', 'Balanço'),
+        ('inbound', 'Inbound'),
+        ('outbound', 'Outbound'),
+        ('balance', 'Balance'),
     ]
     
     id = models.CharField(
