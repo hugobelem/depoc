@@ -5,7 +5,7 @@ from .models import Products, Category, CostHistory, ProductAnimal
 
 @register(Products)
 class ProductsAdmin(admin.ModelAdmin):
-    list_display = ['name', 'sku', 'unit', 'retailPrice', 'id']
+    list_display = ['name', 'sku', 'unit', 'stock', 'retailPrice', 'id']
 
 @register(Category)
 class CategoryAdmin(admin.ModelAdmin):
