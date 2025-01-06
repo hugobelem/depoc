@@ -40,8 +40,7 @@ class Products(models.Model):
     costPrice = models.DecimalField(
 	    max_digits=10,
         decimal_places=2,
-        blank=True,
-        null=True,
+        default=0
 	   )
     retailPrice = models.DecimalField(
 	    max_digits=10,
