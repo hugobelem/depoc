@@ -12,6 +12,7 @@ BusinessProductsCategories = apps.get_model(
     'modules_business', 
     'BusinessProductsCategories'
 )
+Inventory = apps.get_model('modules_inventory', 'Inventory')
 
 
 def assign_product_to_business(product, business):
@@ -24,6 +25,12 @@ def assign_category_to_business(category, business):
     BusinessProductsCategories.objects.create(
         category=category,
         business=business
+    )
+
+def assign_product_to_inventory(product):
+    Inventory.objects.create(
+        quantity=product.stock,
+        product=product
     )
 
 
@@ -91,6 +98,7 @@ class ProductSerializer(serializers.ModelSerializer):
         business = self.context['business']
         product = Products.objects.create(**validated_data)
         assign_product_to_business(product, business)
+        assign_product_to_inventory(product)
 
         return product
     
