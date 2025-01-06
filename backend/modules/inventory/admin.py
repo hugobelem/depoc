@@ -11,4 +11,4 @@ class InventoryAdmin(admin.ModelAdmin):
 
 @register(InventoryTransaction)
 class InventoryTransactionAdmin(admin.ModelAdmin):
-    list_display = ['transactionType', 'quantity', 'unitCost']
+    list_display = ['inventory', 'transactionType', 'quantity', 'unitCost']
