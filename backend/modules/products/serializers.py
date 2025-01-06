@@ -13,6 +13,7 @@ BusinessProductsCategories = apps.get_model(
     'BusinessProductsCategories'
 )
 Inventory = apps.get_model('modules_inventory', 'Inventory')
+InventoryTransaction = apps.get_model('modules_inventory', 'InventoryTransaction')
 
 
 def assign_product_to_business(product, business):
@@ -28,10 +29,15 @@ def assign_category_to_business(category, business):
     )
 
 def assign_product_to_inventory(product):
-    Inventory.objects.create(
-        quantity=product.stock,
-        product=product
-    )
+    inventory = Inventory.objects.create(product=product)
+
+    if product.stock > 0:
+        InventoryTransaction.objects.create(
+            transactionType='inbound',
+            inventory=inventory,
+            quantity=product.stock,
+            unitCost=product.costPrice,
+        )
 
 
 class ProductSerializer(serializers.ModelSerializer):
