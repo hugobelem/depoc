@@ -17,25 +17,17 @@ def generate_ulid(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=InventoryTransaction)
 @receiver(post_save, sender=InventoryTransaction)
+@receiver(post_delete, sender=InventoryTransaction)
 def update_inventory_quantity(sender, instance, **kwargs):
     with transaction.atomic():
         inventory = instance.inventory
+        product = inventory.product
 
         total_quantity = InventoryTransaction.objects\
             .filter(inventory=inventory)\
             .aggregate(Sum('quantity'))['quantity__sum'] or 0
 
         inventory.quantity = total_quantity
+        product.stock = total_quantity
         inventory.save()
-
-@receiver(post_delete, sender=InventoryTransaction)
-def update_inventory_quantity_on_delete(sender, instance, **kwargs):
-    with transaction.atomic():
-        inventory = instance.inventory
-
-        total_quantity = InventoryTransaction.objects\
-            .filter(inventory=inventory)\
-            .aggregate(Sum('quantity'))['quantity__sum'] or 0
-
-        inventory.quantity = total_quantity
-        inventory.save()
+        product.save()
