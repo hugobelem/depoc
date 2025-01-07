@@ -5,7 +5,7 @@ from rest_framework import status
 
 from . import services
 from .throttling import BurstRateThrottle, SustainedRateThrottle
-from .serializers import InventorySerializer
+from .serializers import InventorySerializer, InventoryTransactionSerializer
 from .models import Inventory
 
 class InventoryEndpoint(APIView):
@@ -71,3 +71,47 @@ class InventoryEndpoint(APIView):
             serializer = InventorySerializer(inventories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class InventoryTransactionEndpoint(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
+
+    def post(self, request, product_id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        business_products = services.get_business_products(business)
+        if isinstance(business, Response):
+            error_response = business_products
+            return error_response
+        
+        data = services.get_data(request)
+        if isinstance(business, Response):
+            error_response = data
+            return error_response
+        
+        if field_errors := services.check_field_errors(
+            request,
+            InventoryTransactionSerializer
+        ):
+            return field_errors
+        
+        inventory = Inventory.objects\
+            .filter(product__id=product_id)\
+            .first()
+
+        data['inventory'] = inventory.id
+
+        serializer = InventoryTransactionSerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(
+                {'error': 'Validation failed', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
