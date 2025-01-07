@@ -25,3 +25,36 @@ class InventorySerializer(serializers.ModelSerializer):
                 'location': representation.pop('location'),
             },
         }
+
+
+class InventoryTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InventoryTransaction
+        fields = [
+            'inventory',
+            'transactionType',
+            'date',
+            'quantity',
+            'unitCost',
+            'unitPrice',
+            'description',
+        ]
+        expected_fields = [field for field in fields if field != 'inventory']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return {
+            'id': instance.id,
+            'details': {
+                'inventory': {
+                    'inventodyId': instance.inventory.id,
+                    'inventoryProduct': str(instance.inventory),
+                },
+                'transactionType': representation.pop('transactionType'),
+                'date': representation.pop('date'),
+                'quantity': representation.pop('quantity'),
+                'unitCost': representation.pop('unitCost'),
+                'unitPrice': representation.pop('unitPrice'),
+                'description': representation.pop('description'),
+            },
+        }
