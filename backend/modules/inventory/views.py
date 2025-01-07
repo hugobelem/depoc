@@ -6,7 +6,6 @@ from rest_framework import status
 from . import services
 from .throttling import BurstRateThrottle, SustainedRateThrottle
 from .serializers import InventorySerializer, InventoryTransactionSerializer
-from .models import InventoryTransaction
 
 class InventoryEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
@@ -160,6 +159,11 @@ class InventoryTransactionEndpoint(APIView):
             error_response = business_products
             return error_response
         
+        inventory = services.get_inventory(product_id)
+        if isinstance(inventory, Response):
+                error_response = inventory
+                return inventory
+        
         data = services.get_data(request)
         if isinstance(business, Response):
             error_response = data
@@ -190,3 +194,29 @@ class InventoryTransactionEndpoint(APIView):
         
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)        
+
+
+    def delete(self, request, product_id, transaction_id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        business_products = services.get_business_products(business)
+        if isinstance(business, Response):
+            error_response = business_products
+            return error_response
+        
+        inventory = services.get_inventory(product_id)
+        if isinstance(inventory, Response):
+                error_response = inventory
+                return inventory
+        
+        transaction = services.get_transaction(transaction_id)
+        if isinstance(transaction, Response):
+            error_response = transaction
+            return error_response
+        
+        transaction.delete()
+        message = 'Transaction deleted.'
+        return Response({'success': message}, status=status.HTTP_200_OK)
