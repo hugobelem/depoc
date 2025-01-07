@@ -134,8 +134,6 @@ class InventoryTransactionEndpoint(APIView):
                 error_response = inventory
                 return inventory
         
-        transactions = inventory.transactions.all()
-        
         if transaction_id:
             transaction = services.get_transaction(transaction_id)
 
@@ -145,6 +143,7 @@ class InventoryTransactionEndpoint(APIView):
             
             serializer = InventoryTransactionSerializer(transaction)
         else:
+            transactions = inventory.transactions.all()
             serializer = InventoryTransactionSerializer(transactions, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
