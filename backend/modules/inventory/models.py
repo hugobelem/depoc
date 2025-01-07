@@ -47,6 +47,7 @@ class InventoryTransaction(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     quantity = models.IntegerField(default=0)
     unitCost = models.DecimalField(max_digits=10, decimal_places=2)
+    unitPrice = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True)
 
     class Meta:
