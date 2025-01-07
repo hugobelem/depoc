@@ -67,3 +67,12 @@ def get_inventory(product_id):
         return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
     
     return inventory
+
+
+def get_transaction(transaction_id):
+    transaction = InventoryTransaction.objects.filter(id=transaction_id).first()
+    if not transaction:
+        message = 'Transaction not found.'
+        return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+
+    return transaction
