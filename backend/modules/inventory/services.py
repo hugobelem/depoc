@@ -18,8 +18,7 @@ def check_field_errors(request, serializer):
 
     if invalid_fields:
         message = f'Invalid fields: {", ".join(invalid_fields)}'
-        valid_fields.discard('product')
-        expected_fields = valid_fields
+        expected_fields = serializer.Meta.expected_fields
         return Response(
             {'error': message, 'expected': expected_fields}, 
             status=status.HTTP_400_BAD_REQUEST
@@ -60,3 +59,11 @@ def get_business_products(business):
     
     return business_products
 
+
+def get_inventory(product_id):
+    inventory = Inventory.objects.filter(product__id=product_id).first()
+    if not inventory:
+        message = 'Inventory not found. Verify product ID'
+        return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+    
+    return inventory
