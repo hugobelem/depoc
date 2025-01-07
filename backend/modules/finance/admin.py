@@ -1,3 +1,8 @@
 from django.contrib import admin
+from django.contrib.admin import register
 
-# Register your models here.
+from .models import BankAccount
+
+@register(BankAccount)
+class BankAccountAdmin(admin.ModelAdmin):
+    list_display = ['bankName', 'accountNumber', 'balance', 'status']
