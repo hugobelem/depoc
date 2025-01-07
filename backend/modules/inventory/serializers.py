@@ -7,6 +7,7 @@ class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
         fields = '__all__'
+        read_only_fields = ['product', 'quantity', 'reserved']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
