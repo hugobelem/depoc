@@ -1,4 +1,4 @@
-from django.db.models.signals import pre_save, post_delete
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.db import transaction
 from django.db.models import Sum
 from django.dispatch import receiver
@@ -16,6 +16,7 @@ def generate_ulid(sender, instance, **kwargs):
  
 
 @receiver(pre_save, sender=InventoryTransaction)
+@receiver(post_save, sender=InventoryTransaction)
 def update_inventory_quantity(sender, instance, **kwargs):
     with transaction.atomic():
         inventory = instance.inventory
