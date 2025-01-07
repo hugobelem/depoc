@@ -6,6 +6,7 @@ from rest_framework import status
 from . import services
 from .throttling import BurstRateThrottle, SustainedRateThrottle
 from .serializers import InventorySerializer
+from .models import Inventory
 
 class InventoryEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
@@ -44,4 +45,29 @@ class InventoryEndpoint(APIView):
             )
         
         serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def get(self, request, product_id=None):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        business_products = services.get_business_products(business)
+        if isinstance(business, Response):
+            error_response = business_products
+            return error_response
+
+        if product_id:
+            inventory = services.get_inventory(product_id)
+            if isinstance(inventory, Response):
+                error_response = inventory
+                return inventory
+            serializer = InventorySerializer(inventory)
+        else:
+            products = [bp.product for bp in business_products]
+            inventories = [product.inventory for product in products]
+            serializer = InventorySerializer(inventories, many=True)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
