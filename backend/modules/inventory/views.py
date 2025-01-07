@@ -6,7 +6,7 @@ from rest_framework import status
 from . import services
 from .throttling import BurstRateThrottle, SustainedRateThrottle
 from .serializers import InventorySerializer, InventoryTransactionSerializer
-from .models import Inventory
+from .models import InventoryTransaction
 
 class InventoryEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
@@ -99,9 +99,10 @@ class InventoryTransactionEndpoint(APIView):
         ):
             return field_errors
         
-        inventory = Inventory.objects\
-            .filter(product__id=product_id)\
-            .first()
+        inventory = services.get_inventory(product_id)
+        if isinstance(inventory, Response):
+                error_response = inventory
+                return inventory
 
         data['inventory'] = inventory.id
 
@@ -115,3 +116,35 @@ class InventoryTransactionEndpoint(APIView):
         
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def get(self, request, product_id, transaction_id=None):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        business_products = services.get_business_products(business)
+        if isinstance(business, Response):
+            error_response = business_products
+            return error_response
+        
+        inventory = services.get_inventory(product_id)
+        if isinstance(inventory, Response):
+                error_response = inventory
+                return inventory
+        
+        transactions = inventory.transactions.all()
+        
+        if transaction_id:
+            transaction = services.get_transaction(transaction_id)
+
+            if isinstance(transaction, Response):
+                error_response = transaction
+                return error_response
+            
+            serializer = InventoryTransactionSerializer(transaction)
+        else:
+            serializer = InventoryTransactionSerializer(transactions, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
