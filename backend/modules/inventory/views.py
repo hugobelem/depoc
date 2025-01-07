@@ -12,7 +12,7 @@ class InventoryEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
-    def patch(self, request, id):
+    def patch(self, request, product_id):
         business = services.get_business(request)
         if isinstance(business, Response):
             error_response = business
@@ -31,7 +31,7 @@ class InventoryEndpoint(APIView):
         if field_errors := services.check_field_errors(request, InventorySerializer):
             return field_errors
         
-        inventory = Inventory.objects.filter(id=id).first()
+        inventory = Inventory.objects.filter(id=product_id).first()
         serializer = InventorySerializer(instance=inventory, data=data, partial=True)
 
         if not serializer.is_valid():
