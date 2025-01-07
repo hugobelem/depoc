@@ -11,6 +11,7 @@ urlpatterns = [
     path('members', include('modules.members.urls')),
     path('contacts', include('modules.contacts.urls')),
     path('products', include('modules.products.urls')),
+    path('products', include('modules.invenotry.urls')),
     path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ]
