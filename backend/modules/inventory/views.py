@@ -143,6 +143,9 @@ class InventoryTransactionEndpoint(APIView):
             serializer = InventoryTransactionSerializer(transaction)
         else:
             transactions = inventory.transactions.all()
+            if not transactions:
+                message = 'No transaction found for this product.'
+                return Response({'error': message}, status.HTTP_404_NOT_FOUND)
             serializer = InventoryTransactionSerializer(transactions, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
