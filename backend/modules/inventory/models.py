@@ -22,7 +22,7 @@ class Inventory(models.Model):
         app_label = 'modules_inventory'
 
     def __str__(self):
-        return f'Inventory for {self.product}'
+        return f'{self.product}'
 
 
 class InventoryTransaction(models.Model):
