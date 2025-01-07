@@ -18,12 +18,12 @@ class InventoryEndpoint(APIView):
             return error_response
 
         business_products = services.get_business_products(business)
-        if isinstance(business, Response):
+        if isinstance(business_products, Response):
             error_response = business_products
             return error_response
         
         data = services.get_data(request)
-        if isinstance(business, Response):
+        if isinstance(data, Response):
             error_response = data
             return error_response
         
@@ -54,7 +54,7 @@ class InventoryEndpoint(APIView):
             return error_response
         
         business_products = services.get_business_products(business)
-        if isinstance(business, Response):
+        if isinstance(business_products, Response):
             error_response = business_products
             return error_response
 
@@ -83,12 +83,12 @@ class InventoryTransactionEndpoint(APIView):
             return error_response
         
         business_products = services.get_business_products(business)
-        if isinstance(business, Response):
+        if isinstance(business_products, Response):
             error_response = business_products
             return error_response
         
         data = services.get_data(request)
-        if isinstance(business, Response):
+        if isinstance(data, Response):
             error_response = data
             return error_response
         
@@ -124,7 +124,7 @@ class InventoryTransactionEndpoint(APIView):
             return error_response
         
         business_products = services.get_business_products(business)
-        if isinstance(business, Response):
+        if isinstance(business_products, Response):
             error_response = business_products
             return error_response
         
@@ -158,7 +158,7 @@ class InventoryTransactionEndpoint(APIView):
             return error_response
         
         business_products = services.get_business_products(business)
-        if isinstance(business, Response):
+        if isinstance(business_products, Response):
             error_response = business_products
             return error_response
         
@@ -168,7 +168,7 @@ class InventoryTransactionEndpoint(APIView):
                 return inventory
         
         data = services.get_data(request)
-        if isinstance(business, Response):
+        if isinstance(data, Response):
             error_response = data
             return error_response
         
@@ -206,7 +206,7 @@ class InventoryTransactionEndpoint(APIView):
             return error_response
         
         business_products = services.get_business_products(business)
-        if isinstance(business, Response):
+        if isinstance(business_products, Response):
             error_response = business_products
             return error_response
         
