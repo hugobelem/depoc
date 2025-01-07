@@ -12,6 +12,7 @@ urlpatterns = [
     path('contacts', include('modules.contacts.urls')),
     path('products', include('modules.inventory.urls')),
     path('products', include('modules.products.urls')),
+    path('accounts', include('modules.finance.urls')),
     path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ]
