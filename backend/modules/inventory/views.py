@@ -6,7 +6,6 @@ from rest_framework import status
 from . import services
 from .throttling import BurstRateThrottle, SustainedRateThrottle
 from .serializers import InventorySerializer
-from .models import Inventory
 
 class InventoryEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
@@ -31,7 +30,11 @@ class InventoryEndpoint(APIView):
         if field_errors := services.check_field_errors(request, InventorySerializer):
             return field_errors
         
-        inventory = Inventory.objects.filter(id=product_id).first()
+        inventory = services.get_inventory(product_id)
+        if isinstance(inventory, Response):
+            error_response = inventory
+            return inventory
+
         serializer = InventorySerializer(instance=inventory, data=data, partial=True)
 
         if not serializer.is_valid():
