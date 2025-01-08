@@ -29,7 +29,10 @@ class BankAccountEndpoint(APIView):
             ):
             return field_errors
         
-        serializer = BankAccountSerializer(data=data)
+        serializer = BankAccountSerializer(
+            data=data,
+            context={'business': business},
+        )
 
         if not serializer.is_valid():
             message = 'Validation failed: '
@@ -40,3 +43,24 @@ class BankAccountEndpoint(APIView):
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def get(self, request, id=None):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        business_banks = services.get_business_banks(business)
+        
+        if id:
+            bank_account = business_banks.filter(bankAccount__id=id).first()
+            if not bank_account:
+                message = 'Bank Account not found.'
+                return Response({'error': message}, status.HTTP_404_NOT_FOUND)
+            serializer = BankAccountSerializer(bank_account.bankAccount)
+        else:
+            bank_accounts = [business.bankAccount for business in business_banks]
+            serializer = BankAccountSerializer(bank_accounts, many=True)
+
+        return Response(serializer.data, status.HTTP_200_OK)
