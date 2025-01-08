@@ -1,6 +1,11 @@
 from rest_framework import serializers
 
+from django.apps import apps
+
 from .models import BankAccount
+
+BusinessBankAccounts = apps.get_model('modules_business', 'BusinessBankAccounts')
+
 
 class BankAccountSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,3 +28,15 @@ class BankAccountSerializer(serializers.ModelSerializer):
                 **representation
             },
         }
+
+    def create(self, validated_data):
+        business = self.context['business']
+
+        bank_account = BankAccount.objects.create(**validated_data)
+
+        BusinessBankAccounts.objects.create(
+            business=business,
+            bankAccount=bank_account
+        )
+
+        return bank_account
