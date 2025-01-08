@@ -105,3 +105,23 @@ class BankAccountEndpoint(APIView):
         
         serializer.save()
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+    def delete(self, request, id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        business_banks = services.get_business_banks(business)
+
+        get_bank_account = business_banks.filter(bankAccount__id=id).first()
+        if not get_bank_account:
+            message = 'Bank Account not found.'
+            return Response({'error': message}, status.HTTP_404_NOT_FOUND)
+        
+        bank_account = get_bank_account.bankAccount
+        bank_account.status = 'DELETED'
+        bank_account.save()
+
+        return Response({'success': 'Bank Account deleted.'}, status.HTTP_200_OK)
