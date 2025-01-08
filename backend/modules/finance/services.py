@@ -50,3 +50,13 @@ def get_data(request):
         return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)   
       
     return data
+
+
+def get_business_banks(business):
+    business_banks = BusinessBankAccounts.objects.filter(business=business)
+    print(business_banks)
+    if not business_banks:
+        message = 'No bank found.'
+        return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+    
+    return business_banks
