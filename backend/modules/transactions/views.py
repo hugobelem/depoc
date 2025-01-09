@@ -42,11 +42,12 @@ class TransactionEndpoint(APIView):
             data['amount'] = amount_cleaned
         elif transaction_type == 'debit':
             data['amount'] = -amount_cleaned
-
+        elif transaction_type == 'transfer':
+            data['amount'] = -amount_cleaned
 
         serializer = TransactionSerializer(
             data=data,
-            context={'business': business},
+            context={'business': business, 'data': data, 'request': request},
         )
 
         if not serializer.is_valid():
