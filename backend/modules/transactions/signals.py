@@ -26,9 +26,9 @@ def update_bank_account_balance(sender, instance, **kwargs):
         bank_account.save()
 
 
-# @receiver(post_save, sender=Transaction)
-# def link_transactions(sender, instance, created, **kwargs):
-#     linked_transaction = instance.linkedTransaction
-#     if created and linked_transaction:
-#         linked_transaction.linkedTransaction = instance
-#         linked_transaction.save()
+@receiver(post_save, sender=Transaction)
+def link_transactions(sender, instance, created, **kwargs):
+    linked_transaction = instance.linkedTransaction
+    if created and linked_transaction:
+        linked_transaction.linkedTransaction = instance
+        linked_transaction.save()
