@@ -18,7 +18,11 @@ class TransactionSerializer(serializers.ModelSerializer):
             'linkedTransaction',
         ]
         expected_fields = [
-            field for field in fields if field not in ('timestamp', 'createdBy')
+            field for field in fields if field not in (
+                'timestamp',
+                'createdBy',
+                'linkedTransaction',
+            )
         ]
 
     def to_representation(self, instance):
