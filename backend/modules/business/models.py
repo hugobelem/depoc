@@ -190,3 +190,27 @@ class BusinessBankAccounts(models.Model):
 
     def __str__(self):
         return f'{self.bankAccount} - {self.business}'
+
+class BusinessFinanceCategories(models.Model):
+    id = models.CharField(
+        max_length=26,
+        primary_key=True,
+        unique=True,
+        editable=False
+    )
+    bankAccount = models.ForeignKey(
+        'modules_finance.Category',
+        on_delete=models.CASCADE,
+        related_name='business',
+    )
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name='finance_categories'
+    )
+
+    class Meta:
+        verbose_name_plural = 'Business Finance Categories'
+
+    def __str__(self):
+        return f'{self.bankAccount} - {self.business}'
