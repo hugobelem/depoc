@@ -11,6 +11,7 @@ from .models import (
     BusinessProducts,
     BusinessProductsCategories,
     BusinessBankAccounts,
+    BusinessFinanceCategories,
 )
 
 @receiver(pre_save, sender=Business)
@@ -20,6 +21,7 @@ from .models import (
 @receiver(pre_save, sender=BusinessProducts)
 @receiver(pre_save, sender=BusinessProductsCategories)
 @receiver(pre_save, sender=BusinessBankAccounts)
+@receiver(pre_save, sender=BusinessFinanceCategories)
 def generate_ulids(sender, instance, **kwargs):
     if not instance.id:
         instance.id = ulid.new().str
