@@ -55,6 +55,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['name', 'parent', 'status']
+        expected_fields = ['name']
 
 
     def to_representation(self, instance):
