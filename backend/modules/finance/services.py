@@ -10,6 +10,10 @@ from .models import BankAccount
 BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 BusinessProducts = apps.get_model('modules_business', 'BusinessProducts')
 BusinessBankAccounts = apps.get_model('modules_business', 'BusinessBankAccounts')
+BusinessFinanceCategories = apps.get_model(
+    'modules_business',
+    'BusinessFinanceCategories'
+)
 
 
 def check_field_errors(request, serializer):
@@ -59,3 +63,12 @@ def get_business_banks(business):
         return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
     
     return business_banks
+
+
+def get_business_finance_categories(business):
+    bf_categories = BusinessFinanceCategories.objects.filter(business=business.id)
+    if not bf_categories.exists():
+        message = 'No finance category was found.'
+        return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+    
+    return bf_categories
