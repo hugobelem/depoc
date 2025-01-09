@@ -42,6 +42,8 @@ class Transaction(models.Model):
         'modules_contacts.Contacts',
         on_delete=models.CASCADE,
         related_name='transactions',
+        blank=True,
+        null=True,
     )
     linkedTransaction = models.OneToOneField(
         'self',
