@@ -178,3 +178,77 @@ class CategoryEndpoint(APIView):
             serializer = CategorySerializer(categories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def patch(self, request, id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        data = services.get_data(request)
+        if isinstance(data, Response):
+            error_response = data
+            return error_response
+        
+        if field_errors := services.check_field_errors(request, CategorySerializer):
+            return field_errors
+        
+        finance_categories = services.get_business_finance_categories(business)
+        if isinstance(finance_categories, Response):
+            error_response = finance_categories
+            return error_response
+        
+        selected_category = finance_categories.filter(category__id=id).first()
+        if not selected_category:
+            message = 'Category not found.'
+            return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
+        
+        category = selected_category.category
+        serializer = CategorySerializer(instance=category, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(
+                {'error': 'Validation failed', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def delete(self, request, id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        finance_categories = services.get_business_finance_categories(business)
+        if isinstance(finance_categories, Response):
+            error_response = finance_categories
+            return error_response
+        
+        selected_category = finance_categories.filter(category__id=id).first()
+        if not selected_category:
+            message = 'Category not found.'
+            return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
+        
+        category = selected_category.category
+        if not category:
+            message = 'Category not found.'
+            return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
+        
+        if category.status == 'DELETED':
+            message = 'Category already marked as deleted.'
+            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            category.status = 'DELETED'
+            category.save()
+
+        subcategories = category.subcategories.all()
+        for categories in subcategories:
+            categories.status = 'DELETED'
+            categories.save()
+
+        return Response({'success': 'Category deleted'}, status=status.HTTP_200_OK)
+    
