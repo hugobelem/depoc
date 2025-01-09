@@ -213,4 +213,4 @@ class BusinessFinanceCategories(models.Model):
         verbose_name_plural = 'Business Finance Categories'
 
     def __str__(self):
-        return f'{self.bankAccount} - {self.business}'
+        return f'{self.category} - {self.business}'
