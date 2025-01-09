@@ -46,7 +46,7 @@ def get_business(request):
 def get_data(request):  
     data = request.data
     if not data:
-        message = 'No data provided for inventory creation or update.'
+        message = 'No data provided for resource creation or update.'
         return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)   
       
     return data
