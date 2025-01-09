@@ -38,6 +38,7 @@ def get_data(request):
 def check_field_errors(request, serializer):
     request_fields = set(request.data.keys())
     valid_fields = set(serializer.Meta.fields)
+    valid_fields.add('sendTo')
     invalid_fields = request_fields - valid_fields
 
     if invalid_fields:
