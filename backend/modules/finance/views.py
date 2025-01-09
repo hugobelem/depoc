@@ -142,23 +142,39 @@ class CategoryEndpoint(APIView):
             error_response = data
             return error_response
         
-        if field_errors := services.check_field_errors(
-                request,
-                CategorySerializer,
-            ):
+        if field_errors := services.check_field_errors(request, CategorySerializer):
             return field_errors
         
-        serializer = CategorySerializer(
-            data=data,
-            context={'business': business},
-        )
-
+        serializer = CategorySerializer(data=data, context={'business': business})
         if not serializer.is_valid():
-            message = 'Validation failed: '
             return Response(
-                {'error': message, 'details': serializer.errors},
+                {'error': 'Validation failed', 'details': serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST
-            )
-
+            )   
+        
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def get(self, request, id=None):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        finance_categories = services.get_business_finance_categories(business)
+        if isinstance(finance_categories, Response):
+            error_response = finance_categories
+            return error_response
+        
+        categories = [finance.category for finance in finance_categories]
+        if id:
+            selected_category = finance_categories.filter(category__id=id).first()
+            if not selected_category:
+                message = 'Category not found.'
+                return Response({'error':message}, status=status.HTTP_404_NOT_FOUND)
+            serializer = CategorySerializer(selected_category.category)
+        else:
+            serializer = CategorySerializer(categories, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
