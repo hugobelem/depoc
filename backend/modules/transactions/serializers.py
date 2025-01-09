@@ -30,7 +30,7 @@ class TransactionSerializer(serializers.ModelSerializer):
                 'description': representation.pop('description'),
                 'type': representation.pop('type'),
                 'timestamp': representation.pop('timestamp'),
-                'categoryId': representation.pop('category'),
+                'category': representation.pop('category'),
             },
             'metadata': {
                 'createdBy': representation.pop('createdBy'),
