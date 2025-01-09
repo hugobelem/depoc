@@ -7,6 +7,9 @@ from . import services
 from .throttling import BurstRateThrottle, SustainedRateThrottle
 from .serializers import TransactionSerializer
 
+from decimal import Decimal, InvalidOperation
+
+
 class TransactionEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
@@ -28,6 +31,19 @@ class TransactionEndpoint(APIView):
             ):
             return field_errors
         
+        if amount := data.get('amount', None):
+            try:
+                amount_cleaned = abs(Decimal(amount))
+            except InvalidOperation:
+                raise ValueError('Invalid monetary value format.')
+
+        transaction_type = data.get('type', None)
+        if transaction_type == 'credit':
+            data['amount'] = amount_cleaned
+        elif transaction_type == 'debit':
+            data['amount'] = -amount_cleaned
+
+
         serializer = TransactionSerializer(
             data=data,
             context={'business': business},
