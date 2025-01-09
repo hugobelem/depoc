@@ -8,6 +8,7 @@ from modules.business.models import (
     BusinessProducts,
     BusinessProductsCategories,
     BusinessBankAccounts,
+    BusinessFinanceCategories,
 )
 
 
@@ -32,6 +33,9 @@ class BusinessProductsCategoriesAdmin(admin.ModelAdmin):
 class BusinessBankAccountsAdmin(admin.ModelAdmin):
     list_display = ('bankAccount', 'business')
 
+class BusinessFinanceCategoriesAdmin(admin.ModelAdmin):
+    list_display = ('category', 'business')
+
 admin.site.register(Business, BusinessAdmin)
 admin.site.register(BusinessOwner, BusinessOwnerAdmin)
 admin.site.register(BusinessMembers, BusinessMembersAdmin)
@@ -39,3 +43,4 @@ admin.site.register(BusinessContacts, BusinessContactsAdmin)
 admin.site.register(BusinessProducts, BusinessProductsAdmin)
 admin.site.register(BusinessProductsCategories, BusinessProductsCategoriesAdmin)
 admin.site.register(BusinessBankAccounts, BusinessBankAccountsAdmin)
+admin.site.register(BusinessFinanceCategories, BusinessFinanceCategoriesAdmin)
