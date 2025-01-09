@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Transaction
+from . import services
 
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -45,3 +46,16 @@ class TransactionSerializer(serializers.ModelSerializer):
                 'contact': representation.pop('contact'),
             },
         }
+
+
+    def create(self, validated_data):
+        transaction = Transaction.objects.create(**validated_data)
+
+        business = self.context['business']
+        data = self.context['data']
+        request = self.context['request']
+
+        if transaction.type == 'transfer':
+            services.complete_transfer(business, data, request, transaction)
+
+        return transaction
