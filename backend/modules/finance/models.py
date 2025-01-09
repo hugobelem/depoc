@@ -17,3 +17,27 @@ class BankAccount(models.Model):
 
     def __str__(self):
         return self.bankName
+    
+
+class Category(models.Model):
+    id = models.CharField(
+        max_length=26,
+        primary_key=True,
+        unique=True,
+        editable=False
+    )
+    name = models.CharField(max_length=150, unique=True)
+    parent = models.ForeignKey(
+        'self', 
+        on_delete=models.CASCADE, 
+        blank=True, 
+        null=True, 
+        related_name='subcategories',
+    )
+    status = models.CharField(max_length=150, blank=True, default='ACTIVE')
+
+    class Meta:
+        verbose_name_plural = 'Categories'
+    
+    def __str__(self):
+        return self.name
