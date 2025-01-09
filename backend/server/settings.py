@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'modules.animals',
     'modules.inventory',
     'modules.finance',
+    'modules.transactions',
     'rest_framework',
 ]
 
