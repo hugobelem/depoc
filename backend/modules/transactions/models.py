@@ -8,6 +8,7 @@ class Transaction(models.Model):
     TRANSACTION_TYPES = [
         ('credit', 'Credit'),
         ('debit', 'Debit'),
+        ('transfer', 'Transfer'),
     ]
 
     id = models.CharField(
