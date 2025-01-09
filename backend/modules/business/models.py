@@ -198,7 +198,7 @@ class BusinessFinanceCategories(models.Model):
         unique=True,
         editable=False
     )
-    bankAccount = models.ForeignKey(
+    category = models.ForeignKey(
         'modules_finance.Category',
         on_delete=models.CASCADE,
         related_name='business',
