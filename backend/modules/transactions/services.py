@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.apps import apps
 from django.http import Http404
 
+from .models import Transaction
 
 BusinessOwner = apps.get_model('modules_business', 'BusinessOwner')
 BusinessProducts = apps.get_model('modules_business', 'BusinessProducts')
@@ -59,3 +60,21 @@ def get_business_banks(business):
         return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
     
     return business_banks
+
+
+def complete_transfer(business, data, request, transaction):
+    sendTo = data.get('sendTo', None)
+    amount = data.get('amount', None)
+
+    if sendTo:
+        business_banks = get_business_banks(business)
+        send_to = business_banks.filter(bankAccount__id=sendTo).first()
+    
+    Transaction.objects.create(
+        amount=abs(amount),
+        description='Transfer',
+        type='transfer',
+        bankAccount=send_to.bankAccount,
+        createdBy=request.user,
+        linkedTransaction=transaction
+    )
