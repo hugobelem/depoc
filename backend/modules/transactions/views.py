@@ -114,3 +114,16 @@ class TransactionEndpoint(APIView):
         
         serializer.save()
         return Response(serializer.data, status.HTTP_200_OK)
+
+    def delete(self, request, id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        transactions = business.transactions
+        transaction = transactions.filter(id=id).first()
+
+        transaction.delete()
+
+        return Response({'sucess': 'Transaction deleted.'}, status.HTTP_200_OK)
