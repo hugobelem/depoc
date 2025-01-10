@@ -6,6 +6,7 @@ from rest_framework import status
 from . import services
 from .throttling import BurstRateThrottle, SustainedRateThrottle
 from .serializers import TransactionSerializer
+from .models import Transaction
 
 from decimal import Decimal, InvalidOperation
 
@@ -59,3 +60,20 @@ class TransactionEndpoint(APIView):
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def get(self, request, id=None):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        transactions = business.transactions
+
+        if id:
+            transaction = transactions.filter(id=id).first()
+            serializer = TransactionSerializer(transaction)
+        else:
+            serializer = TransactionSerializer(transactions, many=True)
+
+        return Response(serializer.data)

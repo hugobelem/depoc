@@ -33,6 +33,11 @@ class Transaction(models.Model):
         on_delete=models.CASCADE,
         related_name='transactions',
     )
+    business = models.ForeignKey(
+        'modules_business.Business',
+        on_delete=models.PROTECT,
+        related_name='transactions',
+    )
     bankAccount = models.ForeignKey(
         'modules_finance.BankAccount',
         on_delete=models.PROTECT,
