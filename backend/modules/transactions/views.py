@@ -77,3 +77,40 @@ class TransactionEndpoint(APIView):
             serializer = TransactionSerializer(transactions, many=True)
 
         return Response(serializer.data)
+
+
+    def patch(self, request, id):
+        business = services.get_business(request)
+        if isinstance(business, Response):
+            error_response = business
+            return error_response
+        
+        data = services.get_data(request)
+        if isinstance(data, Response):
+            error_response = data
+            return error_response
+        
+        if field_errors := services.check_field_errors(
+                request,
+                TransactionSerializer,
+            ):
+            return field_errors
+    
+        transactions = business.transactions
+        transaction = transactions.filter(id=id).first()
+
+        serializer = TransactionSerializer(
+            instance=transaction,
+            data=data,
+            partial=True
+        )
+
+        if not serializer.is_valid():
+            message = 'Validation failed: '
+            return Response(
+                {'error': message, 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer.save()
+        return Response(serializer.data, status.HTTP_200_OK)
