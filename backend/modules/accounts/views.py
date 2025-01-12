@@ -5,8 +5,12 @@ from rest_framework.throttling import AnonRateThrottle
 
 from .serializers import UserSerializer, OwnerSerializer
 
-from shared import error, validate
-from shared.throttling import BurstRateThrottle, SustainedRateThrottle
+from shared import (
+    error,
+    validate,
+    BurstRateThrottle,
+    SustainedRateThrottle
+)
 
 
 class MeEndpoint(APIView):
