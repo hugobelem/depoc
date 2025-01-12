@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
 from .serializers import UserSerializer, OwnerSerializer
-from .utils import error, validate
 
+from shared import error, validate
 from shared.throttling import BurstRateThrottle, SustainedRateThrottle
 
 
