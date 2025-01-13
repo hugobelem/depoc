@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'modules.accounts',
+    'modules.business',
     'rest_framework',
 ]
 

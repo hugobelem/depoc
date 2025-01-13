@@ -39,4 +39,4 @@ class UserAdmin(admin.ModelAdmin):
 
 @register(Owner)
 class OwnerAdmin(admin.ModelAdmin):
-    list_display = ['user', 'name', 'email', 'phone']
+    list_display = ['user', 'business', 'name', 'email', 'phone']

@@ -47,6 +47,14 @@ class Owner(models.Model):
         on_delete=models.CASCADE,
         related_name='owner',
     )
+    
+    business = models.OneToOneField(
+        'business.Business',
+        on_delete=models.CASCADE,
+        related_name='business',
+        blank=True,
+        null=True
+    )
 
     name = models.CharField(
         max_length=255,
