@@ -8,17 +8,9 @@ from shared import (
     error,
     validate,
     BurstRateThrottle,
-    SustainedRateThrottle
+    SustainedRateThrottle,
+    get_user_business,
 )
-
-def has_business(request):
-    business = request.user.owner.business
-    
-    if not business:
-        error_response = error.builder(404, 'Owner does not have a business.')
-        return Response(error_response, status.HTTP_404_NOT_FOUND)
-
-    return business
 
 
 class BusinessEndpoint(APIView):
@@ -26,10 +18,10 @@ class BusinessEndpoint(APIView):
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def get(self, request):
-        business = has_business(request)
+        business, error_response = get_user_business(request.user)
 
-        if isinstance(business, Response):
-            return business
+        if error_response:
+            return Response(error_response, status.HTTP_404_NOT_FOUND)
 
         serializer = BusinessSerializer(business)
 
@@ -60,11 +52,10 @@ class BusinessEndpoint(APIView):
 
     def patch(self, request):
         data = request.data
-        business = request.user.owner.business
 
-        if not business:
-            message = 'Owner does not have a business.'
-            error_response = error.builder(404, message)
+        business, error_response = get_user_business(request.user)
+
+        if error_response:
             return Response(error_response, status.HTTP_404_NOT_FOUND)
         
         invalid_params = validate.params(request, BusinessSerializer)
@@ -86,11 +77,9 @@ class BusinessEndpoint(APIView):
 
 
     def delete(self, request):
-        business = request.user.owner.business
+        business, error_response = get_user_business(request.user)
 
-        if not business:
-            message = 'Owner does not have a business.'
-            error_response = error.builder(404, message)
+        if error_response:
             return Response(error_response, status.HTTP_404_NOT_FOUND)
         
         business.is_active = False

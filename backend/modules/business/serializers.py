@@ -18,23 +18,20 @@ class BusinessSerializer(serializers.ModelSerializer):
                 'id': instance.id,
                 'legal_name': representation.pop('legal_name'),
                 'trade_name': representation.pop('trade_name'),   
-                'registration_number': representation.pop('registration_number'),
-                'state_registration': representation.pop('state_registration'),
-                'city_registration': representation.pop('city_registration'),
+                'cnpj': representation.pop('cnpj'),
+                'ie': representation.pop('ie'),
+                'im': representation.pop('im'),
+                'is_active': representation.pop('is_active'),
                 'address': {
-                    'street_address': representation.pop('street_address'),
-                    'address_number': representation.pop('address_number'),
-                    'neighborhood': representation.pop('neighborhood'),
-                    'additional_info': representation.pop('additional_info'),
+                    'postcode': representation.pop('postcode'),
                     'city': representation.pop('city'),
                     'state': representation.pop('state'),
-                    'postcode': representation.pop('postcode'),
+                    'address': representation.pop('address'),
                 },
                 'contact': {
                     'phone': representation.pop('phone'),
                     'email': representation.pop('email'),                    
                 },
-                'is_active': representation.pop('is_active'),
             }
         }        
         
