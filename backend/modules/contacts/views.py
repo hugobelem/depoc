@@ -1,6 +1,7 @@
 from rest_framework import permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
 from django.db.models import Q
 
@@ -10,10 +11,12 @@ from .serializers import CustomerSerializer, SupplierSerializer
 from shared import (
     error,
     validate,
+    paginate,
     BurstRateThrottle,
     SustainedRateThrottle,
     get_user_business,
 )
+
 
 class ContactsSearchEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
@@ -24,6 +27,10 @@ class ContactsSearchEndpoint(APIView):
 
         if not search:
             error_response = error.builder(400, 'Provide a search term.')
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
+        
+        if len(search) < 3:
+            error_response = error.builder(400, 'Enter at least 3 characters.')
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
 
         business, error_response = get_user_business(request.user)
@@ -49,17 +56,18 @@ class ContactsSearchEndpoint(APIView):
 
         customers = CustomerSerializer(search_customers, many=True)
         suppliers = SupplierSerializer(search_suppliers, many=True)
-
         contacts = customers.data + suppliers.data
 
-        return Response(contacts, status.HTTP_200_OK)
+        paginated_data = paginate(contacts, request, 50)
+
+        return paginated_data
 
 
 class ContactsEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
-    def get(self, request):
+    def get(self, request):        
         business, error_response = get_user_business(request.user)
 
         if error_response:
@@ -67,10 +75,11 @@ class ContactsEndpoint(APIView):
 
         customers = CustomerSerializer(business.customers, many=True)
         suppliers = SupplierSerializer(business.suppliers, many=True)   
-
         contacts = customers.data + suppliers.data
 
-        return Response(contacts, status.HTTP_200_OK)
+        paginated_data = paginate(contacts, request, 50)
+        
+        return paginated_data
 
 
 class CustomerEndpoint(APIView):
@@ -92,6 +101,8 @@ class CustomerEndpoint(APIView):
         else:
             customers = business.customers
             serializer = CustomerSerializer(customers, many=True)
+            paginated_data = paginate(serializer.data, request, 50)
+            return paginated_data
 
         return Response(serializer.data, status.HTTP_200_OK)
 
@@ -195,6 +206,8 @@ class SupplierEndpoint(APIView):
         else:
             suppliers = business.suppliers
             serializer = SupplierSerializer(suppliers, many=True)
+            paginated_data = paginate(serializer.data, request, 50)
+            return paginated_data
 
         return Response(serializer.data, status.HTTP_200_OK)
 
