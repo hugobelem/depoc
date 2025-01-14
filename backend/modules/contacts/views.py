@@ -1,7 +1,6 @@
 from rest_framework import permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
 
 from django.db.models import Q
 
@@ -16,7 +15,6 @@ from shared import (
     SustainedRateThrottle,
     get_user_business,
 )
-
 
 class ContactsSearchEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]

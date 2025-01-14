@@ -9,7 +9,8 @@ from shared import (
     error,
     validate,
     BurstRateThrottle,
-    SustainedRateThrottle
+    SustainedRateThrottle,
+    IsOwner,
 )
 
 
@@ -40,7 +41,7 @@ class AccountsEndpoint(APIView):
         elif method in ('GET', 'PATCH'):
             return [permissions.IsAuthenticated()]
         else:
-            return [permissions.IsAdminUser()]
+            return [IsOwner()]
         
 
     def post(self, request):
@@ -103,7 +104,7 @@ class AccountsEndpoint(APIView):
 
 
 class OwnerEndpoint(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsOwner]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def get(self, request):

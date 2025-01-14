@@ -1,4 +1,4 @@
-from rest_framework import permissions, status
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -10,11 +10,12 @@ from shared import (
     BurstRateThrottle,
     SustainedRateThrottle,
     get_user_business,
+    IsOwner,
 )
 
 
 class BusinessEndpoint(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsOwner]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def get(self, request):
