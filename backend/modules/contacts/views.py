@@ -16,6 +16,7 @@ from shared import (
     get_user_business,
 )
 
+
 class ContactsSearchEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
@@ -66,10 +67,10 @@ class ContactsEndpoint(APIView):
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def get(self, request):        
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
 
         customers = CustomerSerializer(business.customers, many=True)
         suppliers = SupplierSerializer(business.suppliers, many=True)   
@@ -85,19 +86,19 @@ class CustomerEndpoint(APIView):
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def get(self, request, customer_id=None):
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
+        customers = business.customers
         if customer_id:
-            customer = Customer.objects.filter(id=customer_id).first()
+            customer = customers.filter(id=customer_id).first() 
             if not customer:
                 error_response = error.builder(404, 'Customer not found.')
                 return Response(error_response, status.HTTP_404_NOT_FOUND)
             serializer = CustomerSerializer(customer)
         else:
-            customers = business.customers
             serializer = CustomerSerializer(customers, many=True)
             paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
@@ -108,10 +109,10 @@ class CustomerEndpoint(APIView):
     def post(self, request):
         data = request.data
 
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
         invalid_params = validate.params(request, CustomerSerializer)
 
@@ -134,10 +135,10 @@ class CustomerEndpoint(APIView):
     def patch(self, request, customer_id):
         data = request.data
 
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
         invalid_params = validate.params(request, CustomerSerializer)
 
@@ -146,7 +147,8 @@ class CustomerEndpoint(APIView):
             error_response = error.builder(400, message, invalid=invalid_params)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
-        customer = Customer.objects.filter(id=customer_id).first()
+        customers = business.customers
+        customer = customers.filter(id=customer_id).first()
         if not customer:
             error_response = error.builder(404, 'Customer not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
@@ -163,12 +165,13 @@ class CustomerEndpoint(APIView):
 
 
     def delete(self, request, customer_id):
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
-        customer = Customer.objects.filter(id=customer_id).first()
+        customers = business.customers
+        customer = customers.filter(id=customer_id).first()
         if not customer:
             error_response = error.builder(404, 'Customer not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
@@ -190,19 +193,19 @@ class SupplierEndpoint(APIView):
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def get(self, request, supplier_id=None):
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
+        suppliers = business.suppliers
         if supplier_id:
-            supplier = Supplier.objects.filter(id=supplier_id).first()
+            supplier = suppliers.filter(id=supplier_id).first()
             if not supplier:
                 error_response = error.builder(404, 'Supplier not found.')
                 return Response(error_response, status.HTTP_404_NOT_FOUND)
             serializer = SupplierSerializer(supplier)
         else:
-            suppliers = business.suppliers
             serializer = SupplierSerializer(suppliers, many=True)
             paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
@@ -213,10 +216,10 @@ class SupplierEndpoint(APIView):
     def post(self, request):
         data = request.data
 
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
         invalid_params = validate.params(request, SupplierSerializer)
 
@@ -239,10 +242,10 @@ class SupplierEndpoint(APIView):
     def patch(self, request, supplier_id):
         data = request.data
 
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
         invalid_params = validate.params(request, SupplierSerializer)
 
@@ -251,7 +254,8 @@ class SupplierEndpoint(APIView):
             error_response = error.builder(400, message, invalid=invalid_params)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
-        supplier = Supplier.objects.filter(id=supplier_id).first()
+        suppliers = business.suppliers
+        supplier = suppliers.filter(id=supplier_id).first()
         if not supplier:
             error_response = error.builder(404, 'Supplier not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
@@ -268,12 +272,13 @@ class SupplierEndpoint(APIView):
 
 
     def delete(self, request, supplier_id):
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
-        supplier = Supplier.objects.filter(id=supplier_id).first()
+        suppliers = business.suppliers
+        supplier = suppliers.filter(id=supplier_id).first()
         if not supplier:
             error_response = error.builder(404, 'Supplier not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)

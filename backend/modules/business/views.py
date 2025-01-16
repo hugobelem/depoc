@@ -19,10 +19,10 @@ class BusinessEndpoint(APIView):
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
     def get(self, request):
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
 
         serializer = BusinessSerializer(business)
 
@@ -54,10 +54,10 @@ class BusinessEndpoint(APIView):
     def patch(self, request):
         data = request.data
 
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
         invalid_params = validate.params(request, BusinessSerializer)
 
@@ -78,10 +78,10 @@ class BusinessEndpoint(APIView):
 
 
     def delete(self, request):
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
         business.is_active = False
         business.save()

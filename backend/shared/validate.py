@@ -11,7 +11,11 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.request import Request
 
 
-def params(request: Request, serializer: ModelSerializer) -> set | None:
+def params(
+        request: Request,
+        serializer: ModelSerializer,
+        add: str | None = None,
+    ) -> set | None:
     """
     Checks if the parameters in the request match 
     the fields defined in the serializer, excluding the 'id' field.
@@ -23,6 +27,9 @@ def params(request: Request, serializer: ModelSerializer) -> set | None:
     serializer = serializer()
     fields = set(serializer.fields.keys())
     fields.discard('id')
+
+    if add:
+        fields.add(add)
 
     request_params = set(request.data.keys())
     invalid_params = request_params - fields

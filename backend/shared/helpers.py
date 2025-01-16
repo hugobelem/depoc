@@ -16,7 +16,6 @@ def get_user_business(user: Request) -> (
     Returns a tuple (business, error_response), where one is None.
     """
     business = getattr(user.owner, 'business', None)
-    print(type(business))
 
     if not business:
         error_response = error.builder(404, 'Owner does not have a business.')

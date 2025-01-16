@@ -23,6 +23,14 @@ class Contact(models.Model):
     notes = models.TextField(blank=True, null=True)
 
 
+    def __str__(self):
+        if hasattr(self, 'customer'):
+            return self.customer.name
+        elif hasattr(self, 'supplier'):
+            return self.supplier.legal_name
+        return 'Contact'
+
+
 class Customer(Contact):
     GENDER_TYPES = [
         ('male', 'Male'),

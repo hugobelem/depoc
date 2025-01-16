@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'modules.accounts',
     'modules.business',
     'modules.contacts',
+    'modules.finance',
     'rest_framework',
 ]
 

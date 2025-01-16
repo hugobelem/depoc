@@ -51,7 +51,7 @@ class Owner(models.Model):
     business = models.OneToOneField(
         'business.Business',
         on_delete=models.CASCADE,
-        related_name='business',
+        related_name='owner',
         blank=True,
         null=True
     )
