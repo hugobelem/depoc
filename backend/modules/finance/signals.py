@@ -1,10 +1,19 @@
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from django.db.models import Sum
+from django.apps import apps
 
 import ulid
 
 from .models import FinancialAccount, FinancialCategory, FinancialTransaction
+
+
+Business = apps.get_model('business', 'Business')
+
+@receiver(post_save, sender=Business)
+def create_standard_financial_account(sender, instance, created, **kwargs):
+    if created:
+        FinancialAccount.objects.create(name='Caixa', business=instance)
 
 
 @receiver(pre_save, sender=FinancialAccount)
