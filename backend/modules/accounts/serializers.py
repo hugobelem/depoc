@@ -55,7 +55,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        user = User.objects.create_superuser(**validated_data)
+        user = User.objects.create_user(is_staff=True, **validated_data)
         Owner.objects.create(user=user)
 
         return user

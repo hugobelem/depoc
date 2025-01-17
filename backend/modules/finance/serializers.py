@@ -109,11 +109,11 @@ class FinancialTransactionSerializer(serializers.ModelSerializer):
         if is_transfer:
             transfer = complete_transfer(business, data, request, transaction)
         
-        if transfer:
-            operator_description = data.get('description', None)
-            transfer_description = f'Transfer Sent to {transfer.account}'
-            description = f'{transfer_description} • {operator_description}'
-            transaction.description = description
-            transaction.save()
+            if transfer:
+                operator_description = data.get('description', None)
+                transfer_description = f'Transfer Sent to {transfer.account}'
+                description = f'{transfer_description} • {operator_description}'
+                transaction.description = description
+                transaction.save()
         
         return transaction
