@@ -32,10 +32,10 @@ class ContactsSearchEndpoint(APIView):
             error_response = error.builder(400, 'Enter at least 3 characters.')
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
 
-        business, error_response = get_user_business(request.user)
+        business, got_no_business = get_user_business(request.user)
 
-        if error_response:
-            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_404_NOT_FOUND)
 
         search_customers = Customer.objects.filter(
             Q(business=business) &

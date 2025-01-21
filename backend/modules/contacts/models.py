@@ -11,7 +11,14 @@ class Contact(models.Model):
     
     is_active = models.BooleanField(default=True)
     
-    code = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    code = models.CharField(
+        max_length=50,
+        unique=True,
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
     phone = models.CharField(max_length=11, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -38,9 +45,17 @@ class Customer(Contact):
         ('unkown', 'Unkown'),
     ]
 
-    name = models.CharField(max_length=150)
-    alias = models.CharField(max_length=150, blank=True, null=True)
-    cpf = models.CharField(max_length=11, unique=True, blank=True, null=True)
+    name = models.CharField(max_length=150, db_index=True)
+    alias = models.CharField(max_length=150, blank=True, null=True, db_index=True)
+
+    cpf = models.CharField(
+        max_length=11,
+        unique=True,
+        blank=True,
+        null=True, 
+        db_index=True,
+    )
+
     amount_spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     number_of_orders = models.PositiveIntegerField(default=0)
 
@@ -65,9 +80,24 @@ class Customer(Contact):
 
 
 class Supplier(Contact):
-    legal_name = models.CharField(max_length=150)
-    trade_name = models.CharField(max_length=150, blank=True, null=True)
-    cnpj = models.CharField(max_length=14, unique=True, blank=True, null=True)
+    legal_name = models.CharField(max_length=150, db_index=True)
+
+    trade_name = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+        db_index=True
+    )
+
+    cnpj = models.CharField(
+        max_length=14,
+        unique=True,
+        blank=True,
+        null=True,
+        db_index=True,
+    
+    )
+    
     ie = models.CharField(max_length=14, blank=True, null=True)
     im = models.CharField(max_length=14, blank=True, null=True)
 
