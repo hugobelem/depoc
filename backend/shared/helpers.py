@@ -21,7 +21,10 @@ def get_user_business(user: Request) -> (
     Helper function to retrieve the business associated with the owner.
     Returns a tuple (business, error_response), where one is None.
     """
-    business = getattr(user.owner, 'business', None)
+    if hasattr(user, 'owner'):
+        business = getattr(user.owner, 'business')
+    elif hasattr(user, 'member'):
+        business = getattr(user.member, 'business')
 
     if not business:
         error_response = error.builder(404, 'Owner does not have a business.')

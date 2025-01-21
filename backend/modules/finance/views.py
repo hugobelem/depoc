@@ -101,7 +101,6 @@ class FinancialAccountEndpoint(APIView):
             error_response = error.builder(404, 'Financial account not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
         
-        data['business'] = business.id
         serializer = FinancialAccountSerializer(
             instance=account,
             data=data,
@@ -217,7 +216,6 @@ class FinancialCategoryEndpoint(APIView):
             error_response = error.builder(404, 'Financial category not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
         
-        data['business'] = business.id
         serializer = FinancialCategorySerializer(
             instance=category,
             data=data,

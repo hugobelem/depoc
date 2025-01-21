@@ -8,7 +8,7 @@ from .models import User, Owner
 
 @register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['name', 'username', 'email', 'id', 'is_superuser']
+    list_display = ['name', 'username', 'email', 'is_superuser', 'is_active', 'id']
     readonly_fields = ['last_login', 'date_joined']
 
     def get_fields(self, request, obj=None):
