@@ -3,52 +3,83 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from django.db.models import Q
-from django.utils import timezone
 
-from decimal import Decimal, InvalidOperation
-
-from datetime import datetime
+from .utils.calculate import calculate_markup, calculate_average_cost
 
 from .serializers import (
-    FinancialAccountSerializer,
-    FinancialCategorySerializer,
-    FinancialTransactionSerializer,
+    ProductSerializer,
+    ProductCategorySerializer,
+    ProductCostHistorySerializer,
 )
 
 from shared import (
     error,
     validate,
     paginate,
-    IsOwner,
     BurstRateThrottle,
     SustainedRateThrottle,
     get_user_business,
-    get_start_and_end_date
 )
 
 
-class FinancialAccountEndpoint(APIView):
-    permission_classes = [IsOwner]
+class ProductSearchEndpoint(APIView):
+    permission_classes = [permissions.IsAdminUser]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
-    def get(self, request, account_id=None):
+    def get(self, request):
+        search = request.query_params.get('search', None)
+
+        if not search:
+            error_response = error.builder(400, 'Provide a search term.')
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
+        
+        if len(search) < 3:
+            error_response = error.builder(400, 'Enter at least 3 characters.')
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
+
+        business, got_no_business = get_user_business(request.user)
+
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_404_NOT_FOUND)
+        
+        products = business.products
+
+        search_products = products.filter(
+            Q(name__icontains=search) |
+            Q(id__exact=search) |
+            Q(sku__exact=search) |
+            Q(barcode__exact=search)
+        )
+
+        serializer = ProductSerializer(search_products, many=True)
+        paginated_data = paginate(serializer.data, request, 10)
+
+        return paginated_data
+
+
+class ProductEndpoint(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
+
+    def get(self, request, product_id=None):
         business, got_no_business = get_user_business(request.user)
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
-        accounts = business.financial_accounts
-        if account_id:
-            account = accounts.filter(id=account_id).first()
+        products = business.products
 
-            if not account:
-                error_response = error.builder(404, 'Financial account not found.')
+        if product_id:
+            product = products.filter(id=product_id).first()
+
+            if not product:
+                error_response = error.builder(404, 'Product not found.')
                 return Response(error_response, status.HTTP_404_NOT_FOUND)
             
-            serializer = FinancialAccountSerializer(account)
+            serializer = ProductSerializer(product)
             return Response(serializer.data, status.HTTP_200_OK)
         else:
-            serializer = FinancialAccountSerializer(accounts, many=True)
+            serializer = ProductSerializer(products, many=True)
             paginated_data = paginate(serializer.data, request, 10)
             return paginated_data
 
@@ -60,8 +91,8 @@ class FinancialAccountEndpoint(APIView):
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
-
-        invalid_params = validate.params(request, FinancialAccountSerializer)
+        
+        invalid_params = validate.params(request, ProductSerializer)
 
         if not data or invalid_params:
             message = 'Required parameter missing or invalid.'
@@ -69,7 +100,7 @@ class FinancialAccountEndpoint(APIView):
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
         data['business'] = business.id
-        serializer = FinancialAccountSerializer(data=data)
+        serializer = ProductSerializer(data=data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
@@ -81,32 +112,28 @@ class FinancialAccountEndpoint(APIView):
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 
-    def patch(self, request, account_id):
+    def patch(self, request, product_id):
         data = request.data
 
         business, got_no_business = get_user_business(request.user)
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
-
-        invalid_params = validate.params(request, FinancialAccountSerializer)
+        
+        invalid_params = validate.params(request, ProductSerializer)
 
         if not data or invalid_params:
             message = 'Required parameter missing or invalid.'
             error_response = error.builder(400, message, invalid=invalid_params)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
-        accounts = business.financial_accounts
-        account = accounts.filter(id=account_id).first()
-        if not account:
-            error_response = error.builder(404, 'Financial account not found.')
+        products = business.products
+        product = products.filter(id=product_id).first()
+        if not product:
+            error_response = error.builder(404, 'Product not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
-        
-        serializer = FinancialAccountSerializer(
-            instance=account,
-            data=data,
-            partial=True,
-        )
+
+        serializer = ProductSerializer(instance=product, data=data, partial=True)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
@@ -118,32 +145,36 @@ class FinancialAccountEndpoint(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 
-    def delete(self, request, account_id):
+    def delete(self, request, product_id):
+        data = request.data
+
         business, got_no_business = get_user_business(request.user)
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
-
-        accounts = business.financial_accounts
-        account = accounts.filter(id=account_id).first()
-        if not account:
-            error_response = error.builder(404, 'Financial account not found.')
+        
+        products = business.products
+        product = products.filter(id=product_id).first()
+        if not product:
+            error_response = error.builder(404, 'Product not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
         
-        account.is_active = False
-        account.save()
+        product.is_active = False
+        product.is_available = False
+        product.save()
 
         data = {
-            'account': {
-                'id': account.id,
+            'product': {
+                'id': product.id,
                 'is_active': False,
+                'is_available': False,
             }
         }
 
         return Response(data, status.HTTP_200_OK)
 
 
-class FinancialCategoryEndpoint(APIView):
+class ProductCategoryEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
@@ -153,18 +184,19 @@ class FinancialCategoryEndpoint(APIView):
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
-        categories = business.financial_categories
+        categories = business.product_categories
+
         if category_id:
             category = categories.filter(id=category_id).first()
 
             if not category:
-                error_response = error.builder(404, 'Financial category not found.')
+                error_response = error.builder(404, 'Category not found.')
                 return Response(error_response, status.HTTP_404_NOT_FOUND)
             
-            serializer = FinancialCategorySerializer(category)
+            serializer = ProductCategorySerializer(category)
             return Response(serializer.data, status.HTTP_200_OK)
         else:
-            serializer = FinancialCategorySerializer(categories, many=True)
+            serializer = ProductCategorySerializer(categories, many=True)
             paginated_data = paginate(serializer.data, request, 10)
             return paginated_data
 
@@ -176,8 +208,8 @@ class FinancialCategoryEndpoint(APIView):
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
-
-        invalid_params = validate.params(request, FinancialCategorySerializer)
+        
+        invalid_params = validate.params(request, ProductCategorySerializer)
 
         if not data or invalid_params:
             message = 'Required parameter missing or invalid.'
@@ -185,7 +217,7 @@ class FinancialCategoryEndpoint(APIView):
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
         data['business'] = business.id
-        serializer = FinancialCategorySerializer(data=data)
+        serializer = ProductCategorySerializer(data=data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
@@ -204,21 +236,21 @@ class FinancialCategoryEndpoint(APIView):
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
-
-        invalid_params = validate.params(request, FinancialCategorySerializer)
+        
+        invalid_params = validate.params(request, ProductCategorySerializer)
 
         if not data or invalid_params:
             message = 'Required parameter missing or invalid.'
             error_response = error.builder(400, message, invalid=invalid_params)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
-        categories = business.financial_categories
+        categories = business.product_categories
         category = categories.filter(id=category_id).first()
         if not category:
-            error_response = error.builder(404, 'Financial category not found.')
+            error_response = error.builder(404, 'Category not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
-        
-        serializer = FinancialCategorySerializer(
+
+        serializer = ProductCategorySerializer(
             instance=category,
             data=data,
             partial=True,
@@ -235,15 +267,17 @@ class FinancialCategoryEndpoint(APIView):
 
 
     def delete(self, request, category_id):
+        data = request.data
+
         business, got_no_business = get_user_business(request.user)
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
-
-        categories = business.financial_categories
+           
+        categories = business.product_categories
         category = categories.filter(id=category_id).first()
         if not category:
-            error_response = error.builder(404, 'Financial category not found.')
+            error_response = error.builder(404, 'Category not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
         
         category.is_active = False
@@ -259,74 +293,76 @@ class FinancialCategoryEndpoint(APIView):
         return Response(data, status.HTTP_200_OK)
 
 
-class FinancialTransactionEndpoint(APIView):
+class ProductCostHistoryEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
-    def get(self, request, transaction_id=None):
+    def get(self, request, product_id, cost_id=None):
         business, got_no_business = get_user_business(request.user)
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
-        transactions = business.financial_transactions
-        if transaction_id:
-            transaction = transactions.filter(id=transaction_id).first()
+        products = business.products
+        product = products.filter(id=product_id).first()
+        if not product:
+            error_response = error.builder(404, 'Product not found.')
+            return Response(error_response, status.HTTP_404_NOT_FOUND)
+
+        costs = product.cost_history
+        if cost_id:
+            cost = costs.filter(id=cost_id).first()
             
-            if not transaction:
-                message = 'Financial transaction not found.'
-                error_response = error.builder(404, message)
+            if not cost:
+                error_response = error.builder(404, 'Cost not found.')
                 return Response(error_response, status.HTTP_404_NOT_FOUND)
             
-            serializer = FinancialTransactionSerializer(transaction)
+            serializer = ProductCostHistorySerializer(cost)
             return Response(serializer.data, status.HTTP_200_OK)
         else:
-            serializer = FinancialTransactionSerializer(transactions, many=True)
+            serializer = ProductCostHistorySerializer(costs, many=True)
             paginated_data = paginate(serializer.data, request, 10)
             return paginated_data
 
 
-    def post(self, request):
+    def post(self, request, product_id):
         data = request.data
-        user = request.user
 
         business, got_no_business = get_user_business(request.user)
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
-
-        invalid_params = validate.params(
-            request,
-            FinancialTransactionSerializer,
-            add='send_to',
-        )
+        
+        invalid_params = validate.params(request, ProductCostHistorySerializer)
 
         if not data or invalid_params:
             message = 'Required parameter missing or invalid.'
             error_response = error.builder(400, message, invalid=invalid_params)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
+        
+        products = business.products
+        product = products.filter(id=product_id).first()
+        if not product:
+            error_response = error.builder(404, 'Product not found.')
+            return Response(error_response, status.HTTP_404_NOT_FOUND)
 
-        if amount := data.get('amount', None):
-            try:
-                amount_cleaned = abs(Decimal(amount))
-            except InvalidOperation:
-                raise ValueError('Invalid monetary value format.')
+        data['product'] = product.id
 
-        transaction_type = data.get('type', None)
-        if transaction_type == 'credit':
-            data['amount'] = amount_cleaned
-        elif transaction_type == 'debit':
-            data['amount'] = -amount_cleaned
-        elif transaction_type == 'transfer':
-            data['amount'] = -amount_cleaned
+        # Automatically calculates the markup
+        # if the user does not specify a value.
+        markup = data.get('markup')
+        if not markup:
+            markup = calculate_markup(data)
+            data['markup'] = markup
 
-        data['business'] = business.id
-        data['operator'] = user.id
+        # Automatically calculates the average cost
+        # if the user does not specify a value.
+        average_cost = data.get('average_cost')
+        if not average_cost:
+            average_cost = calculate_average_cost(data, business)
+            data['average_cost'] = average_cost
 
-        serializer = FinancialTransactionSerializer(
-            data=data,
-            context={'business': business, 'data': data, 'request': request},
-        )
+        serializer = ProductCostHistorySerializer(data=data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
@@ -338,111 +374,74 @@ class FinancialTransactionEndpoint(APIView):
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 
-    def delete(self, request, transaction_id):
+    def patch(self, request, product_id, cost_id):
+        data = request.data
+
         business, got_no_business = get_user_business(request.user)
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
+        
+        invalid_params = validate.params(request, ProductCostHistorySerializer)
 
-        transactions = business.financial_transactions
-        transaction = transactions.filter(id=transaction_id).first()
-        if not transaction:
-            error_response = error.builder(404, 'Transaction not found.')
+        if not data or invalid_params:
+            message = 'Required parameter missing or invalid.'
+            error_response = error.builder(400, message, invalid=invalid_params)
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
+        
+        products = business.products
+        product = products.filter(id=product_id).first()
+        if not product:
+            error_response = error.builder(404, 'Product not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
         
+        costs = product.cost_history
+        cost = costs.filter(id=cost_id).first()
+        if not cost:
+            error_response = error.builder(404, 'Cost not found.')
+            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        
+        serializer = ProductCostHistorySerializer(
+            instance=cost,
+            data=data,
+            partial=True,
+        )
+
+        if not serializer.is_valid():
+            message = 'Validation failed.'
+            error_response = error.builder(400, message, details=serializer.errors)
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
+        
+        serializer.save()
+
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+    def delete(self, request, product_id, cost_id):
+        business, got_no_business = get_user_business(request.user)
+
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
+        
+        products = business.products
+        product = products.filter(id=product_id).first()
+        if not product:
+            error_response = error.builder(404, 'Product not found.')
+            return Response(error_response, status.HTTP_404_NOT_FOUND)
+        
+        costs = product.cost_history
+        cost = costs.filter(id=cost_id).first()
+        if not cost:
+            error_response = error.builder(404, 'Cost not found.')
+            return Response(error_response, status.HTTP_404_NOT_FOUND)
+    
         data = {
-            'transaction': {
-                'id': transaction.id,
+            'cost': {
+                'id': cost.id,
                 'deleted': True,
             }
         }
 
-        transaction.delete()
+        cost.delete()
 
         return Response(data, status.HTTP_200_OK)
-
-
-class FinancialTransactionSearchEndpoint(APIView):
-    permission_classes = [permissions.IsAdminUser]
-    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
-
-    def get(self, request):
-        business, got_no_business = get_user_business(request.user)
-
-        if got_no_business:
-            return Response(got_no_business, status.HTTP_404_NOT_FOUND)
-        
-        search = request.query_params.get('search')
-        date = request.query_params.get('date')
-        start_date = request.query_params.get('start_date')
-        end_date = request.query_params.get('end_date')
-
-        if not any([search, date, start_date, end_date]):
-            error_response = error.builder(400, 'Provide a search term or date.')
-            return Response(error_response, status.HTTP_400_BAD_REQUEST)
-        
-        transactions = business.financial_transactions
-
-        if search:
-            if len(search) < 3:
-                error_response = error.builder(400, 'Enter at least 3 characters.')
-                return Response(error_response, status.HTTP_400_BAD_REQUEST)
-            
-            transactions = transactions.filter(
-                Q(amount__startswith=search) |
-                Q(description__icontains=search)
-            )
-        
-        if date:
-            today = datetime.now()
-
-            is_date_valid = validate.date(date, ignore=['today', 'week', 'month'])
-
-            if not is_date_valid:
-                message = 'Make sure the date is in the format: YYYY-MM-DD.'
-                error_response = error.builder(400, message)
-                return Response(error_response, status.HTTP_400_BAD_REQUEST)
-            
-            query = Q(timestamp__date=date)
-
-            if date == 'today':
-                query = Q(timestamp__date=today)
-            elif date == 'week':
-                start_week, end_week = get_start_and_end_date(today, week=True)
-                query = Q(timestamp__range=[start_week, end_week])
-            elif date == 'month':
-                start_month, end_month = get_start_and_end_date(today, month=True)
-                query = Q(timestamp__range=[start_month, end_month])
-
-            transactions = transactions.filter(query)
-
-        if start_date and end_date:
-            is_start_date_valid = validate.date(start_date)
-            is_end_date_valid = validate.date(end_date)
-
-            if not is_start_date_valid or not is_end_date_valid:
-                message = 'Make sure the date is in the format: YYYY-MM-DD.'
-                error_response = error.builder(400, message)
-                return Response(error_response, status.HTTP_404_NOT_FOUND)
-            
-            date_format = '%Y-%m-%d'
-            start_date = datetime.strptime(start_date, date_format)
-            end_date = datetime.strptime(end_date, date_format)
-
-            start_date = timezone.make_aware(
-                start_date.replace(hour=0, minute=0, second=0, microsecond=0),
-                timezone.get_current_timezone(),
-            )
-            end_date = timezone.make_aware(
-                end_date.replace(hour=23, minute=59, second=59, microsecond=0),
-                timezone.get_current_timezone(),
-            )
-
-            transactions = transactions.filter(
-                Q(timestamp__range=[start_date, end_date])
-            )
-
-        serializer = FinancialTransactionSerializer(transactions, many=True)
-        paginated_data = paginate(serializer.data, request, 10)
-
-        return paginated_data

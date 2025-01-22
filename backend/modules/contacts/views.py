@@ -93,17 +93,18 @@ class CustomerEndpoint(APIView):
         
         customers = business.customers
         if customer_id:
-            customer = customers.filter(id=customer_id).first() 
+            customer = customers.filter(id=customer_id).first()
+
             if not customer:
                 error_response = error.builder(404, 'Customer not found.')
                 return Response(error_response, status.HTTP_404_NOT_FOUND)
+            
             serializer = CustomerSerializer(customer)
+            return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = CustomerSerializer(customers, many=True)
             paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
-
-        return Response(serializer.data, status.HTTP_200_OK)
 
 
     def post(self, request):
@@ -201,16 +202,18 @@ class SupplierEndpoint(APIView):
         suppliers = business.suppliers
         if supplier_id:
             supplier = suppliers.filter(id=supplier_id).first()
+            
             if not supplier:
                 error_response = error.builder(404, 'Supplier not found.')
                 return Response(error_response, status.HTTP_404_NOT_FOUND)
+            
             serializer = SupplierSerializer(supplier)
+            return Response(serializer.data, status.HTTP_200_OK)
+
         else:
             serializer = SupplierSerializer(suppliers, many=True)
             paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
-
-        return Response(serializer.data, status.HTTP_200_OK)
 
 
     def post(self, request):

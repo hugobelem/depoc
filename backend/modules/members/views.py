@@ -29,16 +29,17 @@ class MemberEndpoint(APIView):
 
         if member_id:
             member = members.filter(id=member_id).first()
+            
             if not member:
                 error_response = error.builder(404, 'Member not found.')
                 return Response(error_response, status.HTTP_404_NOT_FOUND)
+            
             serializer = MemberSerializer(member)
+            return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = MemberSerializer(members, many=True)
             paginated_data = paginate(serializer.data, request, 10)
             return paginated_data
-        
-        return Response(serializer.data, status.HTTP_200_OK)
 
 
     def post(self, request):
