@@ -7,6 +7,7 @@ from .models import Product, ProductCategory, ProductCostHistory
 @register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'sku', 'retail_price', 'stock', 'unit', 'is_available']
+    readonly_fields = ['stock']
 
 
 @register(ProductCategory)

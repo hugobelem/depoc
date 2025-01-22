@@ -12,6 +12,7 @@ urlpatterns = [
     path('contacts', include('modules.contacts.urls')),
     path('finance', include('modules.finance.urls')),
     path('members', include('modules.members.urls')),
+    path('products', include('modules.inventory.urls')),
     path('products', include('modules.products.urls')),
 
     path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),

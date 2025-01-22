@@ -1,13 +1,16 @@
 from rest_framework import serializers
 
+from django.db import transaction
+
 from .models import Product, ProductCategory, ProductCostHistory
+
+from modules.inventory.models import Inventory, InventoryTransaction
 
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-        read_only_fields = ['stock']
 
 
     def to_representation(self, instance):
@@ -33,6 +36,24 @@ class ProductSerializer(serializers.ModelSerializer):
                 'is_active': representation.pop('is_active'),
             }
         }
+    
+
+    @transaction.atomic
+    def create(self, validated_data):
+        product = super().create(validated_data)
+
+        inventory = Inventory.objects.create(product=product)
+
+        if product.stock > 0:
+            InventoryTransaction.objects.create(
+                type='inbound',
+                inventory=inventory,
+                quantity=product.stock,
+                unit_cost=product.cost_price,
+                description='Initial inbound quantity.'
+            )
+
+        return product
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):

@@ -18,6 +18,7 @@ def params(
         request: Request,
         serializer: ModelSerializer,
         add: str | None = None,
+        remove: list[str] | None = None,
     ) -> set | None:
     """
     Checks if the parameters in the request match 
@@ -33,6 +34,10 @@ def params(
 
     if add:
         fields.add(add)
+
+    if remove:
+        for param in remove:
+            fields.discard(param)
 
     request_params = set(request.data.keys())
     invalid_params = request_params - fields

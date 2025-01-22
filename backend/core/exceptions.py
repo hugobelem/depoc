@@ -10,9 +10,6 @@ is_production = os.getenv('ENVIRONMENT') == 'production'
 def handler(exc, context):
     response = exception_handler(exc, context)
 
-    print(is_production)
-    print(response)
-
     if response:
         data = {
             'error': {

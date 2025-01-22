@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'modules.finance',
     'modules.members',
     'modules.products',
+    'modules.inventory',
     'rest_framework',
 ]
 

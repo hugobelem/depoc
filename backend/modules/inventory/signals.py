@@ -1,19 +1,19 @@
+import ulid
+
 from django.db.models.signals import pre_save, post_save, post_delete
+from django.dispatch import receiver
 from django.db import transaction
 from django.db.models import Sum
-from django.dispatch import receiver
-
-import ulid
 
 from .models import Inventory, InventoryTransaction
 
 
 @receiver(pre_save, sender=Inventory)
 @receiver(pre_save, sender=InventoryTransaction)
-def generate_ulid(sender, instance, **kwargs):
+def generate_ulids(sender, instance, **kwargs):
     if not instance.id:
         instance.id = ulid.new().str
- 
+
 
 @receiver(pre_save, sender=InventoryTransaction)
 @receiver(post_save, sender=InventoryTransaction)

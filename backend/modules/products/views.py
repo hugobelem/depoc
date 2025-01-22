@@ -132,6 +132,12 @@ class ProductEndpoint(APIView):
         if not product:
             error_response = error.builder(404, 'Product not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
+        
+        stock = data.get('stock')
+        if stock:
+            message = 'Adjust stock quantity through an inventory transaction.'
+            error_response = error.builder(400, message)
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
 
         serializer = ProductSerializer(instance=product, data=data, partial=True)
 

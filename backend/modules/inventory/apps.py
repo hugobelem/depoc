@@ -4,8 +4,8 @@ from django.apps import AppConfig
 class InventoryConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'modules.inventory'
-    label = 'modules_inventory'
-    verbose_name = 'Inventory'
+    module = 'modules'
+    label = 'inventory'
 
     def ready(self):
         from . import signals
