@@ -8,11 +8,14 @@ from .models import Payment
 @register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     list_display = [
-        'contact',
+        'id',
         'total_amount',
-        'due_at',
+        'amount_paid',
+        'outstanding_balance',
         'status',
+        'due_at',
         'payment_type',
+        'contact',
         'business',
     ]
 

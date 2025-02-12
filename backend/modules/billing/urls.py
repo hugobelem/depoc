@@ -16,6 +16,6 @@ urlpatterns = [
     path('payables/<str:payable_id>', views.PayablesEndpoint.as_view()),
     path(
         'payables/<str:payable_id>/settle',
-        views.PayablesEndpoint.as_view()
+        views.PayableSettleEndpoint.as_view()
     ),
 ]

@@ -103,6 +103,14 @@ class FinancialTransaction(models.Model):
         null=True,
     )
 
+    payment = models.ForeignKey(
+        'billing.Payment',
+        related_name='financial_transactions',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True
+    )
+
     linked = models.OneToOneField(
         'self',
         on_delete=models.CASCADE,

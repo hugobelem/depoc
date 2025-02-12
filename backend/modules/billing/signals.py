@@ -1,10 +1,13 @@
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
+from django.db.models import Sum
 
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta, MO, TU, WE, TH, FR, SA, SU
 
 import ulid
+
+from modules.finance.models import FinancialTransaction
 
 from .models import Payment
 
@@ -187,3 +190,37 @@ def generate_weekly_payments(sender, instance, created, **kwargs):
 
         instance.recurrence = 'once'
         instance.save()
+
+
+@receiver(post_delete, sender=FinancialTransaction)
+@receiver(post_save, sender=FinancialTransaction)
+def update_payment_balance(sender, instance, **kwargs):
+    payment = instance.payment
+    if payment:
+        total_amount = payment.total_amount
+
+        total_amount_paid = FinancialTransaction.objects\
+            .filter(payment=payment)\
+            .aggregate((Sum('amount')))['amount__sum'] or 0
+        
+        payment.amount_paid = abs(total_amount_paid)
+        payment.outstanding_balance = total_amount - abs(total_amount_paid)
+        payment.save()
+
+
+@receiver(post_delete, sender=FinancialTransaction)
+@receiver(post_save, sender=FinancialTransaction)
+def update_payment_status(sender, instance, **kwargs):
+    payment = instance.payment
+    if payment:
+        total_amount = payment.total_amount
+        amount_paid = payment.amount_paid
+
+        if amount_paid == 0:
+            payment.status = 'pending'
+        elif amount_paid != 0 and amount_paid < total_amount:
+            payment.status = 'partially_paid'
+        elif amount_paid >= total_amount:
+            payment.status = 'paid'
+
+        payment.save()

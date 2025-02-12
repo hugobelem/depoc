@@ -54,14 +54,6 @@ class Payment(models.Model):
         null=True,
     )
 
-    transaction = models.ForeignKey(
-        'finance.FinancialTransaction',
-        on_delete=models.DO_NOTHING,
-        related_name='payments',
-        blank=True,
-        null=True,
-    )
-
     business = models.ForeignKey(
         'business.Business',
         on_delete=models.CASCADE,
@@ -135,4 +127,4 @@ class Payment(models.Model):
 
 
     def __str__(self):
-        return f'{self.contact} - {self.payment_type} of ${self.total_amount}'
+        return f'ID: {self.id}'

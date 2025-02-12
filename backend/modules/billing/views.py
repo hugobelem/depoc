@@ -6,7 +6,11 @@ from django.db.models import Q
 
 from datetime import datetime
 
+from decimal import Decimal, InvalidOperation
+
 from .serializers import PaymentSerializer
+
+from modules.finance.serializers import FinancialTransactionSerializer
 
 from shared import (
     error,
@@ -222,56 +226,122 @@ class ReceivableSettleEndpoint(APIView):
     permission_classes = [permissions.IsAdminUser]
     throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
 
-    def patch(self, request, receivable_id):
+    def post(self, request, receivable_id):
         data = request.data
+        user = request.user
 
-        business, got_no_business = get_user_business(request.user)
+        business, got_no_business = get_user_business(user)
 
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
-        remove = [
-            'contact',
-            'category',
-            'issued_at',
-            'due_at',
-            'updated_at',
-            'total_amount',
-            'outstanding_balance',
-            'payment_type',
-            'status',
-            'recurrence',
-            'installment_count',
-            'due_weekday',
-            'due_day_of_month',
-            'reference',
-            'notes',
-        ]
-
-        invalid_paramns = validate.params(request, PaymentSerializer, remove=remove)
-
-        if not data or invalid_paramns:
-            message = 'Required parameter missing or invalid.'
-            error_response = error.builder(400, message, invalid=invalid_paramns)
-            return Response(error_response, status.HTTP_400_BAD_REQUEST)
-        
-        payments = business.payments
-        payment = payments.filter(id=receivable_id).first()
+        payment = business.payments.filter(id=receivable_id).first()
 
         if not payment:
             error_response = error.builder(404, 'Receivable not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
-            
-        serializer = PaymentSerializer(instance=payment, data=data, partial=True)
+
+
+        invalid_params = validate.params(request, FinancialTransactionSerializer)
+
+        if not data or invalid_params:
+            message = 'Required parameter missing or invalid.'
+            error_response = error.builder(400, message, invalid=invalid_params)
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
+
+        if amount := data.get('amount', None):
+            try:
+                amount_cleaned = abs(Decimal(amount))
+                data['amount'] = amount_cleaned
+            except InvalidOperation:
+                raise ValueError('Invalid monetary value format.')
+
+        data['type'] = 'credit'
+        data['operator'] = request.user.id
+        data['category'] = payment.category.id if payment.category else None
+        data['description'] = f'{payment.notes} | Ref. Receivable ID {payment.id}'
+        data['contact'] = payment.contact.id
+        data['business'] = payment.business.id
+
+        serializer = FinancialTransactionSerializer(
+            data=data,
+            context={'business': business, 'data': data, 'request': request},
+        )
 
         if not serializer.is_valid():
             message = 'Validation failed.'
             error_response = error.builder(400, message, details=serializer.errors)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
-
+        
         serializer.save()
 
-        return Response(serializer.data, status.HTTP_200_OK)
+        transaction_id = serializer.data['transaction']['id']
+        transaction = business.financial_transactions.get(id=transaction_id)
+        transaction.payment = payment
+        transaction.save()
+
+        return Response(serializer.data, status.HTTP_201_CREATED)
+
+
+class PayableSettleEndpoint(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
+
+    def post(self, request, payable_id):
+        data = request.data
+        user = request.user
+
+        business, got_no_business = get_user_business(user)
+
+        if got_no_business:
+            return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
+        
+        payment = business.payments.filter(id=payable_id).first()
+
+        if not payment:
+            error_response = error.builder(404, 'Payable not found.')
+            return Response(error_response, status.HTTP_404_NOT_FOUND)
+
+
+        invalid_params = validate.params(request, FinancialTransactionSerializer)
+
+        if not data or invalid_params:
+            message = 'Required parameter missing or invalid.'
+            error_response = error.builder(400, message, invalid=invalid_params)
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
+
+        if amount := data.get('amount', None):
+            try:
+                amount_cleaned = abs(Decimal(amount))
+                data['amount'] = -amount_cleaned
+            except InvalidOperation:
+                raise ValueError('Invalid monetary value format.')
+
+        data['type'] = 'debit'
+        data['operator'] = request.user.id
+        data['category'] = payment.category.id if payment.category else None
+        data['description'] = f'{payment.notes} | Ref. Payable ID {payment.id}'
+        data['contact'] = payment.contact.id
+        data['business'] = payment.business.id
+
+        serializer = FinancialTransactionSerializer(
+            data=data,
+            context={'business': business, 'data': data, 'request': request},
+        )
+
+        if not serializer.is_valid():
+            message = 'Validation failed.'
+            error_response = error.builder(400, message, details=serializer.errors)
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
+        
+        serializer.save()
+
+        transaction_id = serializer.data['transaction']['id']
+        transaction = business.financial_transactions.get(id=transaction_id)
+        transaction.payment = payment
+        transaction.save()
+
+        return Response(serializer.data, status.HTTP_201_CREATED)
 
 
 class PayableSearchEndpoint(APIView):
