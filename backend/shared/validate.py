@@ -36,8 +36,9 @@ def params(
         fields.add(add)
 
     if remove:
-        for param in remove:
-            fields.discard(param)
+        if not isinstance(remove, list):
+            raise ValueError('Remove has to be a list')
+        fields.difference_update(remove)
 
     request_params = set(request.data.keys())
     invalid_params = request_params - fields

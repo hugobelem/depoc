@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-from django.db import transaction
-
 from .models import Customer, Supplier
 
 
@@ -45,7 +43,6 @@ class CustomerSerializer(serializers.ModelSerializer):
         }
     
 
-    @transaction.atomic()
     def create(self, validated_data):
         business = self.context['business']
         
@@ -93,7 +90,6 @@ class SupplierSerializer(serializers.ModelSerializer):
         }
     
 
-    @transaction.atomic()
     def create(self, validated_data):
         business = self.context['business']
         

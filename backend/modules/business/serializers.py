@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-from django.db import transaction
-
 from .models import Business
 
 
@@ -36,7 +34,6 @@ class BusinessSerializer(serializers.ModelSerializer):
         }        
         
     
-    @transaction.atomic()
     def create(self, validated_data):
         business = super().create(validated_data)
 
