@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: SSH into Lightsail & Deploy
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -19,5 +22,13 @@ jobs:
             cd /home/ubuntu/depoc
             git pull origin main
             cd backend
-            pipenv --venv
-  
+              
+            # Compare local Pipfile.lock with the one in the repo
+            git diff --quiet Pipfile.lock || {
+              echo "Pipfile.lock has changed, installing dependencies.";
+              pipenv install --deploy --ignore-pipfile
+            }
+
+            pipenv run python manage.py migrate
+            sudo systemctl restart gunicorn
+            sudo systemctl restart nginx
