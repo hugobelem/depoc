@@ -27,6 +27,7 @@ jobs:
             git diff --quiet Pipfile.lock || {
               echo "Pipfile.lock has changed, installing dependencies.";
               pipenv install --deploy --ignore-pipfile
+              echo "pipenv install completed."
             }
 
             pipenv run python manage.py migrate
