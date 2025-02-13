@@ -17,5 +17,6 @@ jobs:
           key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY }}
           script: |
             cd /home/ubuntu/depoc
-            pwd
-            ls -la
+            git pull origin main
+
+  
