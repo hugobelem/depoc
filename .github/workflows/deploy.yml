@@ -1,0 +1,29 @@
+name: Deploy to AWS Lightsail
+
+on:
+  push:
+    branches:
+      -main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH into Lightsail & Deploy
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.AWS_LIGHTSAIL_IP }}
+          username: ubuntu
+          key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/depoc
+            git pull origin main
+            cd backend
+            pipenv shell
+            pip install --upgrade pip
+            pipenv install -r requirements.txt
+            python manage.py migrate
+            sudo systemctl restart gunicorn
+            sudo systemctl restart nginx
+  
