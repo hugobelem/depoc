@@ -30,9 +30,6 @@ jobs:
               echo "pipenv install completed."
             }
 
-            pipenv install --deploy --ignore-pipfile
-            echo "pipenv install completed INDEED."
-
             pipenv run python manage.py migrate
-            sudo systemctl restart gunicorn
+            sudo systemctl restart depoc-api.service
             sudo systemctl restart nginx
