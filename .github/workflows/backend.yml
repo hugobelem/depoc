@@ -33,6 +33,6 @@ jobs:
 
     - name: Run Tests
       run: |
-        pipenv run python migrate
+        pipenv run python manage.py migrate
         pipenv run python manage.py test modules
       working-directory: backend
