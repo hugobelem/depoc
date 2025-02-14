@@ -44,7 +44,6 @@ AUTHENTICATION_BACKENDS = [
     'modules.accounts.backends.EmailOrUsernameAuth',
 ]
 
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',        
@@ -60,9 +59,15 @@ REST_FRAMEWORK = {
         'anon': '5/hour',
         'user': '10/min',
     },
-    'EXCEPTION_HANDLER': 'core.exceptions.handler'
+    'EXCEPTION_HANDLER': 'core.exceptions.handler',
 }
 
+if ENVIRONMENT == 'production':
+    REST_FRAMEWORK.update({
+        'DEFAULT_RENDERER_CLASSES': [
+            'rest_framework.renderers.JSONRenderer',
+        ]}
+    )
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=5),

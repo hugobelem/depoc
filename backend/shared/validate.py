@@ -55,7 +55,7 @@ def date(date: str, ignore: list[str] | None = None) -> bool:
     YYYY-MM-DD
     - ignore: List of str that should be ignored during validation
     """
-    r = re.compile('\d{4}-\d{2}-\d{2}')
+    r = re.compile(r'\d{4}-\d{2}-\d{2}')
     valid_format = r.match(date) is not None
     valid_length = len(date) == 10
 
