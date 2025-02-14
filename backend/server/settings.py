@@ -56,7 +56,7 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '5/hour',
+        'anon': '50/hour',
         'user': '10/min',
     },
     'EXCEPTION_HANDLER': 'core.exceptions.handler',
