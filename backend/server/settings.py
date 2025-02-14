@@ -106,14 +106,21 @@ TEMPLATES = [
     },
 ]
 
-
-database_url = os.environ.get('DATABASE_URL')
-DATABASES = {
-    'default': dj_database_url.config(
-        default=database_url,
-        conn_max_age=600
-    )
-}
+if ENVIRONMENT == 'test':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / "db.sqlite3",
+        }
+    }
+else:
+    database_url = os.environ.get('DATABASE_URL')
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=database_url,
+            conn_max_age=600
+        )
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
