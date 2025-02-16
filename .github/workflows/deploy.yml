@@ -15,9 +15,9 @@ jobs:
       - name: SSH into Lightsail & Deploy
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.AWS_LIGHTSAIL_IP }}
+          host: ${{ secrets.EC2_IP }}
           username: ubuntu
-          key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/depoc
             git pull origin main
@@ -31,5 +31,5 @@ jobs:
             }
 
             pipenv run python manage.py migrate
-            sudo systemctl restart depoc-api.service
+            sudo systemctl restart gunicorn.service
             sudo systemctl restart nginx
