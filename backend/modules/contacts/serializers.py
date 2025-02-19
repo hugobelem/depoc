@@ -21,24 +21,16 @@ class CustomerSerializer(serializers.ModelSerializer):
                 'cpf': representation.pop('cpf'),
                 'is_active': representation.pop('is_active'),
                 'notes': representation.pop('notes'),
-                'contact': {
-                    'phone': representation.pop('phone'),
-                    'email': representation.pop('email'),
-                },
-                'address': {
-                    'postcode': representation.pop('postcode'),
-                    'city': representation.pop('city'),
-                    'state': representation.pop('state'),
-                    'address': representation.pop('address'),
-                },
-                'metrics': {
-                    'amount_spent': representation.pop('amount_spent'),
-                    'number_of_orders': representation.pop('number_of_orders'),
-                },
-                'metadata': {
-                    'created_at': representation.pop('created_at'),
-                    'updated_at': representation.pop('updated_at'),
-                },
+                'phone': representation.pop('phone'),
+                'email': representation.pop('email'),
+                'postcode': representation.pop('postcode'),
+                'city': representation.pop('city'),
+                'state': representation.pop('state'),
+                'address': representation.pop('address'),
+                'amount_spent': representation.pop('amount_spent'),
+                'number_of_orders': representation.pop('number_of_orders'),
+                'created_at': representation.pop('created_at'),
+                'updated_at': representation.pop('updated_at'),
             }
         }
     

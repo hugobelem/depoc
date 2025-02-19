@@ -20,16 +20,12 @@ class BusinessSerializer(serializers.ModelSerializer):
                 'ie': representation.pop('ie'),
                 'im': representation.pop('im'),
                 'is_active': representation.pop('is_active'),
-                'address': {
-                    'postcode': representation.pop('postcode'),
-                    'city': representation.pop('city'),
-                    'state': representation.pop('state'),
-                    'address': representation.pop('address'),
-                },
-                'contact': {
-                    'phone': representation.pop('phone'),
-                    'email': representation.pop('email'),                    
-                },
+                'postcode': representation.pop('postcode'),
+                'city': representation.pop('city'),
+                'state': representation.pop('state'),
+                'address': representation.pop('address'),
+                'phone': representation.pop('phone'),
+                'email': representation.pop('email'),                    
             }
         }        
         

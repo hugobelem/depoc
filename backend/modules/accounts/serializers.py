@@ -31,15 +31,11 @@ class UserSerializer(serializers.ModelSerializer):
                 'name': representation.pop('name'),
                 'email': representation.pop('email'),
                 'username': representation.pop('username'),
-                'status': {
-                    'is_active': representation.pop('is_active'),
-                    'is_staff': representation.pop('is_staff'),
-                    'is_superuser': representation.pop('is_superuser'),
-                },
-                'metadata': {
-                    'last_login': representation.pop('last_login'),
-                    'date_joined': representation.pop('date_joined'),
-                },
+                'is_active': representation.pop('is_active'),
+                'is_staff': representation.pop('is_staff'),
+                'is_superuser': representation.pop('is_superuser'),
+                'last_login': representation.pop('last_login'),
+                'date_joined': representation.pop('date_joined'),
             }
         }
 
@@ -83,6 +79,5 @@ class OwnerSerializer(serializers.ModelSerializer):
                 'name': representation.pop('name'),
                 'email': representation.pop('email'),
                 'phone': representation.pop('phone'),
-                'user': representation.pop('user')['user'],
             }
         }
