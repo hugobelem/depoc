@@ -47,7 +47,6 @@ class FinancialAccountSerializer(serializers.ModelSerializer):
                 'balance': representation.pop('balance'),
                 'created_at': representation.pop('created_at'),
                 'is_active': representation.pop('is_active'),
-                'business': representation.pop('business'),
             }
         }
 
@@ -65,7 +64,6 @@ class FinancialCategorySerializer(serializers.ModelSerializer):
                 'id': representation.pop('id'),
                 'name': representation.pop('name'),
                 'is_active': representation.pop('is_active'),
-                'business': representation.pop('business'),
                 'parent': representation.pop('parent'),
             }
         }
@@ -92,7 +90,6 @@ class FinancialTransactionSerializer(serializers.ModelSerializer):
                 'account': representation.pop('account'),
                 'contact': representation.pop('contact'),
                 'linked': representation.pop('linked'),
-                'business': representation.pop('business'),
             }
         }
 

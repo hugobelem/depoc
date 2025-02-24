@@ -2,7 +2,7 @@ from rest_framework import permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from django.db.models import Q
+from django.db.models import Q, ProtectedError
 
 from datetime import datetime
 
@@ -217,7 +217,15 @@ class ReceivablesEndpoint(APIView):
             }
         }
 
-        payment.delete()
+        try:
+            payment.delete()
+        except ProtectedError:
+            message = (
+                'Cannot delete receivable because it '
+                'has associated financial transactions.'
+            )
+            error_response = error.builder(500, message)
+            return Response(error_response, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(data, status.HTTP_200_OK)
 
@@ -537,7 +545,15 @@ class PayablesEndpoint(APIView):
                 'deleted': True,
             }
         }
-
-        payment.delete()
+        
+        try:
+            payment.delete()
+        except ProtectedError:
+            message = (
+                'Cannot delete payable because it '
+                'has associated financial transactions.'
+            )
+            error_response = error.builder(500, message)
+            return Response(error_response, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(data, status.HTTP_200_OK)

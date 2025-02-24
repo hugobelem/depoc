@@ -64,20 +64,14 @@ class SupplierSerializer(serializers.ModelSerializer):
                 'im': representation.pop('im'),
                 'is_active': representation.pop('is_active'),
                 'notes': representation.pop('notes'),
-                'contact': {
-                    'phone': representation.pop('phone'),
-                    'email': representation.pop('email'),
-                },
-                'address': {
-                    'postcode': representation.pop('postcode'),
-                    'city': representation.pop('city'),
-                    'state': representation.pop('state'),
-                    'address': representation.pop('address'),
-                },
-                'metadata': {
-                    'created_at': representation.pop('created_at'),
-                    'updated_at': representation.pop('updated_at'),
-                },
+                'phone': representation.pop('phone'),
+                'email': representation.pop('email'),
+                'postcode': representation.pop('postcode'),
+                'city': representation.pop('city'),
+                'state': representation.pop('state'),
+                'address': representation.pop('address'),
+                'created_at': representation.pop('created_at'),
+                'updated_at': representation.pop('updated_at'),
             }
         }
     

@@ -31,7 +31,7 @@ class InventoryTransaction(models.Model):
     ]
     
     id = models.CharField(
-        max_length=25,
+        max_length=26,
         primary_key=True,
         unique=True,
         editable=False,
