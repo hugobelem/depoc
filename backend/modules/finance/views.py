@@ -319,6 +319,11 @@ class FinancialTransactionEndpoint(APIView):
             data['amount'] = -amount_cleaned
         elif transaction_type == 'transfer':
             data['amount'] = -amount_cleaned
+            send_to = data.get('send_to', None)
+            if not send_to:
+                message = 'Destination account not provided'
+                error_response = error.builder(400, message)
+                return Response(error_response, status.HTTP_400_BAD_REQUEST)
 
         data['business'] = business.id
         data['operator'] = user.id

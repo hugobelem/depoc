@@ -78,6 +78,11 @@ class FinancialTransactionSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        transaction = instance
+        category = transaction.category
+        operator = transaction.operator
+        account = transaction.account
+        contact = transaction.contact
         return {
             'transaction': {
                 'id': representation.pop('id'),
@@ -85,10 +90,23 @@ class FinancialTransactionSerializer(serializers.ModelSerializer):
                 'amount': representation.pop('amount'),
                 'type': representation.pop('type'),
                 'timestamp': representation.pop('timestamp'),
-                'category': representation.pop('category'),
-                'operator': representation.pop('operator'),
-                'account': representation.pop('account'),
-                'contact': representation.pop('contact'),
+                'category': {
+                    'id': category.id if category else None,
+                    'name': category.name if category else None,
+                },
+                'operator': {
+                    'id': operator.id if operator else None,
+                    'name': operator.name if operator else None,            
+                },
+                'account': {
+                    'id': account.id if account else None,
+                    'name': account.name if account else None,
+                },
+                'contact': {
+                    'name': str(contact) if contact else None,
+                    'id': contact.id if contact else None,
+                },
+                'payment': representation.pop('payment'),
                 'linked': representation.pop('linked'),
             }
         }
