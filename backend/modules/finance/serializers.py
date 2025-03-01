@@ -59,12 +59,17 @@ class FinancialCategorySerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        category = instance
+        parent = category.parent
         return {
             'category': {
                 'id': representation.pop('id'),
                 'name': representation.pop('name'),
                 'is_active': representation.pop('is_active'),
-                'parent': representation.pop('parent'),
+                'parent': {
+                    'id': parent.id if parent else None,
+                    'name': parent.name if parent else None,
+                },
             }
         }
 
