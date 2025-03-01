@@ -24,7 +24,6 @@ def generate_ulids(sender, instance, **kwargs):
         instance.id = ulid.new().str
 
 
-@receiver(pre_save, sender=FinancialTransaction)
 @receiver(post_save, sender=FinancialTransaction)
 @receiver(post_delete, sender=FinancialTransaction)
 def update_financial_account_balance(sender, instance, **kwargs):
