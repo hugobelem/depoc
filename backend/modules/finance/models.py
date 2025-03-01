@@ -117,8 +117,7 @@ class FinancialTransaction(models.Model):
         blank=True,
         null=True,
     )    
-
-    amount = models.DecimalField(max_digits=10, decimal_places=2, db_index=True)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, db_index=True)
     description = models.CharField(max_length=255, db_index=True)
     type = models.CharField(max_length=255, choices=TRANSACTION_TYPES)
     timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
