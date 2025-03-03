@@ -88,6 +88,7 @@ def create_installment(
         issued_at=payment.issued_at,
         due_at=next_due_date,
         total_amount=payment.total_amount,
+        outstanding_balance=payment.total_amount,
         status='pending',
         paid_at=None,
         payment_method=payment.payment_method,
@@ -138,7 +139,6 @@ def generate_installments(sender, instance, created, **kwargs):
         instance.notes = note
         instance.installment_count = 0
         instance.recurrence = 'once'
-        instance.outstanding_balance = instance.total_amount
         instance.save()
 
 
@@ -210,15 +210,10 @@ def update_payment_balance(sender, instance, **kwargs):
         payment.save()
 
 
-@receiver(post_save, sender=Payment)
 @receiver(pre_save, sender=Payment)
-def update_outstanding_balance(sender, instance, created, **kwargs):
-    if created:
-        instance.outstanding_balance = instance.total_amount
+def update_outstanding_balance(sender, instance, **kwargs):
     if instance.status == 'pending':
         instance.outstanding_balance = instance.total_amount
-
-    instance.save()
 
 
 @receiver(post_delete, sender=FinancialTransaction)
