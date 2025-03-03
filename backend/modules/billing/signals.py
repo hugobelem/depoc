@@ -168,7 +168,7 @@ def generate_weekly_payments(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Payment)
-def generate_weekly_payments(sender, instance, created, **kwargs):
+def generate_monthly_payments(sender, instance, created, **kwargs):
     recurrence = instance.recurrence
     if created and recurrence == 'monthly':
         due_date = instance.due_date_of_month
@@ -206,6 +206,13 @@ def update_payment_balance(sender, instance, **kwargs):
         payment.amount_paid = abs(total_amount_paid)
         payment.outstanding_balance = total_amount - abs(total_amount_paid)
         payment.save()
+
+
+@receiver(post_save, sender=Payment)
+def update_outstanding_balance(sender, instance, created, **kwargs):
+    if created:
+        instance.outstanding_balance = instance.total_amount
+        instance.save()
 
 
 @receiver(post_delete, sender=FinancialTransaction)
