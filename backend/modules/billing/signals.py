@@ -225,8 +225,10 @@ def update_payment_status(sender, instance, **kwargs):
 
         if amount_paid == 0:
             payment.status = 'pending'
+            payment.paid_at = None
         elif amount_paid != 0 and amount_paid < total_amount:
             payment.status = 'partially_paid'
+            payment.paid_at = None
         elif amount_paid >= total_amount:
             payment.status = 'paid'
             date = datetime.fromisoformat(str(instance.timestamp)).date()
