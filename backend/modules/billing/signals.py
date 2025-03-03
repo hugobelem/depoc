@@ -134,9 +134,11 @@ def generate_installments(sender, instance, created, **kwargs):
         if installment_payments:
             Payment.objects.bulk_create(installment_payments)
 
-        instance.notes = f'{instance.notes} | instalment [{1} of {installment_count}]'
+        note = f'{instance.notes} | instalment [{1} of {installment_count}]'
+        instance.notes = note
         instance.installment_count = 0
         instance.recurrence = 'once'
+        instance.outstanding_balance = instance.total_amount
         instance.save()
 
 
@@ -209,10 +211,14 @@ def update_payment_balance(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Payment)
+@receiver(pre_save, sender=Payment)
 def update_outstanding_balance(sender, instance, created, **kwargs):
     if created:
         instance.outstanding_balance = instance.total_amount
-        instance.save()
+    if instance.status == 'pending':
+        instance.outstanding_balance = instance.total_amount
+
+    instance.save()
 
 
 @receiver(post_delete, sender=FinancialTransaction)
