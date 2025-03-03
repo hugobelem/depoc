@@ -122,11 +122,11 @@ def generate_installments(sender, instance, created, **kwargs):
             installment_payments.append(
                 create_installment(
                     payment=instance,
-                    due_at=due_at,
+                    due_date=due_at,
                     due_day=due_day,
                     months=months,
                     count=count,
-                    installment_count=installment_count,
+                    installments=installment_count,
                     is_installments=True,
                 )
             )
