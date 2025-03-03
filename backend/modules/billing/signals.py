@@ -2,7 +2,7 @@ from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from django.db.models import Sum
 
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta, MO, TU, WE, TH, FR, SA, SU
 
 import ulid
@@ -229,5 +229,7 @@ def update_payment_status(sender, instance, **kwargs):
             payment.status = 'partially_paid'
         elif amount_paid >= total_amount:
             payment.status = 'paid'
+            date = datetime.fromisoformat(str(instance.timestamp)).date()
+            payment.paid_at = date
 
         payment.save()
