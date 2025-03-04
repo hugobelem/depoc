@@ -38,7 +38,7 @@ class MemberEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = MemberSerializer(members, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
 
 

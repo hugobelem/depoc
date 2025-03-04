@@ -94,7 +94,7 @@ class ReceivableSearchEndpoint(APIView):
             )
    
         serializer = PaymentSerializer(payments, many=True)
-        paginated_data = paginate(serializer.data, request, 10)
+        paginated_data = paginate(serializer.data, request, 50)
 
         return paginated_data
 
@@ -122,7 +122,7 @@ class ReceivablesEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = PaymentSerializer(payments, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
         
 
@@ -423,7 +423,7 @@ class PayableSearchEndpoint(APIView):
             )
    
         serializer = PaymentSerializer(payments, many=True)
-        paginated_data = paginate(serializer.data, request, 10)
+        paginated_data = paginate(serializer.data, request, 50)
 
         return paginated_data
 
@@ -451,7 +451,7 @@ class PayablesEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = PaymentSerializer(payments, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
         
 

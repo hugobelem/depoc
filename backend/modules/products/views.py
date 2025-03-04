@@ -52,7 +52,7 @@ class ProductSearchEndpoint(APIView):
         )
 
         serializer = ProductSerializer(search_products, many=True)
-        paginated_data = paginate(serializer.data, request, 10)
+        paginated_data = paginate(serializer.data, request, 50)
 
         return paginated_data
 
@@ -80,7 +80,7 @@ class ProductEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = ProductSerializer(products, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
 
 
@@ -203,7 +203,7 @@ class ProductCategoryEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = ProductCategorySerializer(categories, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
 
 
@@ -327,7 +327,7 @@ class ProductCostHistoryEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = ProductCostHistorySerializer(costs, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
 
 

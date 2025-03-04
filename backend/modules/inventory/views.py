@@ -39,7 +39,7 @@ class InventoryEndpoint(APIView):
         else:
             all_inventory = [product.inventory for product in products]
             serializer = InventorySerializer(all_inventory, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
 
 
@@ -109,7 +109,7 @@ class InventoryTransactionEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = InventoryTransactionSerializer(transactions, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
 
 

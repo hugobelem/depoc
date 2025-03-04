@@ -49,7 +49,7 @@ class FinancialAccountEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = FinancialAccountSerializer(accounts, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
 
 
@@ -165,7 +165,7 @@ class FinancialCategoryEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = FinancialCategorySerializer(categories, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
 
 
@@ -282,7 +282,7 @@ class FinancialTransactionEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             serializer = FinancialTransactionSerializer(transactions, many=True)
-            paginated_data = paginate(serializer.data, request, 10)
+            paginated_data = paginate(serializer.data, request, 50)
             return paginated_data
 
 
@@ -448,6 +448,6 @@ class FinancialTransactionSearchEndpoint(APIView):
             )
 
         serializer = FinancialTransactionSerializer(transactions, many=True)
-        paginated_data = paginate(serializer.data, request, 10)
+        paginated_data = paginate(serializer.data, request, 50)
 
         return paginated_data
