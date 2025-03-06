@@ -138,6 +138,7 @@ def generate_installments(sender, instance, created, **kwargs):
         note = f'{instance.notes} | instalment [{1} of {installment_count}]'
         instance.notes = note
         instance.installment_count = 0
+        instance.outstanding_balance = instance.total_amount
         instance.recurrence = 'once'
         instance.save()
 
@@ -146,7 +147,7 @@ def generate_installments(sender, instance, created, **kwargs):
 def generate_weekly_payments(sender, instance, created, **kwargs):
     recurrence = instance.recurrence
     if created and recurrence == 'weekly':
-        due_date = instance.due_date_of_month
+        due_date = instance.due_at
         due_weekday = instance.due_weekday
 
         weekdays_left = count_weekdays(due_date, due_weekday)
@@ -210,10 +211,11 @@ def update_payment_balance(sender, instance, **kwargs):
         payment.save()
 
 
-@receiver(pre_save, sender=Payment)
-def update_outstanding_balance(sender, instance, **kwargs):
-    if instance.status == 'pending':
+@receiver(post_save, sender=Payment)
+def update_outstanding_balance(sender, instance, created, **kwargs):
+    if created:
         instance.outstanding_balance = instance.total_amount
+        instance.save()
 
 
 @receiver(post_delete, sender=FinancialTransaction)
@@ -227,6 +229,7 @@ def update_payment_status(sender, instance, **kwargs):
         if amount_paid == 0:
             payment.status = 'pending'
             payment.paid_at = None
+            payment.outstanding_balance = payment.total_amount
         elif amount_paid != 0 and amount_paid < total_amount:
             payment.status = 'partially_paid'
             payment.paid_at = None
