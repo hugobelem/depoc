@@ -212,11 +212,17 @@ def update_payment_balance(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Payment)
-def update_outstanding_balance(sender, instance, created, **kwargs):
+def update_outstanding_balance_on_creation(sender, instance, created, **kwargs):
     if created:
         instance.outstanding_balance = instance.total_amount
         instance.save()
 
+
+@receiver(pre_save, sender=Payment)
+def update_outstanding_balance_on_update(sender, instance, **kwargs):
+    if instance.status == 'pending':
+        instance.outstanding_balance = instance.total_amount
+        
 
 @receiver(post_delete, sender=FinancialTransaction)
 @receiver(post_save, sender=FinancialTransaction)
