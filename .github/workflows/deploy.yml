@@ -1,4 +1,4 @@
-name: Deploy to AWS Lightsail
+name: Deploy to AWS EC2
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: SSH into Lightsail & Deploy
+      - name: SSH into EC2 & Deploy
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_IP }}
