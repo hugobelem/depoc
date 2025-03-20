@@ -24,6 +24,7 @@ def handler(exc, context):
             'error': {
                 'status': 500,
                 'message': 'An unexpected error occurred.',
+                'detail': response.text,
             }
         }
         return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
