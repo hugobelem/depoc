@@ -170,7 +170,7 @@ LOGGING = {
     },
     "handlers": {
         "file": {
-            "level": "INFO",
+            "level": "ERROR",
             "class": "logging.FileHandler",
             "filename": os.path.join(BASE_DIR, "logs", "django_errors.log"),
             "formatter": "verbose",
