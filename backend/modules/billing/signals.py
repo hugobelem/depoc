@@ -220,9 +220,12 @@ def update_outstanding_balance_on_creation(sender, instance, created, **kwargs):
 
 @receiver(pre_save, sender=Payment)
 def update_outstanding_balance_on_update(sender, instance, **kwargs):
-    payment = Payment.objects.get(id=instance.id)
-    if payment.total_amount != instance.total_amount:
-        instance.outstanding_balance = instance.total_amount
+    try:
+        payment = Payment.objects.get(id=instance.id)
+        if payment.total_amount != instance.total_amount:
+            instance.outstanding_balance = instance.total_amount
+    except Exception:
+        pass
         
 
 @receiver(post_delete, sender=FinancialTransaction)
