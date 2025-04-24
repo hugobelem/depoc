@@ -16,8 +16,8 @@ def calculate_markup(data):
 
 
 def calculate_average_cost(data, business):
-    product_quantity = data.get('quantity', 0)
-    product_cost = data.get('cost_price', 0)
+    product_quantity = int(data.get('quantity', 0))
+    product_cost = Decimal(data.get('cost_price', 0))
     product_id = data.get('product', '')
 
     product_total_cost = product_cost * product_quantity
@@ -32,7 +32,6 @@ def calculate_average_cost(data, business):
     total_cost = product_total_cost
     total_quantity = product_quantity
 
-
     for history in cost_history:
         total_cost += history.cost_price * history.quantity
         total_quantity += history.quantity
@@ -40,4 +39,4 @@ def calculate_average_cost(data, business):
     if total_quantity == 0:
         return None
     
-    return round(total_cost / total_quantity, 2)
+    return round(float(total_cost) / int(total_quantity), 2)

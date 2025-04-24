@@ -86,6 +86,7 @@ class ProductEndpoint(APIView):
 
     def post(self, request):
         data = request.data
+        post_data = data.copy()
 
         business, got_no_business = get_user_business(request.user)
 
@@ -99,8 +100,8 @@ class ProductEndpoint(APIView):
             error_response = error.builder(400, message, invalid=invalid_params)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
-        data['business'] = business.id
-        serializer = ProductSerializer(data=data)
+        post_data['business'] = business.id
+        serializer = ProductSerializer(data=post_data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
@@ -132,9 +133,8 @@ class ProductEndpoint(APIView):
         if not product:
             error_response = error.builder(404, 'Product not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
-        
-        stock = data.get('stock')
-        if stock:
+
+        if data.get('stock'):
             message = 'Adjust stock quantity through an inventory transaction.'
             error_response = error.builder(400, message)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
@@ -209,6 +209,7 @@ class ProductCategoryEndpoint(APIView):
 
     def post(self, request):
         data = request.data
+        post_data = data.copy()
 
         business, got_no_business = get_user_business(request.user)
 
@@ -222,8 +223,8 @@ class ProductCategoryEndpoint(APIView):
             error_response = error.builder(400, message, invalid=invalid_params)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
-        data['business'] = business.id
-        serializer = ProductCategorySerializer(data=data)
+        post_data['business'] = business.id
+        serializer = ProductCategorySerializer(data=post_data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
@@ -333,6 +334,7 @@ class ProductCostHistoryEndpoint(APIView):
 
     def post(self, request, product_id):
         data = request.data
+        post_data = data.copy()
 
         business, got_no_business = get_user_business(request.user)
 
@@ -352,23 +354,23 @@ class ProductCostHistoryEndpoint(APIView):
             error_response = error.builder(404, 'Product not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
 
-        data['product'] = product.id
+        post_data['product'] = product.id
 
         # Automatically calculates the markup
         # if the user does not specify a value.
         markup = data.get('markup')
         if not markup:
-            markup = calculate_markup(data)
-            data['markup'] = markup
+            markup = calculate_markup(post_data)
+            post_data['markup'] = markup
 
         # Automatically calculates the average cost
         # if the user does not specify a value.
         average_cost = data.get('average_cost')
         if not average_cost:
-            average_cost = calculate_average_cost(data, business)
-            data['average_cost'] = average_cost
+            average_cost = calculate_average_cost(post_data, business)
+            post_data['average_cost'] = average_cost
 
-        serializer = ProductCostHistorySerializer(data=data)
+        serializer = ProductCostHistorySerializer(data=post_data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
