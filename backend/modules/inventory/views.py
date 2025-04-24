@@ -134,21 +134,21 @@ class InventoryTransactionEndpoint(APIView):
             error_response = error.builder(404, 'Product not found.')
             return Response(error_response, status.HTTP_404_NOT_FOUND)
         
-        if quantity := data.get('quantity', None):
-            quantity_cleaned = abs(quantity)
+        post_data = data.copy()
 
-        transaction_type = data.get('type', None)
+        if quantity := post_data.get('quantity', None):
+            quantity_cleaned = abs(int(quantity))
+
+        transaction_type = post_data.get('type', None)
         if transaction_type == 'inbound':
-            data['quantity'] = quantity_cleaned
+            post_data['quantity'] = quantity_cleaned
         elif transaction_type == 'outbound':
-            data['quantity'] = -quantity_cleaned
-        elif transaction_type == 'balance':
-            data['quantity'] = quantity_cleaned
+            post_data['quantity'] = -quantity_cleaned
         
         inventory = product.inventory
-        data['inventory'] = inventory.id
+        post_data['inventory'] = inventory.id
 
-        serializer = InventoryTransactionSerializer(data=data)
+        serializer = InventoryTransactionSerializer(data=post_data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
