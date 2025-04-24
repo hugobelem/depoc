@@ -2,7 +2,7 @@ import requests
 
 from django.test import LiveServerTestCase
 
-from modules.accounts.factories import UserFactory
+from .factories import UserFactory
 
 
 class EmailOrUsernameBackendTest(LiveServerTestCase):

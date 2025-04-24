@@ -174,7 +174,7 @@ def generate_weekly_payments(sender, instance, created, **kwargs):
 def generate_monthly_payments(sender, instance, created, **kwargs):
     recurrence = instance.recurrence
     if created and recurrence == 'monthly':
-        due_date = instance.due_date_of_month
+        due_date = instance.due_at
         months_left = count_months(due_date)
 
         monthly_payments = []
@@ -221,9 +221,13 @@ def update_outstanding_balance_on_creation(sender, instance, created, **kwargs):
 @receiver(pre_save, sender=Payment)
 def update_outstanding_balance_on_update(sender, instance, **kwargs):
     try:
-        payment = Payment.objects.get(id=instance.id)
-        if payment.total_amount != instance.total_amount:
-            instance.outstanding_balance = instance.total_amount
+        previous_payment = Payment.objects.get(id=instance.id)
+        current_payment = instance
+        is_payment_updated = (
+            previous_payment.total_amount != current_payment.total_amount
+        )
+        if is_payment_updated:
+            current_payment.outstanding_balance = current_payment.total_amount
     except Exception:
         pass
         

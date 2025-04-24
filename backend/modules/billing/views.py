@@ -145,9 +145,10 @@ class ReceivablesEndpoint(APIView):
             error_response = error.builder(400, message, invalid=invalid_paramns)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
-        data['business'] = business.id
-        data['payment_type'] = 'receivable'
-        serializer = PaymentSerializer(data=data)
+        post_data = data.copy()
+        post_data['business'] = business.id
+        post_data['payment_type'] = 'receivable'
+        serializer = PaymentSerializer(data=post_data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
@@ -236,6 +237,7 @@ class ReceivableSettleEndpoint(APIView):
 
     def post(self, request, receivable_id):
         data = request.data
+        post_data = data.copy()
         user = request.user
 
         business, got_no_business = get_user_business(user)
@@ -257,23 +259,23 @@ class ReceivableSettleEndpoint(APIView):
             error_response = error.builder(400, message, invalid=invalid_params)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
 
-        if amount := data.get('amount', None):
+        if amount := post_data.get('amount', None):
             try:
                 amount_cleaned = abs(Decimal(amount))
-                data['amount'] = amount_cleaned
+                post_data['amount'] = amount_cleaned
             except InvalidOperation:
                 raise ValueError('Invalid monetary value format.')
-
-        data['type'] = 'credit'
-        data['operator'] = request.user.id
-        data['category'] = payment.category.id if payment.category else None
-        data['description'] = f'{payment.notes} | Ref. Receivable ID {payment.id}'
-        data['contact'] = payment.contact.id
-        data['business'] = payment.business.id
+        
+        post_data['type'] = 'credit'
+        post_data['operator'] = request.user.id
+        post_data['category'] = payment.category.id if payment.category else None
+        post_data['description'] = f'{payment.notes} | Ref. Receivable ID {payment.id}'
+        post_data['contact'] = payment.contact.id
+        post_data['business'] = payment.business.id
 
         serializer = FinancialTransactionSerializer(
-            data=data,
-            context={'business': business, 'data': data, 'request': request},
+            data=post_data,
+            context={'business': business, 'data': post_data, 'request': request},
         )
 
         if not serializer.is_valid():
@@ -297,6 +299,7 @@ class PayableSettleEndpoint(APIView):
 
     def post(self, request, payable_id):
         data = request.data
+        post_data = data.copy()
         user = request.user
 
         business, got_no_business = get_user_business(user)
@@ -321,20 +324,20 @@ class PayableSettleEndpoint(APIView):
         if amount := data.get('amount', None):
             try:
                 amount_cleaned = abs(Decimal(amount))
-                data['amount'] = -amount_cleaned
+                post_data['amount'] = -amount_cleaned
             except InvalidOperation:
                 raise ValueError('Invalid monetary value format.')
 
-        data['type'] = 'debit'
-        data['operator'] = request.user.id
-        data['category'] = payment.category.id if payment.category else None
-        data['description'] = f'{payment.notes} | Ref. Payable ID {payment.id}'
-        data['contact'] = payment.contact.id
-        data['business'] = payment.business.id
+        post_data['type'] = 'debit'
+        post_data['operator'] = request.user.id
+        post_data['category'] = payment.category.id if payment.category else None
+        post_data['description'] = f'{payment.notes} | Ref. Payable ID {payment.id}'
+        post_data['contact'] = payment.contact.id
+        post_data['business'] = payment.business.id
 
         serializer = FinancialTransactionSerializer(
-            data=data,
-            context={'business': business, 'data': data, 'request': request},
+            data=post_data,
+            context={'business': business, 'data': post_data, 'request': request},
         )
 
         if not serializer.is_valid():
@@ -474,9 +477,10 @@ class PayablesEndpoint(APIView):
             error_response = error.builder(400, message, invalid=invalid_paramns)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
-        data['business'] = business.id
-        data['payment_type'] = 'payable'
-        serializer = PaymentSerializer(data=data)
+        post_data = data.copy()
+        post_data['business'] = business.id
+        post_data['payment_type'] = 'payable'
+        serializer = PaymentSerializer(data=post_data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'
