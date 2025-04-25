@@ -4,7 +4,7 @@ A comprehensive management system built by a business owner, tailored for small 
 
 This project took shape in response to a specific need in my last brick-and-mortar store. After closing the business, I continued developing and refining the system, now sharing it as a proud father. 👪
 
-# Modules
+## Modules
 The system is designed to cover the entire business workflow. From purchasing goods to completing sales and issuing the Brazilian Tax Invoice (NFe - Nota Fiscal Eletrônica). These are the proposed modules under development:
 - Inventory Management ⚒️
 - Human Resources ⚒️
@@ -12,10 +12,10 @@ The system is designed to cover the entire business workflow. From purchasing go
 - Sales & CRM ⚒️
 - Brazilian Tax Invoice (Nota Fiscal) ⚒️
 
-# Features
+## Features
 - RBAC (Role-based Acess Control) ⚒️
 
-# Stack
+## Stack
 - Backend
   - Python, along with the Django framework.
 - Infrastructure
