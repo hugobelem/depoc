@@ -288,6 +288,7 @@ class FinancialTransactionEndpoint(APIView):
 
     def post(self, request):
         data = request.data
+        post_data = data.copy()
         user = request.user
 
         business, got_no_business = get_user_business(request.user)
@@ -314,23 +315,23 @@ class FinancialTransactionEndpoint(APIView):
 
         transaction_type = data.get('type', None)
         if transaction_type == 'credit':
-            data['amount'] = amount_cleaned
+            post_data['amount'] = amount_cleaned
         elif transaction_type == 'debit':
-            data['amount'] = -amount_cleaned
+            post_data['amount'] = -amount_cleaned
         elif transaction_type == 'transfer':
-            data['amount'] = -amount_cleaned
+            post_data['amount'] = -amount_cleaned
             send_to = data.get('send_to', None)
             if not send_to:
                 message = 'Destination account not provided'
                 error_response = error.builder(400, message)
                 return Response(error_response, status.HTTP_400_BAD_REQUEST)
 
-        data['business'] = business.id
-        data['operator'] = user.id
+        post_data['business'] = business.id
+        post_data['operator'] = user.id
 
         serializer = FinancialTransactionSerializer(
-            data=data,
-            context={'business': business, 'data': data, 'request': request},
+            data=post_data,
+            context={'business': business, 'data': post_data, 'request': request},
         )
 
         if not serializer.is_valid():
