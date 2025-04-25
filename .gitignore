@@ -45,11 +45,8 @@ local_settings.py
 dmypy.json
 setup.cfg
 
-#api
-api.rest
-
-#env
+# env
 .env
 
+# local
 archive
-*.rest
