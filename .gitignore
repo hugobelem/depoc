@@ -50,3 +50,8 @@ setup.cfg
 
 # local
 archive
+
+# celery
+celerybeat-schedule
+celerybeat-schedule-shm
+celerybeat-schedule-wal
