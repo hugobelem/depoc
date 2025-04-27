@@ -8,6 +8,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.settings')
 
 app = Celery('server')
 
+app.conf.broker_connection_retry_on_startup = True
 app.conf.beat_schedule = {
     'update-payments-daily': {
         'task': 'modules.billing.tasks.update_payment_status',
