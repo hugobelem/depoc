@@ -12,7 +12,7 @@ app.conf.broker_connection_retry_on_startup = True
 app.conf.beat_schedule = {
     'update-payments-daily': {
         'task': 'modules.billing.tasks.update_payment_status',
-        'schedule': crontab(minute=0, hour=0),
+        'schedule': 10.0,
     }
 }
 
