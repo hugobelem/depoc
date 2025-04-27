@@ -155,6 +155,9 @@ APPEND_SLASH = False
 
 ASGI_APPLICATION = 'server.asgi.application'
 
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = 'rpc://'
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
