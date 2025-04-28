@@ -14,3 +14,4 @@ def update_payment_status():
             if payment.due_at < now:
                 payment.status = 'overdue'
             payment.save()
+    return 'Update payment task completed'
