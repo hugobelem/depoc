@@ -158,6 +158,10 @@ ASGI_APPLICATION = 'server.asgi.application'
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = 'rpc://'
 
+# EMAIL_BACKEND = "core.mail.GmailBackend"
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER = 'hi@depoc.com.br'
+# GMAIL_SERVICE_KEY = os.environ.get('GMAIL_SERVICE_KEY')
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
