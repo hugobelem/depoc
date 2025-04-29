@@ -33,7 +33,6 @@ class UserSerializer(serializers.ModelSerializer):
                 'username': representation.pop('username'),
                 'is_active': representation.pop('is_active'),
                 'is_staff': representation.pop('is_staff'),
-                'is_superuser': representation.pop('is_superuser'),
                 'last_login': representation.pop('last_login'),
                 'date_joined': representation.pop('date_joined'),
             }
