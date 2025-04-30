@@ -269,7 +269,7 @@ class FinancialTransactionEndpoint(APIView):
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
-        transactions = business.financial_transactions
+        transactions = business.financial_transactions.order_by('-timestamp')
         if transaction_id:
             transaction = transactions.filter(id=transaction_id).first()
             
