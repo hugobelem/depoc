@@ -31,6 +31,19 @@ def complete_transfer(business, data, request, transaction):
 
     return None
 
+def serialize_with_parents(category):
+    if category.parent:
+        return {
+            "id": category.id,
+            "name": category.name,
+            "parent": serialize_with_parents(category.parent)
+        }
+    return {
+        "id": category.id,
+        "name": category.name,
+        "parent": None
+    }
+
 
 class FinancialAccountSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,28 +62,17 @@ class FinancialAccountSerializer(serializers.ModelSerializer):
                 'is_active': representation.pop('is_active'),
             }
         }
-
+    
 
 class FinancialCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = FinancialCategory
         fields = '__all__'
 
-
     def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        category = instance
-        parent = category.parent
+        super().to_representation(instance)
         return {
-            'category': {
-                'id': representation.pop('id'),
-                'name': representation.pop('name'),
-                'is_active': representation.pop('is_active'),
-                'parent': {
-                    'id': parent.id if parent else None,
-                    'name': parent.name if parent else None,
-                },
-            }
+            'category': serialize_with_parents(instance)
         }
 
 

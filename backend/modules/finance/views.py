@@ -171,6 +171,7 @@ class FinancialCategoryEndpoint(APIView):
 
     def post(self, request):
         data = request.data
+        post_data = data.copy()
 
         business, got_no_business = get_user_business(request.user)
 
@@ -184,8 +185,8 @@ class FinancialCategoryEndpoint(APIView):
             error_response = error.builder(400, message, invalid=invalid_params)
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
-        data['business'] = business.id
-        serializer = FinancialCategorySerializer(data=data)
+        post_data['business'] = business.id
+        serializer = FinancialCategorySerializer(data=post_data)
 
         if not serializer.is_valid():
             message = 'Validation failed.'

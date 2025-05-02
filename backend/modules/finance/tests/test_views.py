@@ -3,7 +3,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from django.test import TestCase
 
-from .factories import UserFactory, MemberFactory
+from .factories import UserFactory
 
 from modules.accounts.models import Owner
 from modules.business.models import Business
