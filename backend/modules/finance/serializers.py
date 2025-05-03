@@ -34,14 +34,16 @@ def complete_transfer(business, data, request, transaction):
 def serialize_with_parents(category):
     if category.parent:
         return {
-            "id": category.id,
-            "name": category.name,
-            "parent": serialize_with_parents(category.parent)
+            'id': category.id,
+            'name': category.name,
+            'is_active': category.is_active,
+            'parent': serialize_with_parents(category.parent)
         }
     return {
-        "id": category.id,
-        "name": category.name,
-        "parent": None
+        'id': category.id,
+        'name': category.name,
+        'is_active': category.is_active,
+        'parent': None
     }
 
 
