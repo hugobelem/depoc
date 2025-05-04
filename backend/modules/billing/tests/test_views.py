@@ -1,7 +1,11 @@
+import factory
+
 from rest_framework.test import APIRequestFactory
 from rest_framework_simplejwt.tokens import AccessToken
 
 from django.test import TestCase
+
+from datetime import datetime
 
 from modules.billing.views import (
     ReceivableSearchEndpoint,
@@ -17,7 +21,9 @@ from modules.business.models import Business
 from modules.finance.models import FinancialAccount
 from modules.billing.models import Payment
 
-from .factories import UserFactory, CustomerFactory
+from .factories import UserFactory, CustomerFactory, SupplierFactory, PayableFactory
+
+from shared.helpers import get_start_and_end_date
 
 
 class ReceivableSearchEndpointViewTest(TestCase):
@@ -332,12 +338,12 @@ class PayableSearchEndpointViewTest(TestCase):
         self.user = UserFactory()
 
         owner = Owner.objects.create(user=self.user)
-        business = Business.objects.create(
+        self.business = Business.objects.create(
             legal_name='The Test Business INC',
             trade_name='Test Business',
             cnpj=12345678901234
         )
-        owner.business = business
+        owner.business = self.business
         owner.save()
 
         self.token = AccessToken.for_user(self.user)
@@ -376,6 +382,33 @@ class PayableSearchEndpointViewTest(TestCase):
         )
         response = PayableSearchEndpoint.as_view()(request)
         self.assertEqual(response.status_code, 400)
+
+    def test_start_and_end_week_dates(self):
+        '''
+        The `?date=week` query param returns all dates in the
+        current week, starting Sunday and ending on Saturday.
+        '''
+        today = datetime.now()
+        start_date, end_date = get_start_and_end_date(today, week=True)
+        supplier = SupplierFactory.create()
+
+        PayableFactory.create_batch(
+            2,
+            business=self.business,
+            contact=supplier,
+            due_at=factory.Iterator([start_date, end_date]),
+        )
+
+        request = self.factory.get(
+            'payables/?date=week',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = PayableSearchEndpoint.as_view()(request)
+
+        payable_0001_due_date = response.data['results'][0]['payment']['due_at']
+        payable_0002_due_date = response.data['results'][1]['payment']['due_at']
+        self.assertEqual(payable_0001_due_date, start_date.strftime('%Y-%m-%d'))
+        self.assertEqual(payable_0002_due_date, end_date.strftime('%Y-%m-%d'))
 
 
 class PayablesEndpointViewTest(TestCase):

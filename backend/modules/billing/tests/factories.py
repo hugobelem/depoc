@@ -17,3 +17,20 @@ class CustomerFactory(factory.django.DjangoModelFactory):
         model = 'contacts.Customer'
 
     name = factory.Faker('name')
+
+
+class SupplierFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = 'contacts.Supplier'
+
+    legal_name = factory.Faker('name')
+
+
+class PayableFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = 'billing.Payment'
+
+    payment_type = 'payable'
+    issued_at = '2025-01-01'
+    due_at = '2025-01-01'
+    total_amount = 100
