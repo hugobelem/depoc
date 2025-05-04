@@ -62,8 +62,8 @@ def get_start_and_end_date(
     - A tuple of `datetime` objects: `(start_date, end_date)`.
     """
     if week:
-        weekday = today.weekday() + 1
-        start_date = today - timedelta(days=weekday)
+        weekday = today.weekday()
+        start_date = today - timedelta(days=weekday+1) if weekday != 6 else today
         end_date = start_date + timedelta(days=6)
     elif month:
         start_date = today.replace(day=1)

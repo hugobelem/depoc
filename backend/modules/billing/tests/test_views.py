@@ -390,8 +390,8 @@ class PayableSearchEndpointViewTest(TestCase):
         '''
         today = datetime.now()
         start_date, end_date = get_start_and_end_date(today, week=True)
-        supplier = SupplierFactory.create()
 
+        supplier = SupplierFactory.create()
         PayableFactory.create_batch(
             2,
             business=self.business,
