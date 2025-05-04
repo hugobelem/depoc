@@ -37,7 +37,7 @@ class FinancialAccountEndpoint(APIView):
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
         
-        accounts = business.financial_accounts
+        accounts = business.financial_accounts.order_by('-balance')
         if account_id:
             account = accounts.filter(id=account_id).first()
 
