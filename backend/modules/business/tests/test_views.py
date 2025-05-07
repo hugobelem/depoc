@@ -37,4 +37,15 @@ class BusinessEndpointViewTest(TestCase):
         response = BusinessEndpoint.as_view()(request)
         self.assertEqual(response.status_code, 403)
 
-    
+    def test_creating_many_business(self):
+        data = {}
+        request = self.factory.post(
+            'business',
+            data=data,
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = BusinessEndpoint.as_view()(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data['error']['message'], 'Owner has an existing business.'
+        )
