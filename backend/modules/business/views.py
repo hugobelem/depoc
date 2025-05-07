@@ -33,6 +33,11 @@ class BusinessEndpoint(APIView):
         data = request.data
         owner = request.user.owner
 
+        business, get_no_business = get_user_business(request.user)
+        if business:
+            error_response = error.builder(400, 'Owner has an existing business.')
+            return Response(error_response, status.HTTP_400_BAD_REQUEST)
+
         invalid_params = validate.params(request, BusinessSerializer)
 
         if not data or invalid_params:
