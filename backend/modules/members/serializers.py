@@ -32,7 +32,7 @@ class MemberSerializer(serializers.ModelSerializer):
                 'credential': {
                     'id': representation.pop('credential'),
                     'username': member.credential.username,
-                },
+                } if member.credential else None,
             }
         }
 
