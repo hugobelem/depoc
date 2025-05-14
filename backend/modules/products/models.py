@@ -40,6 +40,7 @@ class Product(models.Model):
         'contacts.Supplier',
         related_name='products',
         blank=True,
+        null=True,
     )
 
     cost_price = models.DecimalField(
