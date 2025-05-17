@@ -21,7 +21,13 @@ from modules.business.models import Business
 from modules.finance.models import FinancialAccount
 from modules.billing.models import Payment
 
-from .factories import UserFactory, CustomerFactory, SupplierFactory, PayableFactory
+from .factories import (
+    UserFactory,
+    CustomerFactory,
+    SupplierFactory,
+    PayableFactory,
+    ReceivableFactory
+)
 
 from shared.helpers import get_start_and_end_date
 
@@ -32,12 +38,12 @@ class ReceivableSearchEndpointViewTest(TestCase):
         self.user = UserFactory()
 
         owner = Owner.objects.create(user=self.user)
-        business = Business.objects.create(
+        self.business = Business.objects.create(
             legal_name='The Test Business INC',
             trade_name='Test Business',
             cnpj=12345678901234
         )
-        owner.business = business
+        owner.business = self.business
         owner.save()
 
         self.token = AccessToken.for_user(self.user)
@@ -77,6 +83,88 @@ class ReceivableSearchEndpointViewTest(TestCase):
         response = ReceivableSearchEndpoint.as_view()(request)
         self.assertEqual(response.status_code, 400)
 
+    def test_search_by_name(self):
+        customer = CustomerFactory.create(
+            name='Customer Name',
+            alias='Customer Alias',
+        )
+
+        ReceivableFactory.create(
+            business=self.business,
+            contact=customer,
+        )
+
+        request = self.factory.get(
+            'receivables/?search=Customer Name',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = ReceivableSearchEndpoint.as_view()(request)
+
+        receivable_contact = response.data['results'][0]['payment']['contact']
+        self.assertEqual(receivable_contact, 'Customer Name')
+
+    def test_search_by_alias(self):
+        customer = CustomerFactory.create(
+            name='Customer Name',
+            alias='Customer Alias',
+        )
+
+        ReceivableFactory.create(
+            business=self.business,
+            contact=customer,
+        )
+
+        request = self.factory.get(
+            'receivables/?search=Customer Alias',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = ReceivableSearchEndpoint.as_view()(request)
+        
+        receivable_contact = response.data['results'][0]['payment']['contact']
+        self.assertEqual(receivable_contact, 'Customer Name')
+
+    def test_search_by_reference(self):
+        customer = CustomerFactory.create(
+            name='Customer Name',
+            alias='Customer Alias',
+        )
+
+        ReceivableFactory.create(
+            business=self.business,
+            contact=customer,
+            reference='Customer Recivable Ref'
+        )
+
+        request = self.factory.get(
+            'receivables/?search=Customer Recivable Ref',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = ReceivableSearchEndpoint.as_view()(request)
+        
+        receivable_ref = response.data['results'][0]['payment']['reference']
+        self.assertEqual(receivable_ref, 'Customer Recivable Ref')
+
+    def test_search_by_notes(self):
+        customer = CustomerFactory.create(
+            name='Customer Name',
+            alias='Customer Alias',
+        )
+
+        ReceivableFactory.create(
+            business=self.business,
+            contact=customer,
+            notes='Customer Recivable Notes'
+        )
+
+        request = self.factory.get(
+            'receivables/?search=Customer Recivable Notes',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = ReceivableSearchEndpoint.as_view()(request)
+        
+        receivable_notes = response.data['results'][0]['payment']['notes']
+        self.assertEqual(receivable_notes, 'Customer Recivable Notes')
+
 
 class ReceivablesEndpointViewTest(TestCase):
     def setUp(self):
@@ -92,7 +180,9 @@ class ReceivablesEndpointViewTest(TestCase):
         )
         owner.business = business
         owner.save()
-        self.account = FinancialAccount.objects.create(name='Bank', business=business)
+        self.account = FinancialAccount.objects.create(
+            name='Bank', business=business
+        )
 
         self.token = AccessToken.for_user(self.user)
         self.auth_header = f'Bearer {self.token}'
@@ -374,6 +464,83 @@ class PayableSearchEndpointViewTest(TestCase):
         )
         response = PayableSearchEndpoint.as_view()(request)
         self.assertEqual(response.status_code, 400)
+
+    def test_search_by_legal_name(self):
+        supplier = SupplierFactory.create(
+            legal_name='Legal Name',
+            trade_name='Trade Name',
+        )
+
+        PayableFactory.create(business=self.business, contact=supplier)
+
+        request = self.factory.get(
+            'payables/?search=Legal Name',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = PayableSearchEndpoint.as_view()(request)
+        
+        payable_contact = response.data['results'][0]['payment']['contact']
+        self.assertEqual(payable_contact, 'Legal Name')
+
+    def test_search_by_trade_name(self):
+        supplier = SupplierFactory.create(
+            legal_name='Legal Name',
+            trade_name='Trade Name',
+        )
+
+        PayableFactory.create(business=self.business, contact=supplier)
+
+        request = self.factory.get(
+            'payables/?search=Trade Name',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = PayableSearchEndpoint.as_view()(request)
+        
+        payable_contact = response.data['results'][0]['payment']['contact']
+        self.assertEqual(payable_contact, 'Legal Name')
+
+    def test_search_by_reference(self):
+        supplier = SupplierFactory.create(
+            legal_name='Legal Name',
+            trade_name='Trade Name',
+        )
+
+        PayableFactory.create(
+            business=self.business,
+            contact=supplier,
+            reference='Reference Test 01',
+        )
+
+        request = self.factory.get(
+            'payables/?search=Reference Test 01',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = PayableSearchEndpoint.as_view()(request)
+        
+        payable_ref = response.data['results'][0]['payment']['reference']
+        self.assertEqual(payable_ref, 'Reference Test 01')
+
+    def test_search_by_notes(self):
+        supplier = SupplierFactory.create(
+            legal_name='Legal Name',
+            trade_name='Trade Name',
+        )
+
+        PayableFactory.create(
+            business=self.business,
+            contact=supplier,
+            notes='Payable note',
+        )
+
+        request = self.factory.get(
+            'payables/?search=Payable note',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        response = PayableSearchEndpoint.as_view()(request)
+        
+        payable_notes = response.data['results'][0]['payment']['notes']
+        self.assertEqual(payable_notes, 'Payable note')
+
 
     def test_invalid_date_format(self):
         request = self.factory.get(

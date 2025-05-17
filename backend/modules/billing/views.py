@@ -52,7 +52,9 @@ class ReceivableSearchEndpoint(APIView):
             
             payments = payments.filter(
                 Q(contact__customer__name__icontains=search) |
+                Q(contact__customer__alias__icontains=search) |
                 Q(contact__supplier__legal_name__icontains=search) |
+                Q(contact__supplier__trade_name__icontains=search) |
                 Q(reference__icontains=search) |
                 Q(notes__icontains=search)
             )
@@ -384,7 +386,9 @@ class PayableSearchEndpoint(APIView):
             
             payments = payments.filter(
                 Q(contact__customer__name__icontains=search) |
+                Q(contact__customer__alias__icontains=search) |
                 Q(contact__supplier__legal_name__icontains=search) |
+                Q(contact__supplier__trade_name__icontains=search) |
                 Q(reference__icontains=search) |
                 Q(notes__icontains=search)
             )

@@ -34,3 +34,12 @@ class PayableFactory(factory.django.DjangoModelFactory):
     issued_at = '2025-01-01'
     due_at = '2025-01-01'
     total_amount = 100
+
+class ReceivableFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = 'billing.Payment'
+
+    payment_type = 'receivable'
+    issued_at = '2025-01-01'
+    due_at = '2025-01-01'
+    total_amount = 100
