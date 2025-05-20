@@ -166,14 +166,12 @@ class ProductEndpoint(APIView):
             return Response(error_response, status.HTTP_404_NOT_FOUND)
         
         product.is_active = False
-        product.is_available = False
         product.save()
 
         data = {
             'product': {
                 'id': product.id,
                 'is_active': False,
-                'is_available': False,
             }
         }
 
