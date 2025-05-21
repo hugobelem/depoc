@@ -7,6 +7,22 @@ from .models import Product, ProductCategory, ProductCostHistory
 from modules.inventory.models import Inventory, InventoryTransaction
 
 
+def serialize_with_parents(category):
+    if category.parent:
+        return {
+            'id': category.id,
+            'name': category.name,
+            'is_active': category.is_active,
+            'parent': serialize_with_parents(category.parent)
+        }
+    return {
+        'id': category.id,
+        'name': category.name,
+        'is_active': category.is_active,
+        'parent': None
+    }
+
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -63,14 +79,9 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
 
     def to_representation(self, instance):
-        representation = super().to_representation(instance)
+        super().to_representation(instance)
         return {
-            'category': {
-                'id': representation.pop('id'),
-                'name': representation.pop('name'),
-                'parent': representation.pop('parent'),
-                'is_active': representation.pop('is_active'),
-            }
+            'category': serialize_with_parents(instance)
         }
 
 
