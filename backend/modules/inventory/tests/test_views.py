@@ -79,16 +79,18 @@ class InventoryTransactionEndpointViewTest(TestCase):
     def test_inbound_inventory_transaction(self):
         data = {'type': 'inbound', 'quantity': 3}
         request = self.factory.post(
-            'inventory/<product_id>/transactions',
+            'inventory/<inventory_id>/transactions',
             data=data,
             HTTP_AUTHORIZATION=self.auth_header,
         )
-        response = InventoryTransactionEndpoint.as_view()(
-            request,
-            product_id=self.product.id,
-        )
 
         inventory_id = self.product.inventory.id
+
+        response = InventoryTransactionEndpoint.as_view()(
+            request,
+            inventory_id=inventory_id,
+        )
+
         inventory = Inventory.objects.get(id=inventory_id)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(inventory.product.stock, 3)
@@ -96,16 +98,18 @@ class InventoryTransactionEndpointViewTest(TestCase):
     def test_outbound_inventory_transaction(self):
         data = {'type': 'outbound', 'quantity': 1}
         request = self.factory.post(
-            'inventory/<product_id>/transactions',
+            'inventory/<inventory_id>/transactions',
             data=data,
             HTTP_AUTHORIZATION=self.auth_header,
         )
-        response = InventoryTransactionEndpoint.as_view()(
-            request,
-            product_id=self.product.id,
-        )
 
         inventory_id = self.product.inventory.id
+
+        response = InventoryTransactionEndpoint.as_view()(
+            request,
+            inventory_id=inventory_id,
+        )
+
         inventory = Inventory.objects.get(id=inventory_id)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(inventory.product.stock, -1)
@@ -113,32 +117,34 @@ class InventoryTransactionEndpointViewTest(TestCase):
     def test_delete_inventory_transaction(self):
         data = {'type': 'inbound', 'quantity': 3}
         request = self.factory.post(
-            'inventory/<product_id>/transactions',
+            'inventory/<inventory_id>/transactions',
             data=data,
             HTTP_AUTHORIZATION=self.auth_header,
         )
-        response = InventoryTransactionEndpoint.as_view()(
-            request,
-            product_id=self.product.id,
-        )
-        transaction_id = response.data['transaction']['id']
 
         inventory_id = self.product.inventory.id
+
+        response = InventoryTransactionEndpoint.as_view()(
+            request,
+            inventory_id=inventory_id,
+        )
+
+        transaction_id = response.data['transaction']['id']
+
         inventory = Inventory.objects.get(id=inventory_id)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(inventory.product.stock, 3)
 
         request = self.factory.delete(
-            'inventory/<product_id>/transactions/<transaction_id>',
+            'inventory/transactions/<transaction_id>',
             HTTP_AUTHORIZATION=self.auth_header,
         )
         response = InventoryTransactionEndpoint.as_view()(
             request,
-            product_id=self.product.id,
             transaction_id=transaction_id,
         )
 
         inventory_id = self.product.inventory.id
         inventory = Inventory.objects.get(id=inventory_id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(inventory.product.stock, 0)
+        self.assertEqual(response.data['transaction']['deleted'], True)
