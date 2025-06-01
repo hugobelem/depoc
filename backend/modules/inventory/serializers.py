@@ -32,6 +32,7 @@ class InventoryTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = InventoryTransaction
         fields = '__all__'
+        read_only_fields = ['date']
 
 
     def to_representation(self, instance):
