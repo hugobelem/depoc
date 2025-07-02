@@ -4,32 +4,34 @@ A comprehensive management system built by a business owner, tailored for small 
 
 This project took shape in response to a specific need in my last brick-and-mortar store. After closing the business, I continued developing and refining the system.
 
+The system exposes a RESTful interface at the root endpoint https://api.depoc.com.br, serving as the primary access point for client interactions.
+
 ## Modules
 
-The system covers the full business workflow—from purchasing to sales and issuing Brazil’s electronic tax invoice (NFe). Proposed modules under development:
+This API aims to covers the basic business workflow. From purchasing to sales and issuing Brazil’s electronic tax invoice (NFe). Proposed modules under development:
 
-* **Inventory Management** ✅
+* **User Management with RBAC** ✅
 
-  * Track stock movements: inbound, outbound
+  * Role-based access control
 
 * **Contacts Management** ✅
 
   * Categorize contacts: customers, suppliers
 
-* **User Management with RBAC** ✅
+* **Product Management** ✅
 
-  * Role-based access control for members
+  * Track cost and price history
+  * Support hierarchical categorization
+
+* **Inventory Management** ✅
+
+  * Track stock movements: inbound, outbound
 
 * **Billing** ✅
 
   * Manage accounts payable and receivable
   * Auto-update overdue status
   * Support installments (weekly/monthly)
-
-* **Product Management** ✅
-
-  * Track cost and price history
-  * Support hierarchical categorization
 
 * **Finance** ✅
 
