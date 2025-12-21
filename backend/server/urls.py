@@ -28,7 +28,6 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             key="access_token",
             value=access_token,
             httponly=True,
-            secure=secure,
             samesite='Lax',
         )
         response.set_cookie(
