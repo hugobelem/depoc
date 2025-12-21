@@ -102,7 +102,6 @@ All API resources that may return large datasets are paginated (e.g., contacts, 
     }
 ]
 ```
-`https://api.depoc.com.br/finance/transactions`
 
 **Parameters**
 
@@ -137,6 +136,8 @@ Some API resources have support for retrieval via search parameter.
 - `search` *str*
   The search term longer the three characters.
 
+`https://api.depoc.com.br/contacts/?search=supp`
+
 ```json
 "count": 1,
 "next": null,
@@ -165,8 +166,6 @@ Some API resources have support for retrieval via search parameter.
     }
 ]
 ```
-`https://api.depoc.com.br/contacts/?search=supp`
-
 
 ## Date
 

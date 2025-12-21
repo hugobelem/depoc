@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'modules.inventory',
     'modules.billing',
     'rest_framework',
+    'corsheaders',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -84,6 +85,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 
@@ -158,6 +160,18 @@ ASGI_APPLICATION = 'server.asgi.application'
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = 'rpc://'
 
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_CRDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+]
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+ 
 # EMAIL_BACKEND = "core.mail.GmailBackend"
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER = 'hi@depoc.com.br'
 # GMAIL_SERVICE_KEY = os.environ.get('GMAIL_SERVICE_KEY')
