@@ -7,7 +7,9 @@ from rest_framework.response import Response
 
 from .settings import ENVIRONMENT
 
-secure = ENVIRONMENT != 'development'
+secure = True
+if ENVIRONMENT == 'development':
+    secure = False
 
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
