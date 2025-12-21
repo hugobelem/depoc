@@ -5,6 +5,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 
+from .settings import ENVIRONMENT
+
+secure = ENVIRONMENT != 'development'
+
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -22,7 +26,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             key="access_token",
             value=access_token,
             httponly=True,
-            secure=True,
+            secure=secure,
             samesite='Lax',
         )
         response.set_cookie(
