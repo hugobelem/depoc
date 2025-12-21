@@ -27,14 +27,14 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             value=access_token,
             httponly=True,
             secure=secure,
-            samesite='Lax',
+            samesite="None",
         )
         response.set_cookie(
             key="refresh_token",
             value=refresh_token,
             httponly=True,
             secure=secure,
-            samesite=None,
+            samesite="None",
         )
 
         return response
