@@ -161,10 +161,14 @@ CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = 'rpc://'
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ORIGINS = [
-    'https://localhost:3000',
+CORS_ALLOWED_ORIGINS = [
+    "https://localhost:3000",
 ]
- 
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost:3000",
+]
+
 # EMAIL_BACKEND = "core.mail.GmailBackend"
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER = 'hi@depoc.com.br'
 # GMAIL_SERVICE_KEY = os.environ.get('GMAIL_SERVICE_KEY')
