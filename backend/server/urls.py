@@ -27,6 +27,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             value=access_token,
             httponly=True,
             path="/",
+            max_age=3600,
             secure=secure,
             samesite="None",
         )
@@ -35,6 +36,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             value=refresh_token,
             httponly=True,
             path="/",
+            max_age=3600,
             secure=secure,
             samesite="None",
         )
