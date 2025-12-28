@@ -26,6 +26,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             key="access_token",
             value=access_token,
             httponly=True,
+            path="/",
             secure=secure,
             samesite="None",
         )
@@ -33,6 +34,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             key="refresh_token",
             value=refresh_token,
             httponly=True,
+            path="/",
             secure=secure,
             samesite="None",
         )
