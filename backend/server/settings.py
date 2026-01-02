@@ -112,7 +112,7 @@ if ENVIRONMENT == 'test':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / "db.sqlite3",
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 else:
@@ -162,50 +162,50 @@ CELERY_RESULT_BACKEND = 'rpc://'
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "https://localhost:3000",
-    "https://192.168.1.92:3000/",
+    'https://localhost:3000',
+    'https://192.168.50.125:3000',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://localhost:3000",
-    "https://192.168.1.92:3000/",
+    'https://localhost:3000',
+    'https://192.168.50.125:3000',
 ]
 
-# EMAIL_BACKEND = "core.mail.GmailBackend"
+# EMAIL_BACKEND = 'core.mail.GmailBackend'
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER = 'hi@depoc.com.br'
 # GMAIL_SERVICE_KEY = os.environ.get('GMAIL_SERVICE_KEY')
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {message}",
-            "style": "{",
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
         },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
-        },
-    },
-    "handlers": {
-        "file": {
-            "level": "ERROR",
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "logs", "django_errors.log"),
-            "formatter": "verbose",
-        },
-        "console": {
-            "level": "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
         },
     },
-    "loggers": {
-        "django": {
-            "handlers": ["file", "console"],
-            "level": "DEBUG",
-            "propagate": True,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'django_errors.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }
