@@ -8,4 +8,4 @@ class BurstRateThrottle(UserRateThrottle):
 
 class SustainedRateThrottle(UserRateThrottle):
     scope = 'sustained'
-    rate = '1000/day'
+    rate = '2000/day'
