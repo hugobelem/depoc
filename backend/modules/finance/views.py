@@ -307,9 +307,9 @@ class FinancialTransactionEndpoint(APIView):
                     error_response = error.builder(400, 'Enter at least 3 characters.')
                     return Response(error_response, status.HTTP_400_BAD_REQUEST)
                 
-                transaction = transaction.filter(
+                transactions = transactions.filter(
                     Q(account__id__exact=bank) |
-                    Q(account__iexact=bank)
+                    Q(account__name__iexact=bank)
                 )
             
             if date:
