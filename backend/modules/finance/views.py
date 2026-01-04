@@ -298,7 +298,8 @@ class FinancialTransactionEndpoint(APIView):
                 
                 transactions = transactions.filter(
                     Q(amount__startswith=search) |
-                    Q(description__icontains=search)
+                    Q(description__icontains=search) |
+                    Q(contact__icontains=search)
                 )
             
             if date:
