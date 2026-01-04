@@ -25,10 +25,6 @@ urlpatterns = [
          views.FinancialTransactionEndpoint.as_view()
     ),
     path(
-        '/transactions/',
-         views.FinancialTransactionSearchEndpoint.as_view()
-    ),
-    path(
         '/transactions/<str:transaction_id>',
         views.FinancialTransactionEndpoint.as_view()
     ),
