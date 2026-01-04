@@ -283,6 +283,7 @@ class FinancialTransactionEndpoint(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             search = request.query_params.get('search')
+            bank = request.query_params.get('bank')
             date = request.query_params.get('date')
             start_date = request.query_params.get('start_date')
             end_date = request.query_params.get('end_date')
@@ -298,8 +299,17 @@ class FinancialTransactionEndpoint(APIView):
                 
                 transactions = transactions.filter(
                     Q(amount__startswith=search) |
-                    Q(description__icontains=search) |
-                    Q(contact__icontains=search)
+                    Q(description__icontains=search)
+                )
+
+            if bank:
+                if len(search) < 3:
+                    error_response = error.builder(400, 'Enter at least 3 characters.')
+                    return Response(error_response, status.HTTP_400_BAD_REQUEST)
+                
+                transaction = transaction.filter(
+                    Q(account__id__exact=search) |
+                    Q(account__iexact=search)
                 )
             
             if date:
