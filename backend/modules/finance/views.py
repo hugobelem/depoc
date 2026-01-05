@@ -61,7 +61,11 @@ class FinancialAccountEndpoint(APIView):
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
 
-        invalid_params = validate.params(request, FinancialAccountSerializer)
+        invalid_params = validate.params(
+            request,
+            FinancialAccountSerializer,
+            remove=["balance"]
+        )
 
         if not data or invalid_params:
             message = 'Required parameter missing or invalid.'
@@ -69,6 +73,7 @@ class FinancialAccountEndpoint(APIView):
             return Response(error_response, status.HTTP_400_BAD_REQUEST)
         
         data['business'] = business.id
+        data['balance'] = 0
         serializer = FinancialAccountSerializer(data=data)
 
         if not serializer.is_valid():
@@ -89,7 +94,12 @@ class FinancialAccountEndpoint(APIView):
         if got_no_business:
             return Response(got_no_business, status.HTTP_400_BAD_REQUEST)
 
-        invalid_params = validate.params(request, FinancialAccountSerializer)
+
+        invalid_params = validate.params(
+            request,
+            FinancialAccountSerializer,
+            remove=["balance"]
+        )
 
         if not data or invalid_params:
             message = 'Required parameter missing or invalid.'
