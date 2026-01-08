@@ -3,9 +3,9 @@ from rest_framework.throttling import UserRateThrottle
 
 class BurstRateThrottle(UserRateThrottle):
     scope = 'burst'
-    rate = '60/min'
+    rate = '100/min'
 
 
 class SustainedRateThrottle(UserRateThrottle):
     scope = 'sustained'
-    rate = '3000/day'
+    rate = '4000/day'
