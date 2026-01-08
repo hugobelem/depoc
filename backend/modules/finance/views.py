@@ -309,7 +309,8 @@ class FinancialTransactionEndpoint(APIView):
                 
                 transactions = transactions.filter(
                     Q(amount__startswith=search) |
-                    Q(description__icontains=search)
+                    Q(description__icontains=search) |
+                    Q(id__exact=search)
                 )
 
             if bank:
